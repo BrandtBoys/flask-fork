@@ -28,10 +28,10 @@ jobs:
               uses: actions/setup-python@v3
               with:
                 python-version: "3.9"
-                cache: 'pip' # caching pip dependencies
+                cache: 'pip' 
             
             - name: Install dependencies
-              run: pip install -r workflow_requirements.txt #Install dependencies
+              run: pip install -r requirements.txt 
 
             - name: Install ollama
               run: curl -fsSL https://ollama.com/install.sh | sh
