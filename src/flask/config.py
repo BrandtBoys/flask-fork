@@ -41,13 +41,13 @@ class ConfigAttribute(t.Generic[T]):
         if self.get_converter is not None:
             rv = self.get_converter(rv)
 
-        return rv  # type: ignore[no-any-return]
+        return rv  
 
     def __set__(self, obj: App, value: t.Any) -> None:
         obj.config[self.__name__] = value
 
 
-class Config(dict):  # type: ignore[type-arg]
+class Config(dict):  
     """Works exactly like a dict but provides ways to fill it from files
     or special dictionaries.  There are two common patterns to populate the
     config.
@@ -150,34 +150,36 @@ class Config(dict):  # type: ignore[type-arg]
         .. versionadded:: 2.1
         """
         prefix = f"{prefix}_"
-        len_prefix = len(prefix)
 
         for key in sorted(os.environ):
             if not key.startswith(prefix):
                 continue
 
             value = os.environ[key]
+            key = key.removeprefix(prefix)
 
             try:
                 value = loads(value)
             except Exception:
-                # Keep the value as a string if loading failed.
+              # Keep the value as a string if loading failed.
+                
                 pass
 
-            # Change to key.removeprefix(prefix) on Python >= 3.9.
-            key = key[len_prefix:]
-
+          # Change to key.removeprefix(prefix) on Python >= 3.9.
             if "__" not in key:
-                # A non-nested key, set directly.
+              # A non-nested key, set directly.
+                
                 self[key] = value
                 continue
 
-            # Traverse nested dictionaries with keys separated by "__".
+          # Traverse nested dictionaries with keys separated by "__".
+            
             current = self
             *parts, tail = key.split("__")
 
             for part in parts:
-                # If an intermediate dict does not exist, create it.
+              # If an intermediate dict does not exist, create it.
+                
                 if part not in current:
                     current[part] = {}
 
