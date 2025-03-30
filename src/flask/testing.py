@@ -16,7 +16,7 @@ from werkzeug.wrappers import Request as BaseRequest
 from .cli import ScriptInfo
 from .sessions import SessionMixin
 
-if t.TYPE_CHECKING:  # pragma: no cover
+if t.TYPE_CHECKING:  
     from _typeshed.wsgi import WSGIEnvironment
     from werkzeug.test import TestResponse
 
@@ -79,13 +79,12 @@ class EnvironBuilder(werkzeug.test.EnvironBuilder):
             path = url.path
 
             if url.query:
-                sep = b"?" if isinstance(url.query, bytes) else "?"
-                path += sep + url.query
+                path = f"{path}?{url.query}"
 
         self.app = app
         super().__init__(path, base_url, *args, **kwargs)
 
-    def json_dumps(self, obj: t.Any, **kwargs: t.Any) -> str:  # type: ignore
+    def json_dumps(self, obj: t.Any, **kwargs: t.Any) -> str:  
         """Serialize ``obj`` to a JSON-formatted string.
 
         The serialization will be configured according to the config associated
@@ -213,23 +212,28 @@ class FlaskClient(Client):
         ):
             if isinstance(args[0], werkzeug.test.EnvironBuilder):
                 builder = copy(args[0])
-                builder.environ_base = self._copy_environ(builder.environ_base or {})  # type: ignore[arg-type]
+                builder.environ_base = self._copy_environ(builder.environ_base or {})  
                 request = builder.get_request()
             elif isinstance(args[0], dict):
                 request = EnvironBuilder.from_environ(
                     args[0], app=self.application, environ_base=self._copy_environ({})
                 ).get_request()
             else:
-                # isinstance(args[0], BaseRequest)
+              # isinstance(args[0], BaseRequest)
+                
                 request = copy(args[0])
                 request.environ = self._copy_environ(request.environ)
         else:
-            # request is None
+          # request is None
+            
             request = self._request_from_builder_args(args, kwargs)
 
-        # Pop any previously preserved contexts. This prevents contexts
-        # from being preserved across redirects or multiple requests
-        # within a single block.
+      # Pop any previously preserved contexts. This prevents contexts
+      # from being preserved across redirects or multiple requests
+      # within a single block.
+        
+        
+        
         self._context_stack.close()
 
         response = super().open(
@@ -237,9 +241,10 @@ class FlaskClient(Client):
             buffered=buffered,
             follow_redirects=follow_redirects,
         )
-        response.json_module = self.application.json  # type: ignore[assignment]
+        response.json_module = self.application.json  
 
-        # Re-push contexts that were preserved during the request.
+      # Re-push contexts that were preserved during the request.
+        
         while self._new_contexts:
             cm = self._new_contexts.pop()
             self._context_stack.enter_context(cm)
@@ -272,7 +277,7 @@ class FlaskCliRunner(CliRunner):
         self.app = app
         super().__init__(**kwargs)
 
-    def invoke(  # type: ignore
+    def invoke(  
         self, cli: t.Any = None, args: t.Any = None, **kwargs: t.Any
     ) -> t.Any:
         """Invokes a CLI command in an isolated environment. See

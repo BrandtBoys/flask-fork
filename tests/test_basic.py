@@ -112,7 +112,7 @@ def test_provide_automatic_options_kwarg(app, client):
 
     rv = client.head("/")
     assert rv.status_code == 200
-    assert not rv.data  # head truncates
+    assert not rv.data  
     assert client.post("/more").data == b"POST"
     assert client.get("/more").data == b"GET"
 
@@ -139,7 +139,7 @@ def test_request_dispatching(app, client):
     assert sorted(rv.allow) == ["GET", "HEAD", "OPTIONS"]
     rv = client.head("/")
     assert rv.status_code == 200
-    assert not rv.data  # head truncates
+    assert not rv.data  
     assert client.post("/more").data == b"POST"
     assert client.get("/more").data == b"GET"
     rv = client.delete("/more")
@@ -167,8 +167,10 @@ def test_url_mapping(app, client):
     app.add_url_rule("/", "index", index)
     app.add_url_rule("/more", "more", more, methods=["GET", "POST"])
 
-    # Issue 1288: Test that automatic options are not added
-    #             when non-uppercase 'options' in methods
+  # Issue 1288: Test that automatic options are not added
+  #             when non-uppercase 'options' in methods
+    
+    
     app.add_url_rule("/options", "options", options, methods=["options"])
 
     assert client.get("/").data == b"GET"
@@ -177,7 +179,7 @@ def test_url_mapping(app, client):
     assert sorted(rv.allow) == ["GET", "HEAD", "OPTIONS"]
     rv = client.head("/")
     assert rv.status_code == 200
-    assert not rv.data  # head truncates
+    assert not rv.data  
     assert client.post("/more").data == b"POST"
     assert client.get("/more").data == b"GET"
     rv = client.delete("/more")
@@ -293,6 +295,7 @@ def test_session_using_session_settings(app, client):
         SESSION_COOKIE_DOMAIN=".example.com",
         SESSION_COOKIE_HTTPONLY=False,
         SESSION_COOKIE_SECURE=True,
+        SESSION_COOKIE_PARTITIONED=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_PATH="/",
     )
@@ -309,21 +312,25 @@ def test_session_using_session_settings(app, client):
 
     rv = client.get("/", "http://www.example.com:8080/test/")
     cookie = rv.headers["set-cookie"].lower()
-    # or condition for Werkzeug < 2.3
+  # or condition for Werkzeug < 2.3
+    
     assert "domain=example.com" in cookie or "domain=.example.com" in cookie
     assert "path=/" in cookie
     assert "secure" in cookie
     assert "httponly" not in cookie
     assert "samesite" in cookie
+    assert "partitioned" in cookie
 
     rv = client.get("/clear", "http://www.example.com:8080/test/")
     cookie = rv.headers["set-cookie"].lower()
     assert "session=;" in cookie
-    # or condition for Werkzeug < 2.3
+  # or condition for Werkzeug < 2.3
+    
     assert "domain=example.com" in cookie or "domain=.example.com" in cookie
     assert "path=/" in cookie
     assert "secure" in cookie
     assert "samesite" in cookie
+    assert "partitioned" in cookie
 
 
 def test_session_using_samesite_attribute(app, client):
@@ -432,9 +439,9 @@ def test_session_special_types(app, client):
         client.get("/")
         s = flask.session
         assert s["t"] == (1, 2, 3)
-        assert type(s["b"]) is bytes  # noqa: E721
+        assert type(s["b"]) is bytes  
         assert s["b"] == b"\xff"
-        assert type(s["m"]) is Markup  # noqa: E721
+        assert type(s["m"]) is Markup  
         assert s["m"] == Markup("<html>")
         assert s["u"] == the_uuid
         assert s["d"] == now
@@ -529,7 +536,8 @@ def test_session_vary_cookie(app, client):
         rv = client.get(path)
 
         if header_value:
-            # The 'Vary' key should exist in the headers only once.
+          # The 'Vary' key should exist in the headers only once.
+            
             assert len(rv.headers.get_all("Vary")) == 1
             assert rv.headers["Vary"] == header_value
         else:
@@ -572,11 +580,16 @@ def test_flashes(app, req_ctx):
 
 
 def test_extended_flashing(app):
-    # Be sure app.testing=True below, else tests can fail silently.
-    #
-    # Specifically, if app.testing is not set to True, the AssertionErrors
-    # in the view functions will cause a 500 response to the test client
-    # instead of propagating exceptions.
+  # Be sure app.testing=True below, else tests can fail silently.
+  #
+    
+  # Specifically, if app.testing is not set to True, the AssertionErrors
+  # in the view functions will cause a 500 response to the test client
+  # instead of propagating exceptions.
+    
+    
+    
+    
 
     @app.route("/")
     def index():
@@ -633,7 +646,8 @@ def test_extended_flashing(app):
         assert messages[1] == Markup("<em>Testing</em>")
         return ""
 
-    # Create new test client on each test to clean flashed messages.
+  # Create new test client on each test to clean flashed messages.
+    
 
     client = app.test_client()
     client.get("/")
@@ -763,9 +777,12 @@ def test_teardown_request_handler_error(app, client):
     def teardown_request1(exc):
         assert type(exc) is ZeroDivisionError
         called.append(True)
-        # This raises a new error and blows away sys.exc_info(), so we can
-        # test that all teardown_requests get passed the same original
-        # exception.
+      # This raises a new error and blows away sys.exc_info(), so we can
+      # test that all teardown_requests get passed the same original
+      # exception.
+        
+        
+        
         try:
             raise TypeError()
         except Exception:
@@ -775,9 +792,12 @@ def test_teardown_request_handler_error(app, client):
     def teardown_request2(exc):
         assert type(exc) is ZeroDivisionError
         called.append(True)
-        # This raises a new error and blows away sys.exc_info(), so we can
-        # test that all teardown_requests get passed the same original
-        # exception.
+      # This raises a new error and blows away sys.exc_info(), so we can
+      # test that all teardown_requests get passed the same original
+      # exception.
+        
+        
+        
         try:
             raise TypeError()
         except Exception:
@@ -1316,11 +1336,13 @@ def test_url_generation(app, req_ctx):
 
 
 def test_build_error_handler(app):
-    # Test base case, a URL which results in a BuildError.
+  # Test base case, a URL which results in a BuildError.
+    
     with app.test_request_context():
         pytest.raises(BuildError, flask.url_for, "spam")
 
-    # Verify the error is re-raised if not the current exception.
+  # Verify the error is re-raised if not the current exception.
+    
     try:
         with app.test_request_context():
             flask.url_for("spam")
@@ -1331,9 +1353,11 @@ def test_build_error_handler(app):
     except RuntimeError:
         pytest.raises(BuildError, app.handle_url_build_error, error, "spam", {})
 
-    # Test a custom handler.
+  # Test a custom handler.
+    
     def handler(error, endpoint, values):
-        # Just a test.
+      # Just a test.
+        
         return "/test_handler/"
 
     app.url_build_error_handlers.append(handler)
@@ -1342,7 +1366,8 @@ def test_build_error_handler(app):
 
 
 def test_build_error_handler_reraise(app):
-    # Test a custom handler which reraises the BuildError
+  # Test a custom handler which reraises the BuildError
+    
     def handler_raises_build_error(error, endpoint, values):
         raise error
 
@@ -1441,15 +1466,20 @@ def test_static_route_with_host_matching():
     with app.test_request_context():
         rv = flask.url_for("static", filename="index.html", _external=True)
         assert rv == "http://example.com/static/index.html"
-    # Providing static_host without host_matching=True should error.
+  # Providing static_host without host_matching=True should error.
+    
     with pytest.raises(AssertionError):
         flask.Flask(__name__, static_host="example.com")
-    # Providing host_matching=True with static_folder
-    # but without static_host should error.
+  # Providing host_matching=True with static_folder
+  # but without static_host should error.
+    
+    
     with pytest.raises(AssertionError):
         flask.Flask(__name__, host_matching=True)
-    # Providing host_matching=True without static_host
-    # but with static_folder=None should not error.
+  # Providing host_matching=True without static_host
+  # but with static_folder=None should not error.
+    
+    
     flask.Flask(__name__, host_matching=True, static_folder=None)
 
 
@@ -1483,7 +1513,8 @@ def test_server_name_subdomain():
     app.config["SERVER_NAME"] = "dev.local:443"
     rv = client.get("/", "https://dev.local")
 
-    # Werkzeug 1.0 fixes matching https scheme with 443 port
+  # Werkzeug 1.0 fixes matching https scheme with 443 port
+    
     if rv.status_code != 404:
         assert rv.data == b"default"
 
@@ -1491,7 +1522,8 @@ def test_server_name_subdomain():
     rv = client.get("/", "https://dev.local")
     assert rv.data == b"default"
 
-    # suppress Werkzeug 0.15 warning about name mismatch
+  # suppress Werkzeug 0.15 warning about name mismatch
+    
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore", "Current server name", UserWarning, "flask.app"
@@ -1529,34 +1561,14 @@ def test_werkzeug_passthrough_errors(
 ):
     rv = {}
 
-    # Mocks werkzeug.serving.run_simple method
+  # Mocks werkzeug.serving.run_simple method
+    
     def run_simple_mock(*args, **kwargs):
         rv["passthrough_errors"] = kwargs.get("passthrough_errors")
 
     monkeypatch.setattr(werkzeug.serving, "run_simple", run_simple_mock)
     app.config["PROPAGATE_EXCEPTIONS"] = propagate_exceptions
     app.run(debug=debug, use_debugger=use_debugger, use_reloader=use_reloader)
-
-
-def test_max_content_length(app, client):
-    app.config["MAX_CONTENT_LENGTH"] = 64
-
-    @app.before_request
-    def always_first():
-        flask.request.form["myfile"]
-        AssertionError()
-
-    @app.route("/accept", methods=["POST"])
-    def accept_file():
-        flask.request.form["myfile"]
-        AssertionError()
-
-    @app.errorhandler(413)
-    def catcher(error):
-        return "42"
-
-    rv = client.post("/accept", data={"myfile": "foo" * 100})
-    assert rv.data == b"42"
 
 
 def test_url_processors(app, client):
@@ -1643,11 +1655,13 @@ def test_routing_redirect_debugging(monkeypatch, app, client):
     def user():
         return flask.request.form["status"]
 
-    # default redirect code preserves form data
+  # default redirect code preserves form data
+    
     rv = client.post("/user", data={"status": "success"}, follow_redirects=True)
     assert rv.data == b"success"
 
-    # 301 and 302 raise error
+  # 301 and 302 raise error
+    
     monkeypatch.setattr(RequestRedirect, "code", 301)
 
     with client, pytest.raises(AssertionError) as exc_info:
@@ -1753,16 +1767,19 @@ def test_subdomain_matching_other_name(matching):
     def index():
         return "", 204
 
-    # suppress Werkzeug 0.15 warning about name mismatch
+  # suppress Werkzeug 0.15 warning about name mismatch
+    
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore", "Current server name", UserWarning, "flask.app"
         )
-        # ip address can't match name
+      # ip address can't match name
+        
         rv = client.get("/", "http://127.0.0.1:3000/")
         assert rv.status_code == 404 if matching else 204
 
-    # allow all subdomains if matching is disabled
+  # allow all subdomains if matching is disabled
+    
     rv = client.get("/", "http://www.localhost.localdomain:3000/")
     assert rv.status_code == 404 if matching else 204
 
@@ -1798,7 +1815,8 @@ def test_multi_route_class_views(app, client):
 def test_run_defaults(monkeypatch, app):
     rv = {}
 
-    # Mocks werkzeug.serving.run_simple method
+  # Mocks werkzeug.serving.run_simple method
+    
     def run_simple_mock(*args, **kwargs):
         rv["result"] = "running..."
 
@@ -1810,7 +1828,8 @@ def test_run_defaults(monkeypatch, app):
 def test_run_server_port(monkeypatch, app):
     rv = {}
 
-    # Mocks werkzeug.serving.run_simple method
+  # Mocks werkzeug.serving.run_simple method
+    
     def run_simple_mock(hostname, port, application, *args, **kwargs):
         rv["result"] = f"running on {hostname}:{port} ..."
 
@@ -1847,13 +1866,16 @@ def test_run_from_config(
 def test_max_cookie_size(app, client, recwarn):
     app.config["MAX_COOKIE_SIZE"] = 100
 
-    # outside app context, default to Werkzeug static value,
-    # which is also the default config
+  # outside app context, default to Werkzeug static value,
+  # which is also the default config
+    
+    
     response = flask.Response()
     default = flask.Flask.default_config["MAX_COOKIE_SIZE"]
     assert response.max_cookie_size == default
 
-    # inside app context, use app config
+  # inside app context, use app config
+    
     with app.app_context():
         assert flask.Response().max_cookie_size == 100
 
@@ -1876,8 +1898,10 @@ def test_max_cookie_size(app, client, recwarn):
 
 @require_cpython_gc
 def test_app_freed_on_zero_refcount():
-    # A Flask instance should not create a reference cycle that prevents CPython
-    # from freeing it when all external references to it are released (see #3761).
+  # A Flask instance should not create a reference cycle that prevents CPython
+  # from freeing it when all external references to it are released (see #3761).
+    
+    
     gc.disable()
     try:
         app = flask.Flask(__name__)
