@@ -20,7 +20,7 @@ from .globals import request_ctx
 from .globals import session
 from .signals import message_flashed
 
-if t.TYPE_CHECKING:  # pragma: no cover
+if t.TYPE_CHECKING:  
     from .wrappers import Response
 
 
@@ -96,14 +96,14 @@ def stream_with_context(
     .. versionadded:: 0.9
     """
     try:
-        gen = iter(generator_or_function)  # type: ignore[arg-type]
+        gen = iter(generator_or_function)  
     except TypeError:
 
         def decorator(*args: t.Any, **kwargs: t.Any) -> t.Any:
-            gen = generator_or_function(*args, **kwargs)  # type: ignore[operator]
+            gen = generator_or_function(*args, **kwargs)  
             return stream_with_context(gen)
 
-        return update_wrapper(decorator, generator_or_function)  # type: ignore[arg-type]
+        return update_wrapper(decorator, generator_or_function)  
 
     def generator() -> t.Iterator[t.AnyStr | None]:
         ctx = _cv_request.get(None)
@@ -113,27 +113,37 @@ def stream_with_context(
                 " context is active, such as in a view function."
             )
         with ctx:
-            # Dummy sentinel.  Has to be inside the context block or we're
-            # not actually keeping the context around.
+          # Dummy sentinel.  Has to be inside the context block or we're
+          # not actually keeping the context around.
+            
+            
             yield None
 
-            # The try/finally is here so that if someone passes a WSGI level
-            # iterator in we're still running the cleanup logic.  Generators
-            # don't need that because they are closed on their destruction
-            # automatically.
+          # The try/finally is here so that if someone passes a WSGI level
+          # iterator in we're still running the cleanup logic.  Generators
+          # don't need that because they are closed on their destruction
+          # automatically.
+            
+            
+            
+            
             try:
                 yield from gen
             finally:
                 if hasattr(gen, "close"):
                     gen.close()
 
-    # The trick is to start the generator.  Then the code execution runs until
-    # the first dummy None is yielded at which point the context was already
-    # pushed.  This item is discarded.  Then when the iteration continues the
-    # real generator is executed.
+  # The trick is to start the generator.  Then the code execution runs until
+  # the first dummy None is yielded at which point the context was already
+  # pushed.  This item is discarded.  Then when the iteration continues the
+  # real generator is executed.
+    
+    
+    
+    
     wrapped_g = generator()
     next(wrapped_g)
-    return wrapped_g  # type: ignore[return-value]
+    return wrapped_g  
 
 
 def make_response(*args: t.Any) -> Response:
@@ -323,17 +333,24 @@ def flash(message: str, category: str = "message") -> None:
                      messages and ``'warning'`` for warnings.  However any
                      kind of string can be used as category.
     """
-    # Original implementation:
-    #
-    #     session.setdefault('_flashes', []).append((category, message))
-    #
-    # This assumed that changes made to mutable structures in the session are
-    # always in sync with the session object, which is not true for session
-    # implementations that use external storage for keeping their keys/values.
+  # Original implementation:
+  #
+    
+  #     session.setdefault('_flashes', []).append((category, message))
+  #
+    
+  # This assumed that changes made to mutable structures in the session are
+  # always in sync with the session object, which is not true for session
+  # implementations that use external storage for keeping their keys/values.
+    
+    
+    
+    
+    
     flashes = session.get("_flashes", [])
     flashes.append((category, message))
     session["_flashes"] = flashes
-    app = current_app._get_current_object()  # type: ignore
+    app = current_app._get_current_object()  
     message_flashed.send(
         app,
         _async_wrapper=app.ensure_sync,
@@ -392,7 +409,7 @@ def _prepare_send_file_kwargs(**kwargs: t.Any) -> dict[str, t.Any]:
         environ=request.environ,
         use_x_sendfile=current_app.config["USE_X_SENDFILE"],
         response_class=current_app.response_class,
-        _root_path=current_app.root_path,  # type: ignore
+        _root_path=current_app.root_path,  
     )
     return kwargs
 
@@ -508,7 +525,7 @@ def send_file(
 
     .. versionadded:: 0.2
     """
-    return werkzeug.utils.send_file(  # type: ignore[return-value]
+    return werkzeug.utils.send_file(  
         **_prepare_send_file_kwargs(
             path_or_file=path_or_file,
             environ=request.environ,
@@ -547,7 +564,8 @@ def send_from_directory(
     raises a 404 :exc:`~werkzeug.exceptions.NotFound` error.
 
     :param directory: The directory that ``path`` must be located under,
-        relative to the current application's root path.
+        relative to the current application's root path. This *must not*
+        be a value provided by the client, otherwise it becomes insecure.
     :param path: The path to the file to send, relative to
         ``directory``.
     :param kwargs: Arguments to pass to :func:`send_file`.
@@ -561,7 +579,7 @@ def send_from_directory(
 
     .. versionadded:: 0.5
     """
-    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]
+    return werkzeug.utils.send_from_directory(  
         directory, path, **_prepare_send_file_kwargs(**kwargs)
     )
 
@@ -575,13 +593,15 @@ def get_root_path(import_name: str) -> str:
 
     :meta private:
     """
-    # Module already imported and has a file attribute. Use that first.
+  # Module already imported and has a file attribute. Use that first.
+    
     mod = sys.modules.get(import_name)
 
     if mod is not None and hasattr(mod, "__file__") and mod.__file__ is not None:
         return os.path.dirname(os.path.abspath(mod.__file__))
 
-    # Next attempt: check the loader.
+  # Next attempt: check the loader.
+    
     try:
         spec = importlib.util.find_spec(import_name)
 
@@ -592,23 +612,30 @@ def get_root_path(import_name: str) -> str:
     else:
         loader = spec.loader
 
-    # Loader does not exist or we're referring to an unloaded main
-    # module or a main module without path (interactive sessions), go
-    # with the current working directory.
+  # Loader does not exist or we're referring to an unloaded main
+  # module or a main module without path (interactive sessions), go
+  # with the current working directory.
+    
+    
+    
     if loader is None:
         return os.getcwd()
 
     if hasattr(loader, "get_filename"):
         filepath = loader.get_filename(import_name)
     else:
-        # Fall back to imports.
+      # Fall back to imports.
+        
         __import__(import_name)
         mod = sys.modules[import_name]
         filepath = getattr(mod, "__file__", None)
 
-        # If we don't have a file path it might be because it is a
-        # namespace package. In this case pick the root path from the
-        # first module that is contained in the package.
+      # If we don't have a file path it might be because it is a
+      # namespace package. In this case pick the root path from the
+      # first module that is contained in the package.
+        
+        
+        
         if filepath is None:
             raise RuntimeError(
                 "No root path can be found for the provided module"
@@ -619,8 +646,9 @@ def get_root_path(import_name: str) -> str:
                 " provided."
             )
 
-    # filepath is import_name.py for a module, or __init__.py for a package.
-    return os.path.dirname(os.path.abspath(filepath))  # type: ignore[no-any-return]
+  # filepath is import_name.py for a module, or __init__.py for a package.
+    
+    return os.path.dirname(os.path.abspath(filepath))  
 
 
 @lru_cache(maxsize=None)
