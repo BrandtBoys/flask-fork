@@ -33,7 +33,7 @@ from .scaffold import find_package
 from .scaffold import Scaffold
 from .scaffold import setupmethod
 
-if t.TYPE_CHECKING:  # pragma: no cover
+if t.TYPE_CHECKING:  
     from werkzeug.wrappers import Response as BaseResponse
 
     from ..testing import FlaskClient
@@ -153,78 +153,135 @@ class App(Scaffold):
         automatically, such as for namespace packages.
     """
 
-    #: The class of the object assigned to :attr:`aborter`, created by
-    #: :meth:`create_aborter`. That object is called by
-    #: :func:`flask.abort` to raise HTTP errors, and can be
-    #: called directly as well.
-    #:
-    #: Defaults to :class:`werkzeug.exceptions.Aborter`.
-    #:
-    #: .. versionadded:: 2.2
+  #: The class of the object assigned to :attr:`aborter`, created by
+  #: :meth:`create_aborter`. That object is called by
+  #: :func:`flask.abort` to raise HTTP errors, and can be
+  #: called directly as well.
+  #:
+    
+  #: Defaults to :class:`werkzeug.exceptions.Aborter`.
+  #:
+    
+  #: .. versionadded:: 2.2
+    
+    
+    
+    
+    
+    
     aborter_class = Aborter
 
-    #: The class that is used for the Jinja environment.
-    #:
-    #: .. versionadded:: 0.11
+  #: The class that is used for the Jinja environment.
+  #:
+    
+  #: .. versionadded:: 0.11
+    
+    
     jinja_environment = Environment
 
-    #: The class that is used for the :data:`~flask.g` instance.
-    #:
-    #: Example use cases for a custom class:
-    #:
-    #: 1. Store arbitrary attributes on flask.g.
-    #: 2. Add a property for lazy per-request database connectors.
-    #: 3. Return None instead of AttributeError on unexpected attributes.
-    #: 4. Raise exception if an unexpected attr is set, a "controlled" flask.g.
-    #:
-    #: In Flask 0.9 this property was called `request_globals_class` but it
-    #: was changed in 0.10 to :attr:`app_ctx_globals_class` because the
-    #: flask.g object is now application context scoped.
-    #:
-    #: .. versionadded:: 0.10
+  #: The class that is used for the :data:`~flask.g` instance.
+  #:
+    
+  #: Example use cases for a custom class:
+  #:
+    
+  #: 1. Store arbitrary attributes on flask.g.
+  #: 2. Add a property for lazy per-request database connectors.
+  #: 3. Return None instead of AttributeError on unexpected attributes.
+  #: 4. Raise exception if an unexpected attr is set, a "controlled" flask.g.
+  #:
+    
+  #: In Flask 0.9 this property was called `request_globals_class` but it
+  #: was changed in 0.10 to :attr:`app_ctx_globals_class` because the
+  #: flask.g object is now application context scoped.
+  #:
+    
+  #: .. versionadded:: 0.10
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     app_ctx_globals_class = _AppCtxGlobals
 
-    #: The class that is used for the ``config`` attribute of this app.
-    #: Defaults to :class:`~flask.Config`.
-    #:
-    #: Example use cases for a custom class:
-    #:
-    #: 1. Default values for certain config options.
-    #: 2. Access to config values through attributes in addition to keys.
-    #:
-    #: .. versionadded:: 0.11
+  #: The class that is used for the ``config`` attribute of this app.
+  #: Defaults to :class:`~flask.Config`.
+  #:
+    
+  #: Example use cases for a custom class:
+  #:
+    
+  #: 1. Default values for certain config options.
+  #: 2. Access to config values through attributes in addition to keys.
+  #:
+    
+  #: .. versionadded:: 0.11
+    
+    
+    
+    
+    
+    
     config_class = Config
 
-    #: The testing flag.  Set this to ``True`` to enable the test mode of
-    #: Flask extensions (and in the future probably also Flask itself).
-    #: For example this might activate test helpers that have an
-    #: additional runtime cost which should not be enabled by default.
-    #:
-    #: If this is enabled and PROPAGATE_EXCEPTIONS is not changed from the
-    #: default it's implicitly enabled.
-    #:
-    #: This attribute can also be configured from the config with the
-    #: ``TESTING`` configuration key.  Defaults to ``False``.
+  #: The testing flag.  Set this to ``True`` to enable the test mode of
+  #: Flask extensions (and in the future probably also Flask itself).
+  #: For example this might activate test helpers that have an
+  #: additional runtime cost which should not be enabled by default.
+  #:
+    
+  #: If this is enabled and PROPAGATE_EXCEPTIONS is not changed from the
+  #: default it's implicitly enabled.
+  #:
+    
+  #: This attribute can also be configured from the config with the
+  #: ``TESTING`` configuration key.  Defaults to ``False``.
+    
+    
+    
+    
+    
+    
+    
+    
     testing = ConfigAttribute[bool]("TESTING")
 
-    #: If a secret key is set, cryptographic components can use this to
-    #: sign cookies and other things. Set this to a complex random value
-    #: when you want to use the secure cookie for instance.
-    #:
-    #: This attribute can also be configured from the config with the
-    #: :data:`SECRET_KEY` configuration key. Defaults to ``None``.
+  #: If a secret key is set, cryptographic components can use this to
+  #: sign cookies and other things. Set this to a complex random value
+  #: when you want to use the secure cookie for instance.
+  #:
+    
+  #: This attribute can also be configured from the config with the
+  #: :data:`SECRET_KEY` configuration key. Defaults to ``None``.
+    
+    
+    
+    
+    
     secret_key = ConfigAttribute[t.Union[str, bytes, None]]("SECRET_KEY")
 
-    #: A :class:`~datetime.timedelta` which is used to set the expiration
-    #: date of a permanent session.  The default is 31 days which makes a
-    #: permanent session survive for roughly one month.
-    #:
-    #: This attribute can also be configured from the config with the
-    #: ``PERMANENT_SESSION_LIFETIME`` configuration key.  Defaults to
-    #: ``timedelta(days=31)``
+  #: A :class:`~datetime.timedelta` which is used to set the expiration
+  #: date of a permanent session.  The default is 31 days which makes a
+  #: permanent session survive for roughly one month.
+  #:
+    
+  #: This attribute can also be configured from the config with the
+  #: ``PERMANENT_SESSION_LIFETIME`` configuration key.  Defaults to
+  #: ``timedelta(days=31)``
+    
+    
+    
+    
+    
+    
     permanent_session_lifetime = ConfigAttribute[timedelta](
         "PERMANENT_SESSION_LIFETIME",
-        get_converter=_make_timedelta,  # type: ignore[arg-type]
+        get_converter=_make_timedelta,  
     )
 
     json_provider_class: type[JSONProvider] = DefaultJSONProvider
@@ -239,41 +296,68 @@ class App(Scaffold):
     .. versionadded:: 2.2
     """
 
-    #: Options that are passed to the Jinja environment in
-    #: :meth:`create_jinja_environment`. Changing these options after
-    #: the environment is created (accessing :attr:`jinja_env`) will
-    #: have no effect.
-    #:
-    #: .. versionchanged:: 1.1.0
-    #:     This is a ``dict`` instead of an ``ImmutableDict`` to allow
-    #:     easier configuration.
-    #:
+  #: Options that are passed to the Jinja environment in
+  #: :meth:`create_jinja_environment`. Changing these options after
+  #: the environment is created (accessing :attr:`jinja_env`) will
+  #: have no effect.
+  #:
+    
+  #: .. versionchanged:: 1.1.0
+  #:     This is a ``dict`` instead of an ``ImmutableDict`` to allow
+  #:     easier configuration.
+  #:
+    
+    
+    
+    
+    
+    
+    
+    
     jinja_options: dict[str, t.Any] = {}
 
-    #: The rule object to use for URL rules created.  This is used by
-    #: :meth:`add_url_rule`.  Defaults to :class:`werkzeug.routing.Rule`.
-    #:
-    #: .. versionadded:: 0.7
+  #: The rule object to use for URL rules created.  This is used by
+  #: :meth:`add_url_rule`.  Defaults to :class:`werkzeug.routing.Rule`.
+  #:
+    
+  #: .. versionadded:: 0.7
+    
+    
+    
     url_rule_class = Rule
 
-    #: The map object to use for storing the URL rules and routing
-    #: configuration parameters. Defaults to :class:`werkzeug.routing.Map`.
-    #:
-    #: .. versionadded:: 1.1.0
+  #: The map object to use for storing the URL rules and routing
+  #: configuration parameters. Defaults to :class:`werkzeug.routing.Map`.
+  #:
+    
+  #: .. versionadded:: 1.1.0
+    
+    
+    
     url_map_class = Map
 
-    #: The :meth:`test_client` method creates an instance of this test
-    #: client class. Defaults to :class:`~flask.testing.FlaskClient`.
-    #:
-    #: .. versionadded:: 0.7
+  #: The :meth:`test_client` method creates an instance of this test
+  #: client class. Defaults to :class:`~flask.testing.FlaskClient`.
+  #:
+    
+  #: .. versionadded:: 0.7
+    
+    
+    
     test_client_class: type[FlaskClient] | None = None
 
-    #: The :class:`~click.testing.CliRunner` subclass, by default
-    #: :class:`~flask.testing.FlaskCliRunner` that is used by
-    #: :meth:`test_cli_runner`. Its ``__init__`` method should take a
-    #: Flask app object as the first argument.
-    #:
-    #: .. versionadded:: 1.0
+  #: The :class:`~click.testing.CliRunner` subclass, by default
+  #: :class:`~flask.testing.FlaskCliRunner` that is used by
+  #: :meth:`test_cli_runner`. Its ``__init__`` method should take a
+  #: Flask app object as the first argument.
+  #:
+    
+  #: .. versionadded:: 1.0
+    
+    
+    
+    
+    
     test_cli_runner_class: type[FlaskCliRunner] | None = None
 
     default_config: dict[str, t.Any]
@@ -308,22 +392,34 @@ class App(Scaffold):
                 " A relative path was given instead."
             )
 
-        #: Holds the path to the instance folder.
-        #:
-        #: .. versionadded:: 0.8
+      #: Holds the path to the instance folder.
+      #:
+        
+      #: .. versionadded:: 0.8
+        
+        
         self.instance_path = instance_path
 
-        #: The configuration dictionary as :class:`Config`.  This behaves
-        #: exactly like a regular dictionary but supports additional methods
-        #: to load a config from files.
+      #: The configuration dictionary as :class:`Config`.  This behaves
+      #: exactly like a regular dictionary but supports additional methods
+      #: to load a config from files.
+        
+        
+        
         self.config = self.make_config(instance_relative_config)
 
-        #: An instance of :attr:`aborter_class` created by
-        #: :meth:`make_aborter`. This is called by :func:`flask.abort`
-        #: to raise HTTP errors, and can be called directly as well.
-        #:
-        #: .. versionadded:: 2.2
-        #:     Moved from ``flask.abort``, which calls this object.
+      #: An instance of :attr:`aborter_class` created by
+      #: :meth:`make_aborter`. This is called by :func:`flask.abort`
+      #: to raise HTTP errors, and can be called directly as well.
+      #:
+        
+      #: .. versionadded:: 2.2
+      #:     Moved from ``flask.abort``, which calls this object.
+        
+        
+        
+        
+        
         self.aborter = self.make_aborter()
 
         self.json: JSONProvider = self.json_provider_class(self)
@@ -342,72 +438,122 @@ class App(Scaffold):
         .. versionadded:: 2.2
         """
 
-        #: A list of functions that are called by
-        #: :meth:`handle_url_build_error` when :meth:`.url_for` raises a
-        #: :exc:`~werkzeug.routing.BuildError`. Each function is called
-        #: with ``error``, ``endpoint`` and ``values``. If a function
-        #: returns ``None`` or raises a ``BuildError``, it is skipped.
-        #: Otherwise, its return value is returned by ``url_for``.
-        #:
-        #: .. versionadded:: 0.9
+      #: A list of functions that are called by
+      #: :meth:`handle_url_build_error` when :meth:`.url_for` raises a
+      #: :exc:`~werkzeug.routing.BuildError`. Each function is called
+      #: with ``error``, ``endpoint`` and ``values``. If a function
+      #: returns ``None`` or raises a ``BuildError``, it is skipped.
+      #: Otherwise, its return value is returned by ``url_for``.
+      #:
+        
+      #: .. versionadded:: 0.9
+        
+        
+        
+        
+        
+        
+        
         self.url_build_error_handlers: list[
             t.Callable[[Exception, str, dict[str, t.Any]], str]
         ] = []
 
-        #: A list of functions that are called when the application context
-        #: is destroyed.  Since the application context is also torn down
-        #: if the request ends this is the place to store code that disconnects
-        #: from databases.
-        #:
-        #: .. versionadded:: 0.9
+      #: A list of functions that are called when the application context
+      #: is destroyed.  Since the application context is also torn down
+      #: if the request ends this is the place to store code that disconnects
+      #: from databases.
+      #:
+        
+      #: .. versionadded:: 0.9
+        
+        
+        
+        
+        
         self.teardown_appcontext_funcs: list[ft.TeardownCallable] = []
 
-        #: A list of shell context processor functions that should be run
-        #: when a shell context is created.
-        #:
-        #: .. versionadded:: 0.11
+      #: A list of shell context processor functions that should be run
+      #: when a shell context is created.
+      #:
+        
+      #: .. versionadded:: 0.11
+        
+        
+        
         self.shell_context_processors: list[ft.ShellContextProcessorCallable] = []
 
-        #: Maps registered blueprint names to blueprint objects. The
-        #: dict retains the order the blueprints were registered in.
-        #: Blueprints can be registered multiple times, this dict does
-        #: not track how often they were attached.
-        #:
-        #: .. versionadded:: 0.7
+      #: Maps registered blueprint names to blueprint objects. The
+      #: dict retains the order the blueprints were registered in.
+      #: Blueprints can be registered multiple times, this dict does
+      #: not track how often they were attached.
+      #:
+        
+      #: .. versionadded:: 0.7
+        
+        
+        
+        
+        
         self.blueprints: dict[str, Blueprint] = {}
 
-        #: a place where extensions can store application specific state.  For
-        #: example this is where an extension could store database engines and
-        #: similar things.
-        #:
-        #: The key must match the name of the extension module. For example in
-        #: case of a "Flask-Foo" extension in `flask_foo`, the key would be
-        #: ``'foo'``.
-        #:
-        #: .. versionadded:: 0.7
+      #: a place where extensions can store application specific state.  For
+      #: example this is where an extension could store database engines and
+      #: similar things.
+      #:
+        
+      #: The key must match the name of the extension module. For example in
+      #: case of a "Flask-Foo" extension in `flask_foo`, the key would be
+      #: ``'foo'``.
+      #:
+        
+      #: .. versionadded:: 0.7
+        
+        
+        
+        
+        
+        
+        
         self.extensions: dict[str, t.Any] = {}
 
-        #: The :class:`~werkzeug.routing.Map` for this instance.  You can use
-        #: this to change the routing converters after the class was created
-        #: but before any routes are connected.  Example::
-        #:
-        #:    from werkzeug.routing import BaseConverter
-        #:
-        #:    class ListConverter(BaseConverter):
-        #:        def to_python(self, value):
-        #:            return value.split(',')
-        #:        def to_url(self, values):
-        #:            return ','.join(super(ListConverter, self).to_url(value)
-        #:                            for value in values)
-        #:
-        #:    app = Flask(__name__)
-        #:    app.url_map.converters['list'] = ListConverter
+      #: The :class:`~werkzeug.routing.Map` for this instance.  You can use
+      #: this to change the routing converters after the class was created
+      #: but before any routes are connected.  Example::
+      #:
+        
+      #:    from werkzeug.routing import BaseConverter
+      #:
+        
+      #:    class ListConverter(BaseConverter):
+      #:        def to_python(self, value):
+      #:            return value.split(',')
+      #:        def to_url(self, values):
+      #:            return ','.join(super(ListConverter, self).to_url(value)
+      #:                            for value in values)
+      #:
+        
+      #:    app = Flask(__name__)
+      #:    app.url_map.converters['list'] = ListConverter
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         self.url_map = self.url_map_class(host_matching=host_matching)
 
         self.subdomain_matching = subdomain_matching
 
-        # tracks internally if the application already handled at least one
-        # request.
+      # tracks internally if the application already handled at least one
+      # request.
+        
+        
         self._got_first_request = False
 
     def _check_setup_finished(self, f_name: str) -> None:
@@ -423,7 +569,7 @@ class App(Scaffold):
             )
 
     @cached_property
-    def name(self) -> str:  # type: ignore
+    def name(self) -> str:  
         """The name of the application.  This is usually the import name
         with the difference that it's guessed from the run file if the
         import name is main.  This name is used as a display name when
@@ -557,7 +703,7 @@ class App(Scaffold):
 
         Default: ``False``
         """
-        return self.config["DEBUG"]  # type: ignore[no-any-return]
+        return self.config["DEBUG"]  
 
     @debug.setter
     def debug(self, value: bool) -> None:
@@ -611,13 +757,16 @@ class App(Scaffold):
         **options: t.Any,
     ) -> None:
         if endpoint is None:
-            endpoint = _endpoint_from_view_func(view_func)  # type: ignore
+            endpoint = _endpoint_from_view_func(view_func)  
         options["endpoint"] = endpoint
         methods = options.pop("methods", None)
 
-        # if the methods are not given and the view_func object knows its
-        # methods we can use that instead.  If neither exists, we go with
-        # a tuple of only ``GET`` as default.
+      # if the methods are not given and the view_func object knows its
+      # methods we can use that instead.  If neither exists, we go with
+      # a tuple of only ``GET`` as default.
+        
+        
+        
         if methods is None:
             methods = getattr(view_func, "methods", None) or ("GET",)
         if isinstance(methods, str):
@@ -627,28 +776,32 @@ class App(Scaffold):
             )
         methods = {item.upper() for item in methods}
 
-        # Methods that should always be added
-        required_methods = set(getattr(view_func, "required_methods", ()))
+      # Methods that should always be added
+        
+        required_methods: set[str] = set(getattr(view_func, "required_methods", ()))
 
-        # starting with Flask 0.8 the view_func object can disable and
-        # force-enable the automatic options handling.
+      # starting with Flask 0.8 the view_func object can disable and
+      # force-enable the automatic options handling.
+        
+        
         if provide_automatic_options is None:
             provide_automatic_options = getattr(
                 view_func, "provide_automatic_options", None
             )
 
         if provide_automatic_options is None:
-            if "OPTIONS" not in methods:
+            if "OPTIONS" not in methods and self.config["PROVIDE_AUTOMATIC_OPTIONS"]:
                 provide_automatic_options = True
                 required_methods.add("OPTIONS")
             else:
                 provide_automatic_options = False
 
-        # Add the required methods now.
+      # Add the required methods now.
+        
         methods |= required_methods
 
         rule_obj = self.url_rule_class(rule, methods=methods, **options)
-        rule_obj.provide_automatic_options = provide_automatic_options  # type: ignore[attr-defined]
+        rule_obj.provide_automatic_options = provide_automatic_options  
 
         self.url_map.add(rule_obj)
         if view_func is not None:
@@ -867,7 +1020,8 @@ class App(Scaffold):
 
         trap_bad_request = self.config["TRAP_BAD_REQUEST_ERRORS"]
 
-        # if unset, trap key errors in debug mode
+      # if unset, trap key errors in debug mode
+        
         if (
             trap_bad_request is None
             and self.debug
@@ -905,7 +1059,7 @@ class App(Scaffold):
         return _wz_redirect(
             location,
             code=code,
-            Response=self.response_class,  # type: ignore[arg-type]
+            Response=self.response_class,  
         )
 
     def inject_url_defaults(self, endpoint: str, values: dict[str, t.Any]) -> None:
@@ -917,8 +1071,10 @@ class App(Scaffold):
         """
         names: t.Iterable[str | None] = (None,)
 
-        # url_for may be called outside a request context, parse the
-        # passed endpoint instead of using request.blueprints.
+      # url_for may be called outside a request context, parse the
+      # passed endpoint instead of using request.blueprints.
+        
+        
         if "." in endpoint:
             names = chain(
                 names, reversed(_split_blueprint_path(endpoint.rpartition(".")[0]))
@@ -950,14 +1106,17 @@ class App(Scaffold):
             try:
                 rv = handler(error, endpoint, values)
             except BuildError as e:
-                # make error available outside except block
+              # make error available outside except block
+                
                 error = e
             else:
                 if rv is not None:
                     return rv
 
-        # Re-raise if called with an active exception, otherwise raise
-        # the passed in exception.
+      # Re-raise if called with an active exception, otherwise raise
+      # the passed in exception.
+        
+        
         if error is sys.exc_info()[1]:
             raise
 

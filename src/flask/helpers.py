@@ -5,7 +5,7 @@ import os
 import sys
 import typing as t
 from datetime import datetime
-from functools import lru_cache
+from functools import cache
 from functools import update_wrapper
 
 import werkzeug.utils
@@ -24,7 +24,6 @@ if t.TYPE_CHECKING:
     from .wrappers import Response
 
 
-# Returns whether debug mode should be enabled for the app, based on the FLASK_DEBUG environment variable.
 def get_debug_flag() -> bool:
     """Get whether debug mode should be enabled for the app, indicated by the
     :envvar:`FLASK_DEBUG` environment variable. The default is ``False``.
@@ -33,7 +32,6 @@ def get_debug_flag() -> bool:
     return bool(val and val.lower() not in {"0", "false", "no"})
 
 
-# Get whether the user has disabled loading default dotenv files by setting FLASK_SKIP_DOTENV environment variable.
 def get_load_dotenv(default: bool = True) -> bool:
     """Get whether the user has disabled loading default dotenv files by
     setting :envvar:`FLASK_SKIP_DOTENV`. The default is ``True``, load
@@ -50,8 +48,6 @@ def get_load_dotenv(default: bool = True) -> bool:
 
 
 @t.overload
-# Returns an iterator that yields values from the input generator or function, 
-# wrapping each value in a context manager.
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr],
 ) -> t.Iterator[t.AnyStr]: ...
@@ -63,8 +59,6 @@ def stream_with_context(
 ) -> t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]: ...
 
 
-# This function wraps a given generator or function with a context manager, 
-# allowing it to access request bound information while maintaining efficiency.
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]],
 ) -> t.Iterator[t.AnyStr] | t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]:
@@ -105,16 +99,15 @@ def stream_with_context(
         gen = iter(generator_or_function)  
     except TypeError:
 
-        # This function is a decorator that takes variable arguments and keyword arguments, 
-# generates a generator or function using these inputs, and then returns a stream with context.
-def decorator(*args: t.Any, **kwargs: t.Any) -> t.Any:
+      # This function is a decorator that takes variable arguments and keyword arguments, 
+        def decorator(*args: t.Any, **kwargs: t.Any) -> t.Any:
             gen = generator_or_function(*args, **kwargs)  
             return stream_with_context(gen)
 
         return update_wrapper(decorator, generator_or_function)  
 
-    # Returns an iterator over a generator, ensuring context is properly cleaned up.
-def generator() -> t.Iterator[t.AnyStr | None]:
+  # Returns an iterator over a generator, ensuring context is properly cleaned up.
+    def generator() -> t.Iterator[t.AnyStr | None]:
         ctx = _cv_request.get(None)
         if ctx is None:
             raise RuntimeError(
@@ -122,16 +115,16 @@ def generator() -> t.Iterator[t.AnyStr | None]:
                 " context is active, such as in a view function."
             )
         with ctx:
-          # Dummy sentinel.  Has to be inside the context block or we're
-          # not actually keeping the context around.
+        # Dummy sentinel.  Has to be inside the context block or we're
+        # not actually keeping the context around.
             
             
             yield None
 
-          # The try/finally is here so that if someone passes a WSGI level
-          # iterator in we're still running the cleanup logic.  Generators
-          # don't need that because they are closed on their destruction
-          # automatically.
+        # The try/finally is here so that if someone passes a WSGI level
+        # iterator in we're still running the cleanup logic.  Generators
+        # don't need that because they are closed on their destruction
+        # automatically.
             
             
             
@@ -142,10 +135,10 @@ def generator() -> t.Iterator[t.AnyStr | None]:
                 if hasattr(gen, "close"):
                     gen.close()
 
-  # The trick is to start the generator.  Then the code execution runs until
-  # the first dummy None is yielded at which point the context was already
-  # pushed.  This item is discarded.  Then when the iteration continues the
-  # real generator is executed.
+# The trick is to start the generator.  Then the code execution runs until
+# the first dummy None is yielded at which point the context was already
+# pushed.  This item is discarded.  Then when the iteration continues the
+# real generator is executed.
     
     
     
@@ -155,8 +148,6 @@ def generator() -> t.Iterator[t.AnyStr | None]:
     return wrapped_g  
 
 
-# This function creates a response object that can be used to add headers, 
-# similar to how Flask views would work but with more control over the response.
 def make_response(*args: t.Any) -> Response:
     """Sometimes it is necessary to set additional headers in a view.  Because
     views do not have to return response objects but can return a value that
@@ -206,8 +197,6 @@ def make_response(*args: t.Any) -> Response:
     return current_app.make_response(args)
 
 
-# Generate a URL to the given endpoint with the given values, 
-# requiring an active request or application context.
 def url_for(
     endpoint: str,
     *,
@@ -346,15 +335,15 @@ def flash(message: str, category: str = "message") -> None:
                      messages and ``'warning'`` for warnings.  However any
                      kind of string can be used as category.
     """
-  # Original implementation:
-  #
+# Original implementation:
+#
     
-  #     session.setdefault('_flashes', []).append((category, message))
-  #
+#     session.setdefault('_flashes', []).append((category, message))
+#
     
-  # This assumed that changes made to mutable structures in the session are
-  # always in sync with the session object, which is not true for session
-  # implementations that use external storage for keeping their keys/values.
+# This assumed that changes made to mutable structures in the session are
+# always in sync with the session object, which is not true for session
+# implementations that use external storage for keeping their keys/values.
     
     
     
@@ -577,8 +566,7 @@ def send_from_directory(
     raises a 404 :exc:`~werkzeug.exceptions.NotFound` error.
 
     :param directory: The directory that ``path`` must be located under,
-        relative to the current application's root path. This *must not*
-        be a value provided by the client, otherwise it becomes insecure.
+        relative to the current application's root path.
     :param path: The path to the file to send, relative to
         ``directory``.
     :param kwargs: Arguments to pass to :func:`send_file`.
@@ -606,14 +594,14 @@ def get_root_path(import_name: str) -> str:
 
     :meta private:
     """
-  # Module already imported and has a file attribute. Use that first.
+# Module already imported and has a file attribute. Use that first.
     
     mod = sys.modules.get(import_name)
 
     if mod is not None and hasattr(mod, "__file__") and mod.__file__ is not None:
         return os.path.dirname(os.path.abspath(mod.__file__))
 
-  # Next attempt: check the loader.
+# Next attempt: check the loader.
     
     try:
         spec = importlib.util.find_spec(import_name)
@@ -625,9 +613,9 @@ def get_root_path(import_name: str) -> str:
     else:
         loader = spec.loader
 
-  # Loader does not exist or we're referring to an unloaded main
-  # module or a main module without path (interactive sessions), go
-  # with the current working directory.
+# Loader does not exist or we're referring to an unloaded main
+# module or a main module without path (interactive sessions), go
+# with the current working directory.
     
     
     
@@ -635,17 +623,17 @@ def get_root_path(import_name: str) -> str:
         return os.getcwd()
 
     if hasattr(loader, "get_filename"):
-        filepath = loader.get_filename(import_name)
+        filepath = loader.get_filename(import_name)  
     else:
-      # Fall back to imports.
+    # Fall back to imports.
         
         __import__(import_name)
         mod = sys.modules[import_name]
         filepath = getattr(mod, "__file__", None)
 
-      # If we don't have a file path it might be because it is a
-      # namespace package. In this case pick the root path from the
-      # first module that is contained in the package.
+    # If we don't have a file path it might be because it is a
+    # namespace package. In this case pick the root path from the
+    # first module that is contained in the package.
         
         
         
@@ -659,12 +647,12 @@ def get_root_path(import_name: str) -> str:
                 " provided."
             )
 
-  # filepath is import_name.py for a module, or __init__.py for a package.
+# filepath is import_name.py for a module, or __init__.py for a package.
     
     return os.path.dirname(os.path.abspath(filepath))  
 
 
-@lru_cache(maxsize=None)
+@cache
 def _split_blueprint_path(name: str) -> list[str]:
     out: list[str] = [name]
 
