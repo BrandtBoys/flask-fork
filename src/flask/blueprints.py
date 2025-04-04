@@ -8,10 +8,10 @@ from .cli import AppGroup
 from .globals import current_app
 from .helpers import send_from_directory
 from .sansio.blueprints import Blueprint as SansioBlueprint
-from .sansio.blueprints import BlueprintSetupState as BlueprintSetupState  # noqa
+from .sansio.blueprints import BlueprintSetupState as BlueprintSetupState  
 from .sansio.scaffold import _sentinel
 
-if t.TYPE_CHECKING:  # pragma: no cover
+if t.TYPE_CHECKING:  
     from .wrappers import Response
 
 
@@ -27,7 +27,7 @@ class Blueprint(SansioBlueprint):
         subdomain: str | None = None,
         url_defaults: dict[str, t.Any] | None = None,
         root_path: str | None = None,
-        cli_group: str | None = _sentinel,  # type: ignore
+        cli_group: str | None = _sentinel,  
     ) -> None:
         super().__init__(
             name,
@@ -42,14 +42,20 @@ class Blueprint(SansioBlueprint):
             cli_group,
         )
 
-        #: The Click command group for registering CLI commands for this
-        #: object. The commands are available from the ``flask`` command
-        #: once the application has been discovered and blueprints have
-        #: been registered.
+      #: The Click command group for registering CLI commands for this
+      #: object. The commands are available from the ``flask`` command
+      #: once the application has been discovered and blueprints have
+      #: been registered.
+        
+        
+        
+        
         self.cli = AppGroup()
 
-        # Set the name of the Click group in case someone wants to add
-        # the app's commands to another CLI tool.
+      # Set the name of the Click group in case someone wants to add
+      # the app's commands to another CLI tool.
+        
+        
         self.cli.name = self.name
 
     def get_send_file_max_age(self, filename: str | None) -> int | None:
@@ -77,7 +83,7 @@ class Blueprint(SansioBlueprint):
         if isinstance(value, timedelta):
             return int(value.total_seconds())
 
-        return value  # type: ignore[no-any-return]
+        return value  
 
     def send_static_file(self, filename: str) -> Response:
         """The view function used to serve files from
@@ -94,36 +100,37 @@ class Blueprint(SansioBlueprint):
         if not self.has_static_folder:
             raise RuntimeError("'static_folder' must be set to serve static_files.")
 
-        # send_file only knows to call get_send_file_max_age on the app,
-        # call it here so it works for blueprints too.
+      # send_file only knows to call get_send_file_max_age on the app,
+      # call it here so it works for blueprints too.
+        
+        
         max_age = self.get_send_file_max_age(filename)
         return send_from_directory(
             t.cast(str, self.static_folder), filename, max_age=max_age
         )
 
-    def open_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
-        """Open a resource file relative to :attr:`root_path` for
-        reading.
+    def open_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
+    ) -> t.IO[t.AnyStr]:
+        """Open a resource file relative to :attr:`root_path` for reading. The
+        blueprint-relative equivalent of the app's :meth:`~.Flask.open_resource`
+        method.
 
-        For example, if the file ``schema.sql`` is next to the file
-        ``app.py`` where the ``Flask`` app is defined, it can be opened
-        with:
+        :param resource: Path to the resource relative to :attr:`root_path`.
+        :param mode: Open the file in this mode. Only reading is supported,
+            valid values are ``"r"`` (or ``"rt"``) and ``"rb"``.
+        :param encoding: Open the file with this encoding when opening in text
+            mode. This is ignored when opening in binary mode.
 
-        .. code-block:: python
-
-            with app.open_resource("schema.sql") as f:
-                conn.executescript(f.read())
-
-        :param resource: Path to the resource relative to
-            :attr:`root_path`.
-        :param mode: Open the file in this mode. Only reading is
-            supported, valid values are "r" (or "rt") and "rb".
-
-        Note this is a duplicate of the same method in the Flask
-        class.
-
+        .. versionchanged:: 3.1
+            Added the ``encoding`` parameter.
         """
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
-        return open(os.path.join(self.root_path, resource), mode)
+        path = os.path.join(self.root_path, resource)
+
+        if mode == "rb":
+            return open(path, mode)  
+
+        return open(path, mode, encoding=encoding)
