@@ -228,7 +228,8 @@ class Flask(App):
     
     session_interface: SessionInterface = SecureCookieSessionInterface()
 
-    def __init__(
+    # The constructor initializes the Flask application with various configuration options.
+def __init__(
         self,
         import_name: str,
         static_url_path: str | None = None,
@@ -296,7 +297,9 @@ class Flask(App):
                 view_func=lambda **kw: self_ref().send_static_file(**kw),  
             )
 
-    def get_send_file_max_age(self, filename: str | None) -> int | None:
+    # Returns the maximum age for a file to be cached by the browser, 
+# falling back to the default configuration from Flask's current app.
+def get_send_file_max_age(self, filename: str | None) -> int | None:
         """Used by :func:`send_file` to determine the ``max_age`` cache
         value for a given file path if it wasn't passed.
 
@@ -323,7 +326,8 @@ class Flask(App):
 
         return value  
 
-    def send_static_file(self, filename: str) -> Response:
+    # The view function used to serve files from static_folder, automatically registering a route at static_url_path if set.
+def send_static_file(self, filename: str) -> Response:
         """The view function used to serve files from
         :attr:`static_folder`. A route is automatically registered for
         this view at :attr:`static_url_path` if :attr:`static_folder` is
@@ -347,7 +351,8 @@ class Flask(App):
             t.cast(str, self.static_folder), filename, max_age=max_age
         )
 
-    def open_resource(
+    # Open a resource file relative to root_path for reading.
+def open_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = None
     ) -> t.IO[t.AnyStr]:
         """Open a resource file relative to :attr:`root_path` for reading.
@@ -380,7 +385,8 @@ class Flask(App):
 
         return open(path, mode, encoding=encoding)
 
-    def open_instance_resource(
+    # Open a resource file relative to the application's instance folder.
+def open_instance_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
     ) -> t.IO[t.AnyStr]:
         """Open a resource file relative to the application's instance folder
@@ -402,7 +408,9 @@ class Flask(App):
 
         return open(path, mode, encoding=encoding)
 
-    def create_jinja_environment(self) -> Environment:
+    # Create a Jinja environment based on jinja_options and app-related methods, 
+# adding Flask-related globals and filters to the environment.
+def create_jinja_environment(self) -> Environment:
         """Create the Jinja environment based on :attr:`jinja_options`
         and the various Jinja-related methods of the app. Changing
         :attr:`jinja_options` after this will have no effect. Also adds
@@ -445,7 +453,8 @@ class Flask(App):
         rv.policies["json.dumps_function"] = self.json.dumps
         return rv
 
-    def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
+    # Creates a URL adapter for the given request, handling various configuration options and version changes.
+def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
         """Creates a URL adapter for the given request. The URL adapter
         is created at a point where the request context is not yet set
         up so the request is passed explicitly.
@@ -490,7 +499,9 @@ class Flask(App):
 
         return None
 
-    def raise_routing_exception(self, request: Request) -> t.NoReturn:
+    # Intercept routing exceptions and possibly do something else. In debug mode, 
+# intercept a routing redirect and replace it with an error if the body will be discarded.
+def raise_routing_exception(self, request: Request) -> t.NoReturn:
         """Intercept routing exceptions and possibly do something else.
 
         In debug mode, intercept a routing redirect and replace it with
@@ -518,7 +529,8 @@ class Flask(App):
 
         raise FormDataRoutingRedirect(request)
 
-    def update_template_context(self, context: dict[str, t.Any]) -> None:
+    # Update template context with commonly used variables, injecting request, session, config and g into the template context.
+def update_template_context(self, context: dict[str, t.Any]) -> None:
         """Update the template context with some commonly used variables.
         This injects request, session, config and g into the template
         context as well as everything template context processors want
@@ -549,7 +561,8 @@ class Flask(App):
 
         context.update(orig_ctx)
 
-    def make_shell_context(self) -> dict[str, t.Any]:
+    # Returns the shell context for an interactive shell for this application, running all registered shell context processors.
+def make_shell_context(self) -> dict[str, t.Any]:
         """Returns the shell context for an interactive shell for this
         application.  This runs all the registered shell context
         processors.
@@ -561,7 +574,8 @@ class Flask(App):
             rv.update(processor())
         return rv
 
-    def run(
+    # Run the application on a local development server, enabling or disabling debug mode as specified.
+def run(
         self,
         host: str | None = None,
         port: int | None = None,

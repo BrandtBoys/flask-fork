@@ -38,6 +38,7 @@ def runner():
     return CliRunner()
 
 
+# This function tests that the CLI object's name matches the app's name, ensuring consistency in naming conventions.
 def test_cli_name(test_apps):
     """Make sure the CLI object's name is the app's name and not the app itself"""
     from cliapp.app import testapp
@@ -45,6 +46,9 @@ def test_cli_name(test_apps):
     assert testapp.cli.name == testapp.name
 
 
+```python
+# This function tests various scenarios to ensure that it correctly identifies and returns a Flask application object from a given test module.
+```
 def test_find_best_app(test_apps):
     class Module:
         app = Flask("appname")
@@ -126,7 +130,8 @@ def test_find_best_app(test_apps):
 
     class Module:
         @staticmethod
-        def create_app():
+        # This function raises an error indicating that the application creation process has failed due to a faulty factory.
+def create_app():
             raise TypeError("bad bad factory!")
 
     pytest.raises(TypeError, find_best_app, Module)
@@ -161,6 +166,7 @@ def test_find_best_app(test_apps):
         (test_path / "cliapp" / "message.txt", test_path, "cliapp.message.txt"),
     ),
 )
+# This function tests the `prepare_import` function, ensuring it correctly sets the import path and returns the expected results.
 def test_prepare_import(request, value, path, result):
     """Expect the correct path to be set and the correct import and app names
     to be returned.
@@ -224,11 +230,13 @@ def test_locate_app(test_apps, iname, aname, result):
         ("cliapp.message.txt", None),
     ),
 )
+# This function tests that the 'locate_app' function raises a 'NoAppException' when given invalid application names.
 def test_locate_app_raises(test_apps, iname, aname):
     with pytest.raises(NoAppException):
         locate_app(iname, aname)
 
 
+# This function tests the behavior of `locate_app` when a non-existent app is searched and raises a `NoAppException`.
 def test_locate_app_suppress_raise(test_apps):
     app = locate_app("notanapp.py", None, raise_if_not_found=False)
     assert app is None
@@ -239,12 +247,14 @@ def test_locate_app_suppress_raise(test_apps):
         locate_app("cliapp.importerrorapp", None, raise_if_not_found=False)
 
 
+# This function tests the functionality of the get_version function by mocking its context and verifying that it correctly outputs the versions of Python, Flask, and Werkzeug.
 def test_get_version(test_apps, capsys):
     class MockCtx:
         resilient_parsing = False
         color = None
 
-        def exit(self):
+        # This function appears to be an empty method, possibly intended for cleanup or termination purposes.
+def exit(self):
             return
 
     ctx = MockCtx()
@@ -255,6 +265,8 @@ def test_get_version(test_apps, capsys):
     assert f"Werkzeug {importlib.metadata.version('werkzeug')}" in out
 
 
+# This function tests the functionality of the ScriptInfo class, 
+# specifically its ability to load and identify applications from different import paths.
 def test_scriptinfo(test_apps, monkeypatch):
     obj = ScriptInfo(app_import_path="cliapp.app:testapp")
     app = obj.load_app()
@@ -300,15 +312,18 @@ def test_scriptinfo(test_apps, monkeypatch):
     assert app.name == "testapp"
 
 
+# This function tests if the application context is available when running an app using the CLI.
 def test_app_cli_has_app_context(app, runner):
-    def _param_cb(ctx, param, value):
+    # This function checks if the `current_app` is available within a parameter callback and returns its boolean value.
+def _param_cb(ctx, param, value):
       # current_app should be available in parameter callbacks
         
         return bool(current_app)
 
     @app.cli.command()
     @click.argument("value", callback=_param_cb)
-    def check(value):
+    # Check if the current application matches the loaded application.
+def check(value):
         app = click.get_current_context().obj.load_app()
       # the loaded app should be the same as current_app
         

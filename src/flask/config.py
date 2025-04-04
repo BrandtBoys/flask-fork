@@ -32,7 +32,8 @@ class ConfigAttribute(t.Generic[T]):
     @t.overload
     def __get__(self, obj: App, owner: type[App]) -> T: ...
 
-    def __get__(self, obj: App | None, owner: type[App] | None = None) -> T | te.Self:
+    # Implements the getter method for a property, allowing access to its configuration and potentially converting it.
+def __get__(self, obj: App | None, owner: type[App] | None = None) -> T | te.Self:
         if obj is None:
             return self
 
@@ -43,7 +44,8 @@ class ConfigAttribute(t.Generic[T]):
 
         return rv  
 
-    def __set__(self, obj: App, value: t.Any) -> None:
+    # Sets the configuration value for the current object instance.
+def __set__(self, obj: App, value: t.Any) -> None:
         obj.config[self.__name__] = value
 
 

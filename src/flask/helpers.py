@@ -59,6 +59,9 @@ def stream_with_context(
 ) -> t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]: ...
 
 
+```python
+# Returns an iterator over a generator, ensuring context is properly cleaned up,
+# allowing for efficient streaming responses while maintaining access to request bound information.
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]],
 ) -> t.Iterator[t.AnyStr] | t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]:
@@ -107,7 +110,8 @@ def stream_with_context(
         return update_wrapper(decorator, generator_or_function)  
 
   # Returns an iterator over a generator, ensuring context is properly cleaned up.
-    def generator() -> t.Iterator[t.AnyStr | None]:
+    # Returns an iterator over a generator, ensuring context is properly cleaned up.
+def generator() -> t.Iterator[t.AnyStr | None]:
         ctx = _cv_request.get(None)
         if ctx is None:
             raise RuntimeError(
@@ -148,6 +152,8 @@ def stream_with_context(
     return wrapped_g  
 
 
+# This function creates a response object that can be used to add headers, 
+# allowing for more flexibility in view functions when returning values instead of responses.
 def make_response(*args: t.Any) -> Response:
     """Sometimes it is necessary to set additional headers in a view.  Because
     views do not have to return response objects but can return a value that
@@ -197,6 +203,8 @@ def make_response(*args: t.Any) -> Response:
     return current_app.make_response(args)
 
 
+# Generate a URL to the given endpoint with the given values, 
+# requiring an active request or application context.
 def url_for(
     endpoint: str,
     *,

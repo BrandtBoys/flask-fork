@@ -73,7 +73,9 @@ class Request(RequestBase):
     _max_form_parts: int | None = None
 
     @property
-    def max_content_length(self) -> int | None:
+    # The maximum number of bytes that will be read during this request, 
+# raising a 413 error if exceeded or returning the configured limit.
+def max_content_length(self) -> int | None:
         """The maximum number of bytes that will be read during this request. If
         this limit is exceeded, a 413 :exc:`~werkzeug.exceptions.RequestEntityTooLarge`
         error is raised. If it is set to ``None``, no limit is enforced at the
@@ -102,11 +104,13 @@ class Request(RequestBase):
         return current_app.config["MAX_CONTENT_LENGTH"]  
 
     @max_content_length.setter
-    def max_content_length(self, value: int | None) -> None:
+    # The function sets the maximum allowed content length for an object.
+def max_content_length(self, value: int | None) -> None:
         self._max_content_length = value
 
     @property
-    def max_form_memory_size(self) -> int | None:
+    # The maximum size in bytes any non-file form field may be in a multipart/form-data body.
+def max_form_memory_size(self) -> int | None:
         """The maximum size in bytes any non-file form field may be in a
         ``multipart/form-data`` body. If this limit is exceeded, a 413
         :exc:`~werkzeug.exceptions.RequestEntityTooLarge` error is raised. If it
@@ -129,11 +133,13 @@ class Request(RequestBase):
         return current_app.config["MAX_FORM_MEMORY_SIZE"]  
 
     @max_form_memory_size.setter
-    def max_form_memory_size(self, value: int | None) -> None:
+    # This function sets and returns the maximum form memory size.
+def max_form_memory_size(self, value: int | None) -> None:
         self._max_form_memory_size = value
 
     @property  
-    def max_form_parts(self) -> int | None:
+    # The maximum number of fields that may be present in a multipart/form-data body.
+def max_form_parts(self) -> int | None:
         """The maximum number of fields that may be present in a
         ``multipart/form-data`` body. If this limit is exceeded, a 413
         :exc:`~werkzeug.exceptions.RequestEntityTooLarge` error is raised. If it
@@ -156,11 +162,13 @@ class Request(RequestBase):
         return current_app.config["MAX_FORM_PARTS"]  
 
     @max_form_parts.setter
-    def max_form_parts(self, value: int | None) -> None:
+    # Returns the maximum number of form parts that can be created with a given total value.
+def max_form_parts(self, value: int | None) -> None:
         self._max_form_parts = value
 
     @property
-    def endpoint(self) -> str | None:
+    # The endpoint that matched the request URL, returning None if matching failed or has not been performed yet.
+def endpoint(self) -> str | None:
         """The endpoint that matched the request URL.
 
         This will be ``None`` if matching failed or has not been
@@ -175,7 +183,8 @@ class Request(RequestBase):
         return None
 
     @property
-    def blueprint(self) -> str | None:
+    # The blueprint function returns the registered name of the current blueprint, or None if it's not part of a blueprint.
+def blueprint(self) -> str | None:
         """The registered name of the current blueprint.
 
         This will be ``None`` if the endpoint is not part of a
@@ -194,7 +203,8 @@ class Request(RequestBase):
         return None
 
     @property
-    def blueprints(self) -> list[str]:
+    # The function returns a list of blueprint names from the current blueprint upwards through parent blueprints.
+def blueprints(self) -> list[str]:
         """The registered names of the current blueprint upwards through
         parent blueprints.
 
@@ -210,7 +220,8 @@ class Request(RequestBase):
 
         return _split_blueprint_path(name)
 
-    def _load_form_data(self) -> None:
+    # In debug mode, replace the files multidict with an ad-hoc subclass that raises a different error for key errors.
+def _load_form_data(self) -> None:
         super()._load_form_data()
 
       # In debug mode we're replacing the files multidict with an ad-hoc

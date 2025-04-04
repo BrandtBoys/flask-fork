@@ -18,7 +18,8 @@ class FakePath:
     def __init__(self, path):
         self.path = path
 
-    def __fspath__(self):
+    # The fspath method returns the path attribute of the object.
+def __fspath__(self):
         return self.path
 
 
@@ -26,12 +27,14 @@ class PyBytesIO:
     def __init__(self, *args, **kwargs):
         self._io = io.BytesIO(*args, **kwargs)
 
-    def __getattr__(self, name):
+    # This method is used to dynamically retrieve an attribute from the underlying io object.
+def __getattr__(self, name):
         return getattr(self._io, name)
 
 
 class TestSendfile:
-    def test_send_file(self, app, req_ctx):
+    # Tests sending a file using Flask's send_file function, verifying direct passthrough and MIME type.
+def test_send_file(self, app, req_ctx):
         rv = flask.send_file("static/index.html")
         assert rv.direct_passthrough
         assert rv.mimetype == "text/html"
@@ -42,7 +45,8 @@ class TestSendfile:
 
         rv.close()
 
-    def test_static_file(self, app, req_ctx):
+    # Test static file functionality in Flask application, including default max_age and custom configuration.
+def test_static_file(self, app, req_ctx):
       # Default max_age is None.
         
 
@@ -97,7 +101,8 @@ class TestSendfile:
             assert rv.cache_control.max_age == 10
             rv.close()
 
-    def test_send_from_directory(self, app, req_ctx):
+    # Tests sending a file from a directory using Flask's send_from_directory method.
+def test_send_from_directory(self, app, req_ctx):
         app.root_path = os.path.join(
             os.path.dirname(__file__), "test_apps", "subdomaintestmodule"
         )
@@ -108,14 +113,17 @@ class TestSendfile:
 
 
 class TestUrlFor:
-    def test_url_for_with_anchor(self, app, req_ctx):
+    # This function tests if the `url_for` method correctly handles anchor tags in URLs.
+def test_url_for_with_anchor(self, app, req_ctx):
         @app.route("/")
-        def index():
+        # This function returns a hardcoded value, often used as a placeholder for a more dynamic or user-provided response.
+def index():
             return "42"
 
         assert flask.url_for("index", _anchor="x y") == "/#x%20y"
 
-    def test_url_for_with_scheme(self, app, req_ctx):
+    # This function tests that the `url_for` function correctly generates a URL with a scheme when using the `_external` parameter.
+def test_url_for_with_scheme(self, app, req_ctx):
         @app.route("/")
         def index():
             return "42"

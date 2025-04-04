@@ -363,7 +363,8 @@ class App(Scaffold):
     default_config: dict[str, t.Any]
     response_class: type[Response]
 
-    def __init__(
+    # Initialize a new Flask application instance with various configuration options.
+def __init__(
         self,
         import_name: str,
         static_url_path: str | None = None,
@@ -556,7 +557,8 @@ class App(Scaffold):
         
         self._got_first_request = False
 
-    def _check_setup_finished(self, f_name: str) -> None:
+    # Check if setup method has been finished and raise assertion error if not.
+def _check_setup_finished(self, f_name: str) -> None:
         if self._got_first_request:
             raise AssertionError(
                 f"The setup method '{f_name}' can no longer be called"
@@ -569,7 +571,8 @@ class App(Scaffold):
             )
 
     @cached_property
-    def name(self) -> str:  
+    # The name of the application, returning a display name used by Flask when needed.
+def name(self) -> str:  
         """The name of the application.  This is usually the import name
         with the difference that it's guessed from the run file if the
         import name is main.  This name is used as a display name when
@@ -586,7 +589,9 @@ class App(Scaffold):
         return self.import_name
 
     @cached_property
-    def logger(self) -> logging.Logger:
+    # A standard Python logging.Logger instance for the app, with the same name as `name`, 
+# and defaulting to a debug level in debug mode if no handlers are configured.
+def logger(self) -> logging.Logger:
         """A standard Python :class:`~logging.Logger` for the app, with
         the same name as :attr:`name`.
 
@@ -613,7 +618,8 @@ class App(Scaffold):
         return create_logger(self)
 
     @cached_property
-    def jinja_env(self) -> Environment:
+    # The Jinja environment used to load templates, created on first access and with immutable jinja_options.
+def jinja_env(self) -> Environment:
         """The Jinja environment used to load templates.
 
         The environment is created the first time this property is
@@ -625,7 +631,8 @@ class App(Scaffold):
     def create_jinja_environment(self) -> Environment:
         raise NotImplementedError()
 
-    def make_config(self, instance_relative: bool = False) -> Config:
+    # Used to create the config attribute by the Flask constructor, handling instance-relative configuration.
+def make_config(self, instance_relative: bool = False) -> Config:
         """Used to create the config attribute by the Flask constructor.
         The `instance_relative` parameter is passed in from the constructor
         of Flask (there named `instance_relative_config`) and indicates if
@@ -641,7 +648,8 @@ class App(Scaffold):
         defaults["DEBUG"] = get_debug_flag()
         return self.config_class(root_path, defaults)
 
-    def make_aborter(self) -> Aborter:
+    # Create the object to assign to :attr:`aborter`, used by :func:`flask.abort` to raise HTTP errors and can be called directly as well.
+def make_aborter(self) -> Aborter:
         """Create the object to assign to :attr:`aborter`. That object
         is called by :func:`flask.abort` to raise HTTP errors, and can
         be called directly as well.

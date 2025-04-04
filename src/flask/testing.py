@@ -45,7 +45,8 @@ class EnvironBuilder(werkzeug.test.EnvironBuilder):
         :class:`~werkzeug.test.EnvironBuilder`.
     """
 
-    def __init__(
+    # Initialize the Flask application with configuration options for URL structure and scheme.
+def __init__(
         self,
         app: Flask,
         path: str = "/",

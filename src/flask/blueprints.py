@@ -16,7 +16,8 @@ if t.TYPE_CHECKING:
 
 
 class Blueprint(SansioBlueprint):
-    def __init__(
+    # The constructor for a Flask application, initializing its components and setting up the Click command group.
+def __init__(
         self,
         name: str,
         import_name: str,
@@ -58,7 +59,9 @@ class Blueprint(SansioBlueprint):
         
         self.cli.name = self.name
 
-    def get_send_file_max_age(self, filename: str | None) -> int | None:
+    # Returns the maximum age for a file to be cached by the browser, 
+# falling back to the default configuration from Flask's current app.
+def get_send_file_max_age(self, filename: str | None) -> int | None:
         """Used by :func:`send_file` to determine the ``max_age`` cache
         value for a given file path if it wasn't passed.
 
@@ -85,7 +88,8 @@ class Blueprint(SansioBlueprint):
 
         return value  
 
-    def send_static_file(self, filename: str) -> Response:
+    # The view function used to serve files from static_folder, automatically registering a route at static_url_path if set.
+def send_static_file(self, filename: str) -> Response:
         """The view function used to serve files from
         :attr:`static_folder`. A route is automatically registered for
         this view at :attr:`static_url_path` if :attr:`static_folder` is
@@ -109,7 +113,8 @@ class Blueprint(SansioBlueprint):
             t.cast(str, self.static_folder), filename, max_age=max_age
         )
 
-    def open_resource(
+    # Open a resource file relative to root_path for reading.
+def open_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
     ) -> t.IO[t.AnyStr]:
         """Open a resource file relative to :attr:`root_path` for reading. The

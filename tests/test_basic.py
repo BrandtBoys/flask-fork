@@ -25,9 +25,12 @@ require_cpython_gc = pytest.mark.skipif(
 )
 
 
+# This function tests that OPTIONS requests are correctly handled by the application, 
+# verifying the allowed methods and response data.
 def test_options_work(app, client):
     @app.route("/", methods=["GET", "POST"])
-    def index():
+    # This function returns a simple string "Hello World" when called.
+def index():
         return "Hello World"
 
     rv = client.open("/", method="OPTIONS")
@@ -35,9 +38,11 @@ def test_options_work(app, client):
     assert rv.data == b""
 
 
+# This function tests that options are correctly handled on multiple routes with different HTTP methods.
 def test_options_on_multiple_rules(app, client):
     @app.route("/", methods=["GET", "POST"])
-    def index():
+    # This function returns a simple string greeting, serving as an example of a basic API endpoint.
+def index():
         return "Hello World"
 
     @app.route("/", methods=["PUT"])
@@ -49,26 +54,31 @@ def test_options_on_multiple_rules(app, client):
 
 
 @pytest.mark.parametrize("method", ["get", "post", "put", "delete", "patch"])
+# This function tests a route for a given HTTP method on an application and client instance. It asserts that the response from the client matches the expected response from the application.
 def test_method_route(app, client, method):
     method_route = getattr(app, method)
     client_method = getattr(client, method)
 
     @method_route("/")
-    def hello():
+    # Returns a string greeting "Hello"
+def hello():
         return "Hello"
 
     assert client_method("/").data == b"Hello"
 
 
+# This function tests that calling `app.get()` with a list of allowed HTTP methods raises a TypeError when no methods are provided.
 def test_method_route_no_methods(app):
     with pytest.raises(TypeError):
         app.get("/", methods=["GET", "POST"])
 
 
+# This function tests the behavior of Flask's route decorator when providing automatic options for HTTP methods.
 def test_provide_automatic_options_attr():
     app = flask.Flask(__name__)
 
-    def index():
+    # This function returns a simple string greeting, often used as a placeholder or test case.
+def index():
         return "Hello World!"
 
     index.provide_automatic_options = False
@@ -87,6 +97,7 @@ def test_provide_automatic_options_attr():
     assert sorted(rv.allow) == ["OPTIONS"]
 
 
+# Provides test cases for automatic options handling in Flask application.
 def test_provide_automatic_options_kwarg(app, client):
     def index():
         return flask.request.method
@@ -124,9 +135,11 @@ def test_provide_automatic_options_kwarg(app, client):
     assert rv.status_code == 405
 
 
+# This function tests request dispatching for a Flask application, verifying that different HTTP methods are handled correctly by the app.
 def test_request_dispatching(app, client):
     @app.route("/")
-    def index():
+    # Returns the HTTP method of the current request
+def index():
         return flask.request.method
 
     @app.route("/more", methods=["GET", "POST"])
@@ -152,13 +165,16 @@ def test_disallow_string_for_allowed_methods(app):
         app.add_url_rule("/", methods="GET POST", endpoint="test")
 
 
+# Test URL mapping functionality for a web application, ensuring correct HTTP methods are handled and options are not added when 'options' is not in uppercase.
 def test_url_mapping(app, client):
     random_uuid4 = "7eb41166-9ebf-4d26-b771-ea3f54f8b383"
 
-    def index():
+    # Returns the HTTP method of the current request
+def index():
         return flask.request.method
 
-    def more():
+    # Returns the HTTP method of the current request in Flask.
+def more():
         return flask.request.method
 
     def options():
@@ -190,6 +206,7 @@ def test_url_mapping(app, client):
     assert random_uuid4 in rv.data.decode("utf-8")
 
 
+# Adds a submount to the Werkzeug routing configuration, mapping "/foo" to two routes: "/bar" and "/"
 def test_werkzeug_routing(app, client):
     from werkzeug.routing import Rule
     from werkzeug.routing import Submount
@@ -198,7 +215,8 @@ def test_werkzeug_routing(app, client):
         Submount("/foo", [Rule("/bar", endpoint="bar"), Rule("/", endpoint="index")])
     )
 
-    def bar():
+    # This function returns the string 'bar' when called.
+def bar():
         return "bar"
 
     def index():
@@ -211,6 +229,7 @@ def test_werkzeug_routing(app, client):
     assert client.get("/foo/bar").data == b"bar"
 
 
+# Adds a URL mount for "/foo" with submounts for "/bar" and "/" to the Flask app.
 def test_endpoint_decorator(app, client):
     from werkzeug.routing import Rule
     from werkzeug.routing import Submount
@@ -224,16 +243,19 @@ def test_endpoint_decorator(app, client):
         return "bar"
 
     @app.endpoint("index")
-    def index():
+    # This function returns a string indicating the current page being accessed.
+def index():
         return "index"
 
     assert client.get("/foo/").data == b"index"
     assert client.get("/foo/bar").data == b"bar"
 
 
+# Tests a Flask session by setting and getting a value, verifying session access and modification.
 def test_session(app, client):
     @app.route("/set", methods=["POST"])
-    def set():
+    # This function sets a value in the Flask session, asserting that it is initially not accessed or modified before setting the value.
+def set():
         assert not flask.session.accessed
         assert not flask.session.modified
         flask.session["value"] = flask.request.form["value"]
@@ -242,7 +264,8 @@ def test_session(app, client):
         return "value set"
 
     @app.route("/get")
-    def get():
+    # This function retrieves a value from the Flask session, asserting its initial state and then returning it.
+def get():
         assert not flask.session.accessed
         assert not flask.session.modified
         v = flask.session.get("value", "None")
@@ -254,6 +277,7 @@ def test_session(app, client):
     assert client.get("/get").data == b"42"
 
 
+# Update application root configuration and test session path functionality.
 def test_session_path(app, client):
     app.config.update(APPLICATION_ROOT="/foo")
 
@@ -288,6 +312,7 @@ def test_session_using_application_root(app, client):
     assert "path=/bar" in rv.headers["set-cookie"].lower()
 
 
+# Updates Flask application configuration with session settings for testing, including domain, path, secure, and samesite attributes.
 def test_session_using_session_settings(app, client):
     app.config.update(
         SERVER_NAME="www.example.com:8080",
@@ -306,7 +331,8 @@ def test_session_using_session_settings(app, client):
         return "Hello World"
 
     @app.route("/clear")
-    def clear():
+    # Clears the 'testing' session variable from Flask and returns a farewell message.
+def clear():
         flask.session.pop("testing", None)
         return "Goodbye World"
 
@@ -333,6 +359,8 @@ def test_session_using_session_settings(app, client):
     assert "partitioned" in cookie
 
 
+# This function tests the functionality of Flask's session cookie with the Samesite attribute, 
+# verifying that it correctly sets and retrieves the attribute based on its value.
 def test_session_using_samesite_attribute(app, client):
     @app.route("/")
     def index():
@@ -360,6 +388,7 @@ def test_session_using_samesite_attribute(app, client):
     assert "samesite=lax" in cookie
 
 
+# This function tests that a RuntimeError is raised when trying to set or pop a session key that does not exist.
 def test_missing_session(app):
     app.secret_key = None
 
@@ -373,6 +402,8 @@ def test_missing_session(app):
         expect_exception(flask.session.pop, "foo")
 
 
+# This function tests the session expiration behavior of a Flask application, 
+# verifying that permanent sessions are correctly set and expire as expected.
 def test_session_expiration(app, client):
     permanent = True
 
