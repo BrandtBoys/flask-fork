@@ -1,5 +1,5 @@
-# This file was part of Flask-CLI and was modified under the terms of
-# its Revised BSD License. Copyright © 2015 CERN.
+
+
 import importlib.metadata
 import os
 import platform
@@ -140,7 +140,8 @@ def test_find_best_app(test_apps):
         ("a/test", cwd / "a", "test"),
         ("test/__init__.py", cwd, "test"),
         ("test/__init__", cwd, "test"),
-        # nested package
+      # nested package
+        
         (
             test_path / "cliapp" / "inner1" / "__init__",
             test_path,
@@ -151,10 +152,12 @@ def test_find_best_app(test_apps):
             test_path,
             "cliapp.inner1.inner2",
         ),
-        # dotted name
+      # dotted name
+        
         ("test.a.b", cwd, "test.a.b"),
         (test_path / "cliapp.app", test_path, "cliapp.app"),
-        # not a Python file, will be caught during import
+      # not a Python file, will be caught during import
+        
         (test_path / "cliapp" / "message.txt", test_path, "cliapp.message.txt"),
     ),
 )
@@ -186,9 +189,11 @@ def test_prepare_import(request, value, path, result):
         ("cliapp.factory", "create_app", "app"),
         ("cliapp.factory", "create_app()", "app"),
         ("cliapp.factory", 'create_app2("foo", "bar")', "app2_foo_bar"),
-        # trailing comma space
+      # trailing comma space
+        
         ("cliapp.factory", 'create_app2("foo", "bar", )', "app2_foo_bar"),
-        # strip whitespace
+      # strip whitespace
+        
         ("cliapp.factory", " create_app () ", "app"),
     ),
 )
@@ -202,15 +207,20 @@ def test_locate_app(test_apps, iname, aname, result):
         ("notanapp.py", None),
         ("cliapp/app", None),
         ("cliapp.app", "notanapp"),
-        # not enough arguments
+      # not enough arguments
+        
         ("cliapp.factory", 'create_app2("foo")'),
-        # invalid identifier
+      # invalid identifier
+        
         ("cliapp.factory", "create_app("),
-        # no app returned
+      # no app returned
+        
         ("cliapp.factory", "no_app"),
-        # nested import error
+      # nested import error
+        
         ("cliapp.importerrorapp", None),
-        # not a Python file
+      # not a Python file
+        
         ("cliapp.message.txt", None),
     ),
 )
@@ -223,7 +233,8 @@ def test_locate_app_suppress_raise(test_apps):
     app = locate_app("notanapp.py", None, raise_if_not_found=False)
     assert app is None
 
-    # only direct import error is suppressed
+  # only direct import error is suppressed
+    
     with pytest.raises(NoAppException):
         locate_app("cliapp.importerrorapp", None, raise_if_not_found=False)
 
@@ -250,7 +261,8 @@ def test_scriptinfo(test_apps, monkeypatch):
     assert app.name == "testapp"
     assert obj.load_app() is app
 
-    # import app with module's absolute path
+  # import app with module's absolute path
+    
     cli_app_path = str(test_path / "cliapp" / "app.py")
 
     obj = ScriptInfo(app_import_path=cli_app_path)
@@ -273,13 +285,15 @@ def test_scriptinfo(test_apps, monkeypatch):
     obj = ScriptInfo()
     pytest.raises(NoAppException, obj.load_app)
 
-    # import app from wsgi.py in current directory
+  # import app from wsgi.py in current directory
+    
     monkeypatch.chdir(test_path / "helloworld")
     obj = ScriptInfo()
     app = obj.load_app()
     assert app.name == "hello"
 
-    # import app from app.py in current directory
+  # import app from app.py in current directory
+    
     monkeypatch.chdir(test_path / "cliapp")
     obj = ScriptInfo()
     app = obj.load_app()
@@ -288,14 +302,16 @@ def test_scriptinfo(test_apps, monkeypatch):
 
 def test_app_cli_has_app_context(app, runner):
     def _param_cb(ctx, param, value):
-        # current_app should be available in parameter callbacks
+      # current_app should be available in parameter callbacks
+        
         return bool(current_app)
 
     @app.cli.command()
     @click.argument("value", callback=_param_cb)
     def check(value):
         app = click.get_current_context().obj.load_app()
-        # the loaded app should be the same as current_app
+      # the loaded app should be the same as current_app
+        
         same_app = current_app._get_current_object() is app
         return same_app, value
 
@@ -398,7 +414,12 @@ def test_flaskgroup_nested(app, runner):
 def test_no_command_echo_loading_error():
     from flask.cli import cli
 
-    runner = CliRunner(mix_stderr=False)
+    try:
+        runner = CliRunner(mix_stderr=False)
+    except (DeprecationWarning, TypeError):
+        
+        runner = CliRunner()
+
     result = runner.invoke(cli, ["missing"])
     assert result.exit_code == 2
     assert "FLASK_APP" in result.stderr
@@ -408,7 +429,12 @@ def test_no_command_echo_loading_error():
 def test_help_echo_loading_error():
     from flask.cli import cli
 
-    runner = CliRunner(mix_stderr=False)
+    try:
+        runner = CliRunner(mix_stderr=False)
+    except (DeprecationWarning, TypeError):
+        
+        runner = CliRunner()
+
     result = runner.invoke(cli, ["--help"])
     assert result.exit_code == 0
     assert "FLASK_APP" in result.stderr
@@ -420,7 +446,13 @@ def test_help_echo_exception():
         raise Exception("oh no")
 
     cli = FlaskGroup(create_app=create_app)
-    runner = CliRunner(mix_stderr=False)
+
+    try:
+        runner = CliRunner(mix_stderr=False)
+    except (DeprecationWarning, TypeError):
+        
+        runner = CliRunner()
+
     result = runner.invoke(cli, ["--help"])
     assert result.exit_code == 0
     assert "Exception: oh no" in result.stderr
@@ -445,9 +477,11 @@ class TestRoutes:
         return partial(runner.invoke, cli)
 
     def expect_order(self, order, output):
-        # skip the header and match the start of each row
+      # skip the header and match the start of each row
+        
         for expect, line in zip(order, output.splitlines()[2:]):
-            # do this instead of startswith for nicer pytest output
+          # do this instead of startswith for nicer pytest output
+            
             assert line[: len(expect)] == expect
 
     def test_simple(self, invoke):
@@ -504,7 +538,7 @@ class TestRoutes:
 
 def dotenv_not_available():
     try:
-        import dotenv  # noqa: F401
+        import dotenv  
     except ImportError:
         return True
 
@@ -518,7 +552,8 @@ need_dotenv = pytest.mark.skipif(
 
 @need_dotenv
 def test_load_dotenv(monkeypatch):
-    # can't use monkeypatch.delitem since the keys don't exist yet
+  # can't use monkeypatch.delitem since the keys don't exist yet
+    
     for item in ("FOO", "BAR", "SPAM", "HAM"):
         monkeypatch._setitem.append((os.environ, item, notset))
 
@@ -526,18 +561,24 @@ def test_load_dotenv(monkeypatch):
     monkeypatch.chdir(test_path)
     assert load_dotenv()
     assert Path.cwd() == test_path
-    # .flaskenv doesn't overwrite .env
+  # .flaskenv doesn't overwrite .env
+    
     assert os.environ["FOO"] == "env"
-    # set only in .flaskenv
+  # set only in .flaskenv
+    
     assert os.environ["BAR"] == "bar"
-    # set only in .env
+  # set only in .env
+    
     assert os.environ["SPAM"] == "1"
-    # set manually, files don't overwrite
+  # set manually, files don't overwrite
+    
     assert os.environ["EGGS"] == "3"
-    # test env file encoding
+  # test env file encoding
+    
     assert os.environ["HAM"] == "火腿"
-    # Non existent file should not load
-    assert not load_dotenv("non-existent-file")
+  # Non existent file should not load
+    
+    assert not load_dotenv("non-existent-file", load_defaults=False)
 
 
 @need_dotenv
@@ -566,19 +607,23 @@ def test_disable_dotenv_from_env(monkeypatch, runner):
 
 
 def test_run_cert_path():
-    # no key
+  # no key
+    
     with pytest.raises(click.BadParameter):
         run_command.make_context("run", ["--cert", __file__])
 
-    # no cert
+  # no cert
+    
     with pytest.raises(click.BadParameter):
         run_command.make_context("run", ["--key", __file__])
 
-    # cert specified first
+  # cert specified first
+    
     ctx = run_command.make_context("run", ["--cert", __file__, "--key", __file__])
     assert ctx.params["cert"] == (__file__, __file__)
 
-    # key specified first
+  # key specified first
+    
     ctx = run_command.make_context("run", ["--key", __file__, "--cert", __file__])
     assert ctx.params["cert"] == (__file__, __file__)
 
@@ -586,16 +631,19 @@ def test_run_cert_path():
 def test_run_cert_adhoc(monkeypatch):
     monkeypatch.setitem(sys.modules, "cryptography", None)
 
-    # cryptography not installed
+  # cryptography not installed
+    
     with pytest.raises(click.BadParameter):
         run_command.make_context("run", ["--cert", "adhoc"])
 
-    # cryptography installed
+  # cryptography installed
+    
     monkeypatch.setitem(sys.modules, "cryptography", types.ModuleType("cryptography"))
     ctx = run_command.make_context("run", ["--cert", "adhoc"])
     assert ctx.params["cert"] == "adhoc"
 
-    # no key with adhoc
+  # no key with adhoc
+    
     with pytest.raises(click.BadParameter):
         run_command.make_context("run", ["--cert", "adhoc", "--key", __file__])
 
@@ -603,21 +651,24 @@ def test_run_cert_adhoc(monkeypatch):
 def test_run_cert_import(monkeypatch):
     monkeypatch.setitem(sys.modules, "not_here", None)
 
-    # ImportError
+  # ImportError
+    
     with pytest.raises(click.BadParameter):
         run_command.make_context("run", ["--cert", "not_here"])
 
     with pytest.raises(click.BadParameter):
         run_command.make_context("run", ["--cert", "flask"])
 
-    # SSLContext
+  # SSLContext
+    
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 
     monkeypatch.setitem(sys.modules, "ssl_context", ssl_context)
     ctx = run_command.make_context("run", ["--cert", "ssl_context"])
     assert ctx.params["cert"] is ssl_context
 
-    # no --key with SSLContext
+  # no --key with SSLContext
+    
     with pytest.raises(click.BadParameter):
         run_command.make_context("run", ["--cert", "ssl_context", "--key", __file__])
 
