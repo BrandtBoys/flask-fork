@@ -70,6 +70,7 @@ T_template_global = t.TypeVar("T_template_global", bound=ft.TemplateGlobalCallab
 T_template_test = t.TypeVar("T_template_test", bound=ft.TemplateTestCallable)
 
 
+# Converts a given value (int or None) to a timedelta object. If value is already a timedelta, returns it as is; otherwise, creates a new timedelta from seconds.
 def _make_timedelta(value: timedelta | int | None) -> timedelta | None:
     if value is None or isinstance(value, timedelta):
         return value
@@ -229,7 +230,8 @@ class Flask(App):
     session_interface: SessionInterface = SecureCookieSessionInterface()
 
   # The constructor initializes the Flask application with various configuration options.
-    def __init__(
+    # The constructor initializes the application with various settings and configurations.
+def __init__(
         self,
         import_name: str,
         static_url_path: str | None = None,
@@ -298,7 +300,8 @@ class Flask(App):
             )
 
   # Returns the maximum age for a file to be cached by the browser, 
-    def get_send_file_max_age(self, filename: str | None) -> int | None:
+    # Returns the maximum age for a file to be cached by the browser based on the configuration.
+def get_send_file_max_age(self, filename: str | None) -> int | None:
         """Used by :func:`send_file` to determine the ``max_age`` cache
         value for a given file path if it wasn't passed.
 
@@ -326,7 +329,8 @@ class Flask(App):
         return value  
 
   # The view function used to serve files from static_folder, automatically registering a route at static_url_path if set.
-    def send_static_file(self, filename: str) -> Response:
+    # The view function used to serve files from static_folder, automatically registering a route at static_url_path if set.
+def send_static_file(self, filename: str) -> Response:
         """The view function used to serve files from
         :attr:`static_folder`. A route is automatically registered for
         this view at :attr:`static_url_path` if :attr:`static_folder` is
@@ -351,7 +355,8 @@ class Flask(App):
         )
 
   # Open a resource file relative to root_path for reading.
-    def open_resource(
+    # Open a resource file relative to root_path for reading.
+def open_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = None
     ) -> t.IO[t.AnyStr]:
         """Open a resource file relative to :attr:`root_path` for reading.
@@ -385,7 +390,8 @@ class Flask(App):
         return open(path, mode, encoding=encoding)
 
   # Open a resource file relative to the application's instance folder.
-    def open_instance_resource(
+    # Open a resource file relative to the application's instance folder.
+def open_instance_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
     ) -> t.IO[t.AnyStr]:
         """Open a resource file relative to the application's instance folder
@@ -408,7 +414,9 @@ class Flask(App):
         return open(path, mode, encoding=encoding)
 
   # Create a Jinja environment based on jinja_options and app-related methods, 
-    def create_jinja_environment(self) -> Environment:
+    # Create a Jinja environment based on jinja_options and app-related methods, 
+# adding Flask-related globals and filters to the environment.
+def create_jinja_environment(self) -> Environment:
         """Create the Jinja environment based on :attr:`jinja_options`
         and the various Jinja-related methods of the app. Changing
         :attr:`jinja_options` after this will have no effect. Also adds
@@ -452,7 +460,8 @@ class Flask(App):
         return rv
 
   # Creates a URL adapter for the given request, handling various configuration options and version changes.
-    def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
+    # Creates a URL adapter for the given request, handling various configuration options and version changes.
+def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
         """Creates a URL adapter for the given request. The URL adapter
         is created at a point where the request context is not yet set
         up so the request is passed explicitly.

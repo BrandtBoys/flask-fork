@@ -38,6 +38,7 @@ class NoAppException(click.UsageError):
     """Raised if an application cannot be found or loaded."""
 
 
+# Given a module instance, this function attempts to find and return the best possible Flask application within the module.
 def find_best_app(module: ModuleType) -> Flask:
     """Given a module instance this tries to find the best possible
     application in the module or raises an exception.
@@ -94,6 +95,7 @@ def find_best_app(module: ModuleType) -> Flask:
     )
 
 
+# Check whether calling a function raised a TypeError due to call failure or factory error.
 def _called_with_wrong_args(f: t.Callable[..., Flask]) -> bool:
     """Check whether calling a function raised a ``TypeError`` because
     the call failed or because something in the factory raised the
@@ -124,6 +126,9 @@ def _called_with_wrong_args(f: t.Callable[..., Flask]) -> bool:
         del tb
 
 
+```python
+# Check if the given string is a variable name or a function, 
+# call a function to get the app instance, or return the variable directly.
 def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
     """Check if the given string is a variable name or a function. Call
     a function to get the app instance, or return the variable directly.
@@ -212,6 +217,7 @@ def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
     )
 
 
+# Given a filename, this function attempts to calculate the Python path by adding it to the search path and returning the expected module name.
 def prepare_import(path: str) -> str:
     """Given a filename this will try to calculate the python path, add it
     to the search path and return the actual module name that is expected.
@@ -254,6 +260,7 @@ def locate_app(
 ) -> Flask | None: ...
 
 
+# Import a Flask application by its name or locate the best matching one based on the imported module.
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: bool = True
 ) -> Flask | None:
@@ -282,6 +289,7 @@ def locate_app(
         return find_app_by_string(module, app_name)
 
 
+# Returns the version information of Flask and Werkzeug, along with the current Python version.
 def get_version(ctx: click.Context, param: click.Parameter, value: t.Any) -> None:
     if not value or ctx.resilient_parsing:
         return
@@ -321,7 +329,8 @@ class ScriptInfo:
     """
 
   # Optionally the import path for the Flask application.
-    def __init__(
+    # The constructor initializes the ScriptInfo object with various parameters and settings.
+def __init__(
         self,
         app_import_path: str | None = None,
         create_app: t.Callable[..., Flask] | None = None,
@@ -355,7 +364,8 @@ class ScriptInfo:
         self._loaded_app: Flask | None = None
 
   # Loads the Flask app (if not yet loaded) and returns it, handling multiple calls by returning the already loaded app.
-    def load_app(self) -> Flask:
+    # Loads the Flask app (if not yet loaded) and returns it, handling multiple calls by returning the already loaded app.
+def load_app(self) -> Flask:
         """Loads the Flask app (if not yet loaded) and returns it.  Calling
         this multiple times will just result in the already loaded app to
         be returned.
@@ -404,6 +414,7 @@ pass_script_info = click.make_pass_decorator(ScriptInfo, ensure=True)
 F = t.TypeVar("F", bound=t.Callable[..., t.Any])
 
 
+# Wraps a callback to ensure it's executed within the application context.
 def with_appcontext(f: F) -> F:
     """Wraps a callback so that it's guaranteed to be executed with the
     script's application context.
@@ -420,7 +431,8 @@ def with_appcontext(f: F) -> F:
 
     @click.pass_context
   # Decorator function to wrap a command with an application context, ensuring it loads and runs within the correct app.
-    def decorator(ctx: click.Context, /, *args: t.Any, **kwargs: t.Any) -> t.Any:
+    # Decorator function to wrap a command with an application context.
+def decorator(ctx: click.Context, /, *args: t.Any, **kwargs: t.Any) -> t.Any:
         if not current_app:
             app = ctx.ensure_object(ScriptInfo).load_app()
             ctx.with_resource(app.app_context())
@@ -439,7 +451,8 @@ class AppGroup(click.Group):
     """
 
   # This function creates a decorator for the command method of a click.Group subclass, 
-    def command(  
+    # This function is a custom decorator for creating Click commands, potentially wrapping the provided function in an application context.
+def command(  
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Callable[[t.Callable[..., t.Any]], click.Command]:
         """This works exactly like the method of the same name on a regular
@@ -449,7 +462,8 @@ class AppGroup(click.Group):
         wrap_for_ctx = kwargs.pop("with_appcontext", True)
 
       # This function is a custom decorator for creating Click commands, potentially wrapping the provided function in an application context.
-        def decorator(f: t.Callable[..., t.Any]) -> click.Command:
+        # This function is a custom decorator for creating Click commands, potentially wrapping the provided function in an application context.
+def decorator(f: t.Callable[..., t.Any]) -> click.Command:
             if wrap_for_ctx:
                 f = with_appcontext(f)
             return super(AppGroup, self).command(*args, **kwargs)(f)  
@@ -457,7 +471,8 @@ class AppGroup(click.Group):
         return decorator
 
   # This function creates a custom click Group with default class set to AppGroup.
-    def group(  
+    # This function creates a custom click Group with default class set to AppGroup.
+def group(  
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Callable[[t.Callable[..., t.Any]], click.Group]:
         """This works exactly like the method of the same name on a regular
@@ -468,6 +483,7 @@ class AppGroup(click.Group):
         return super().group(*args, **kwargs)  
 
 
+# This function sets the application import path for a given script, returning the updated path or None if no value was provided.
 def _set_app(ctx: click.Context, param: click.Option, value: str | None) -> str | None:
     if value is None:
         return None
@@ -496,6 +512,7 @@ _app_option = click.Option(
 )
 
 
+# Sets the debug flag for Flask, defaulting to False unless provided as an option or set via environment variable.
 def _set_debug(ctx: click.Context, param: click.Option, value: bool) -> bool | None:
 # If the flag isn't provided, it will default to False. Don't use
 # that, let debug be set by env in that case.
@@ -525,6 +542,8 @@ _debug_option = click.Option(
 )
 
 
+```python
+# Load environment variables from a .env file, raising an error if python-dotenv is not installed.
 def _env_file_callback(
     ctx: click.Context, param: click.Option, value: str | None
 ) -> str | None:

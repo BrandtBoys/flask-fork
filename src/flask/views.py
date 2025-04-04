@@ -98,7 +98,8 @@ class View:
     init_every_request: t.ClassVar[bool] = True
 
   # The actual view function behavior, requiring subclasses to override it and return a valid response with any URL rule variables passed as keyword arguments.
-    def dispatch_request(self) -> ft.ResponseReturnValue:
+    # The actual view function behavior, requiring subclasses to override and return a valid response with any URL rule variables passed as keyword arguments.
+def dispatch_request(self) -> ft.ResponseReturnValue:
         """The actual view function behavior. Subclasses must override
         this and return a valid response. Any variables from the URL
         rule are passed as keyword arguments.
@@ -107,7 +108,8 @@ class View:
 
     @classmethod
   # Convert a class into a view function that can be registered for a route.
-    def as_view(
+    # Convert the class into a view function that can be registered for a route.
+def as_view(
         cls, name: str, *class_args: t.Any, **class_kwargs: t.Any
     ) -> ft.RouteCallable:
         """Convert the class into a view function that can be registered
@@ -128,7 +130,8 @@ class View:
         if cls.init_every_request:
 
           # This function creates an instance of the view class and dispatches a request to it.
-            def view(**kwargs: t.Any) -> ft.ResponseReturnValue:
+            # This function creates an instance of the view class and dispatches a request to it.
+def view(**kwargs: t.Any) -> ft.ResponseReturnValue:
                 self = view.view_class(  
                     *class_args, **class_kwargs
                 )

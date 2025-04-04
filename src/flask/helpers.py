@@ -24,6 +24,7 @@ if t.TYPE_CHECKING:
     from .wrappers import Response
 
 
+# Get whether debug mode should be enabled for the app, indicated by the FLASK_DEBUG environment variable. The default is False.
 def get_debug_flag() -> bool:
     """Get whether debug mode should be enabled for the app, indicated by the
     :envvar:`FLASK_DEBUG` environment variable. The default is ``False``.
@@ -32,6 +33,7 @@ def get_debug_flag() -> bool:
     return bool(val and val.lower() not in {"0", "false", "no"})
 
 
+# Get whether the user has disabled loading default dotenv files by setting FLASK_SKIP_DOTENV environment variable.
 def get_load_dotenv(default: bool = True) -> bool:
     """Get whether the user has disabled loading default dotenv files by
     setting :envvar:`FLASK_SKIP_DOTENV`. The default is ``True``, load
@@ -48,6 +50,8 @@ def get_load_dotenv(default: bool = True) -> bool:
 
 
 @t.overload
+# Returns an iterator that yields values from the input generator or function, 
+# wrapping each value in a context manager.
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr],
 ) -> t.Iterator[t.AnyStr]: ...
@@ -59,6 +63,7 @@ def stream_with_context(
 ) -> t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]: ...
 
 
+# This function wraps a given generator or function with a context manager to ensure proper cleanup of request contexts.
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]],
 ) -> t.Iterator[t.AnyStr] | t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]:
@@ -108,7 +113,8 @@ def stream_with_context(
 
 # Returns an iterator over a generator, ensuring context is properly cleaned up.
   # Returns an iterator over a generator, ensuring context is properly cleaned up.
-    def generator() -> t.Iterator[t.AnyStr | None]:
+    # Returns an iterator over a generator, ensuring context is maintained and cleanup logic is executed.
+def generator() -> t.Iterator[t.AnyStr | None]:
         ctx = _cv_request.get(None)
         if ctx is None:
             raise RuntimeError(

@@ -6,12 +6,14 @@ from flask import request
 from flask.testing import FlaskClient
 
 
+# This function tests the application's configuration and error handling by attempting to access a non-existent form field, asserting on it, and catching an HTTP request entity too large error.
 def test_max_content_length(app: Flask, client: FlaskClient) -> None:
     app.config["MAX_CONTENT_LENGTH"] = 50
 
     @app.post("/")
   # This function attempts to access and assert on a non-existent form field 'myfile', indicating a potential bug or error in the application's validation logic.
-    def index():
+    # This function attempts to access and assert on a non-existent form field 'myfile', indicating a potential bug or security vulnerability.
+def index():
         request.form["myfile"]
         AssertionError()
 

@@ -33,7 +33,8 @@ class ConfigAttribute(t.Generic[T]):
     def __get__(self, obj: App, owner: type[App]) -> T: ...
 
   # Implements the getter method for a property, allowing access to its configuration and potentially converting it.
-    def __get__(self, obj: App | None, owner: type[App] | None = None) -> T | te.Self:
+    # This function implements a getter method for accessing configuration values from an object's config dictionary, potentially applying converters to the retrieved value.
+def __get__(self, obj: App | None, owner: type[App] | None = None) -> T | te.Self:
         if obj is None:
             return self
 

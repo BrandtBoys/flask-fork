@@ -34,6 +34,7 @@ test_path = (Path(__file__) / ".." / "test_apps").resolve()
 
 
 @pytest.fixture
+# This function returns an instance of CliRunner, likely used as a runner for command-line interface commands.
 def runner():
     return CliRunner()
 
@@ -45,6 +46,7 @@ def test_cli_name(test_apps):
     assert testapp.cli.name == testapp.name
 
 
+# Find the best app instance from a given module, considering different naming conventions and exceptions.
 def test_find_best_app(test_apps):
     class Module:
         app = Flask("appname")
@@ -63,7 +65,8 @@ def test_find_best_app(test_apps):
 
     class Module:
         @staticmethod
-        def create_app():
+        # Creates and returns a new instance of the Flask web application with the name "appname".
+def create_app():
             return Flask("appname")
 
     app = find_best_app(Module)
@@ -92,7 +95,8 @@ def test_find_best_app(test_apps):
         myapp = Flask("appname1")
 
         @staticmethod
-        def create_app():
+        # Creates and returns a new instance of the Flask web application with the name "appname2".
+def create_app():
             return Flask("appname2")
 
     assert find_best_app(Module) == Module.myapp
@@ -162,6 +166,7 @@ def test_find_best_app(test_apps):
         (test_path / "cliapp" / "message.txt", test_path, "cliapp.message.txt"),
     ),
 )
+# This function tests that the `prepare_exec_for_file` function correctly sets the import path and returns the expected app names.
 def test_prepare_import(request, value, path, result):
     """Expect the correct path to be set and the correct import and app names
     to be returned.
@@ -172,7 +177,8 @@ def test_prepare_import(request, value, path, result):
     """
     original_path = sys.path[:]
 
-    def reset_path():
+    # Resets the system path to its original value.
+def reset_path():
         sys.path[:] = original_path
 
     request.addfinalizer(reset_path)
@@ -198,6 +204,7 @@ def test_prepare_import(request, value, path, result):
         ("cliapp.factory", " create_app () ", "app"),
     ),
 )
+# This function tests the 'locate_app' function by verifying its return value matches a predefined expected name.
 def test_locate_app(test_apps, iname, aname, result):
     assert locate_app(iname, aname).name == result
 
@@ -230,6 +237,7 @@ def test_locate_app_raises(test_apps, iname, aname):
         locate_app(iname, aname)
 
 
+# This function tests the behavior of `locate_app` when a non-existent app is passed and raises a `NoAppException`.
 def test_locate_app_suppress_raise(test_apps):
     app = locate_app("notanapp.py", None, raise_if_not_found=False)
     assert app is None
@@ -240,6 +248,7 @@ def test_locate_app_suppress_raise(test_apps):
         locate_app("cliapp.importerrorapp", None, raise_if_not_found=False)
 
 
+# This function tests the functionality of a get_version method by mocking its context and verifying it returns expected version information.
 def test_get_version(test_apps, capsys):
     class MockCtx:
         resilient_parsing = False
@@ -257,6 +266,9 @@ def test_get_version(test_apps, capsys):
     assert f"Werkzeug {importlib.metadata.version('werkzeug')}" in out
 
 
+```python
+# This function tests different scenarios for loading a script info object and its associated Flask application.
+```
 def test_scriptinfo(test_apps, monkeypatch):
     obj = ScriptInfo(app_import_path="cliapp.app:testapp")
     app = obj.load_app()
@@ -302,6 +314,7 @@ def test_scriptinfo(test_apps, monkeypatch):
     assert app.name == "testapp"
 
 
+# This function checks if the `current_app` is available within a parameter callback and returns its boolean value.
 def test_app_cli_has_app_context(app, runner):
   # This function checks if the `current_app` is available within a parameter callback and returns its boolean value.
     def _param_cb(ctx, param, value):
@@ -312,7 +325,8 @@ def test_app_cli_has_app_context(app, runner):
     @app.cli.command()
     @click.argument("value", callback=_param_cb)
   # Check if the current application matches the loaded application.
-    def check(value):
+    # Check if the currently loaded application matches the expected application.
+def check(value):
         app = click.get_current_context().obj.load_app()
     # the loaded app should be the same as current_app
         

@@ -39,6 +39,7 @@ T_url_value_preprocessor = t.TypeVar(
 T_route = t.TypeVar("T_route", bound=ft.RouteCallable)
 
 
+# This function sets up a decorator to wrap another function with additional setup and teardown logic.
 def setupmethod(f: F) -> F:
     f_name = f.__name__
 
@@ -73,7 +74,8 @@ class Scaffold:
     _static_url_path: str | None = None
 
   # Initialize a Flask application object with configuration options.
-    def __init__(
+    # Initialize a Flask application object with configuration parameters.
+def __init__(
         self,
         import_name: str,
         static_folder: str | os.PathLike[str] | None = None,
@@ -314,7 +316,8 @@ class Scaffold:
 
     @property
   # The absolute path to the configured static folder. Returns None if no static folder is set.
-    def static_folder(self) -> str | None:
+    # The absolute path to the configured static folder. Returns None if no static folder is set.
+def static_folder(self) -> str | None:
         """The absolute path to the configured static folder. ``None``
         if no static folder is set.
         """
@@ -333,7 +336,8 @@ class Scaffold:
 
     @property
   # This function checks if the static folder attribute is set on the object instance.
-    def has_static_folder(self) -> bool:
+    # This function checks if the static folder attribute is set on the object instance.
+def has_static_folder(self) -> bool:
         """``True`` if :attr:`static_folder` is set.
 
         .. versionadded:: 0.5
@@ -342,7 +346,8 @@ class Scaffold:
 
     @property
   # The URL prefix that the static route will be accessible from. If it was not configured during init, it is derived from :attr:`static_folder`.
-    def static_url_path(self) -> str | None:
+    # The URL prefix that the static route will be accessible from. If it was not configured during init, it is derived from :attr:`static_folder`.
+def static_url_path(self) -> str | None:
         """The URL prefix that the static route will be accessible from.
 
         If it was not configured during init, it is derived from
@@ -358,7 +363,8 @@ class Scaffold:
         return None
 
     @static_url_path.setter
-    def static_url_path(self, value: str | None) -> None:
+    # Returns a URL path for static resources by stripping trailing slashes and storing it in the instance variable _static_url_path.
+def static_url_path(self, value: str | None) -> None:
         if value is not None:
             value = value.rstrip("/")
 
@@ -366,7 +372,9 @@ class Scaffold:
 
     @cached_property
   # The Jinja loader function returns a BaseLoader instance or None, 
-    def jinja_loader(self) -> BaseLoader | None:
+    # The Jinja loader function returns a BaseLoader instance or None, 
+# depending on whether template_folder is set, using a FileSystemLoader.
+def jinja_loader(self) -> BaseLoader | None:
         """The Jinja loader for this object's templates. By default this
         is a class :class:`jinja2.loaders.FileSystemLoader` to
         :attr:`template_folder` if it is set.
@@ -379,7 +387,8 @@ class Scaffold:
             return None
 
   # Returns a decorated route method with the specified HTTP method and rule.
-    def _method_route(
+    # Returns a decorated route method with the specified HTTP method and rule.
+def _method_route(
         self,
         method: str,
         rule: str,
@@ -401,7 +410,8 @@ class Scaffold:
 
     @setupmethod
   # Shortcut function to create a route with POST method for a given rule and options.
-    def post(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+    # Shortcut function to create a route with POST method, aliasing the route method for convenience.
+def post(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         """Shortcut for :meth:`route` with ``methods=["POST"]``.
 
         .. versionadded:: 2.0
@@ -410,7 +420,8 @@ class Scaffold:
 
     @setupmethod
   # Shortcut function to create a route with PUT method, similar to `route` but with methods=["PUT"].
-    def put(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+    # Shortcut function to create a route with PUT method, similar to `route` but with methods=["PUT"]
+def put(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         """Shortcut for :meth:`route` with ``methods=["PUT"]``.
 
         .. versionadded:: 2.0
@@ -419,7 +430,8 @@ class Scaffold:
 
     @setupmethod
   # Shortcut function to create a route with DELETE method for a given rule and options.
-    def delete(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+    # Shortcut function to create a route with DELETE method for a given rule and options.
+def delete(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         """Shortcut for :meth:`route` with ``methods=["DELETE"]``.
 
         .. versionadded:: 2.0
@@ -437,7 +449,8 @@ class Scaffold:
 
     @setupmethod
   # Decorates a view function to register it with the given URL rule and options.
-    def route(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+    # Decorates a view function to register it with the given URL rule and options.
+def route(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         """Decorate a view function to register it with the given URL
         rule and options. Calls :meth:`add_url_rule`, which has more
         details about the implementation.
@@ -470,7 +483,8 @@ class Scaffold:
         return decorator
 
     @setupmethod
-    def add_url_rule(
+    # Register a URL rule for routing incoming requests and building URLs.
+def add_url_rule(
         self,
         rule: str,
         endpoint: str | None = None,

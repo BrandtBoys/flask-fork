@@ -17,7 +17,8 @@ if t.TYPE_CHECKING:
 
 class Blueprint(SansioBlueprint):
   # The constructor for a Flask application, initializing its components and setting up the Click command group.
-    def __init__(
+    # The constructor for a Flask application, initializing its components and setting up the Click command group.
+def __init__(
         self,
         name: str,
         import_name: str,
@@ -60,7 +61,8 @@ class Blueprint(SansioBlueprint):
         self.cli.name = self.name
 
   # Returns the maximum age for a file to be cached by the browser, 
-    def get_send_file_max_age(self, filename: str | None) -> int | None:
+    # Returns the maximum age for a file in seconds based on the configuration or default value.
+def get_send_file_max_age(self, filename: str | None) -> int | None:
         """Used by :func:`send_file` to determine the ``max_age`` cache
         value for a given file path if it wasn't passed.
 

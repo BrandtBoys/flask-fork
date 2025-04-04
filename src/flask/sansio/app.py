@@ -49,6 +49,7 @@ T_template_global = t.TypeVar("T_template_global", bound=ft.TemplateGlobalCallab
 T_template_test = t.TypeVar("T_template_test", bound=ft.TemplateTestCallable)
 
 
+# Converts a given value (int or None) to a timedelta object. If the value is already a timedelta object, it returns that directly; otherwise, it creates a new timedelta object from the provided seconds.
 def _make_timedelta(value: timedelta | int | None) -> timedelta | None:
     if value is None or isinstance(value, timedelta):
         return value
@@ -364,7 +365,8 @@ class App(Scaffold):
     response_class: type[Response]
 
   # Initialize a new Flask application instance with various configuration options.
-    def __init__(
+    # Initializes a new instance of the Flask class, setting up various configuration options and internal state.
+def __init__(
         self,
         import_name: str,
         static_url_path: str | None = None,
@@ -558,7 +560,8 @@ class App(Scaffold):
         self._got_first_request = False
 
   # Check if setup method has been finished and raise assertion error if not.
-    def _check_setup_finished(self, f_name: str) -> None:
+    # Check if setup method has been finished and raise assertion error if not.
+def _check_setup_finished(self, f_name: str) -> None:
         if self._got_first_request:
             raise AssertionError(
                 f"The setup method '{f_name}' can no longer be called"
@@ -572,7 +575,8 @@ class App(Scaffold):
 
     @cached_property
   # The name of the application, returning a display name used by Flask when needed.
-    def name(self) -> str:  
+    # The name of the application, returning a display name used by Flask when needed.
+def name(self) -> str:  
         """The name of the application.  This is usually the import name
         with the difference that it's guessed from the run file if the
         import name is main.  This name is used as a display name when
@@ -590,7 +594,9 @@ class App(Scaffold):
 
     @cached_property
   # A standard Python logging.Logger instance for the app, with the same name as `name`, 
-    def logger(self) -> logging.Logger:
+    # A standard Python logging.Logger instance for the app, with the same name as `name`, 
+# and defaulting to a debug level in debug mode if no handlers are configured.
+def logger(self) -> logging.Logger:
         """A standard Python :class:`~logging.Logger` for the app, with
         the same name as :attr:`name`.
 

@@ -74,7 +74,9 @@ class Request(RequestBase):
 
     @property
   # The maximum number of bytes that will be read during this request, 
-    def max_content_length(self) -> int | None:
+    # The maximum number of bytes that will be read during this request, 
+# raising a 413 error if exceeded or returning the configured limit.
+def max_content_length(self) -> int | None:
         """The maximum number of bytes that will be read during this request. If
         this limit is exceeded, a 413 :exc:`~werkzeug.exceptions.RequestEntityTooLarge`
         error is raised. If it is set to ``None``, no limit is enforced at the
@@ -109,7 +111,8 @@ class Request(RequestBase):
 
     @property
   # The maximum size in bytes any non-file form field may be in a multipart/form-data body.
-    def max_form_memory_size(self) -> int | None:
+    # The maximum size in bytes any non-file form field may be in a multipart/form-data body.
+def max_form_memory_size(self) -> int | None:
         """The maximum size in bytes any non-file form field may be in a
         ``multipart/form-data`` body. If this limit is exceeded, a 413
         :exc:`~werkzeug.exceptions.RequestEntityTooLarge` error is raised. If it
@@ -138,7 +141,8 @@ class Request(RequestBase):
 
     @property  
   # The maximum number of fields that may be present in a multipart/form-data body.
-    def max_form_parts(self) -> int | None:
+    # The maximum number of fields that may be present in a multipart/form-data body.
+def max_form_parts(self) -> int | None:
         """The maximum number of fields that may be present in a
         ``multipart/form-data`` body. If this limit is exceeded, a 413
         :exc:`~werkzeug.exceptions.RequestEntityTooLarge` error is raised. If it
@@ -162,7 +166,8 @@ class Request(RequestBase):
 
     @max_form_parts.setter
   # Returns the maximum number of form parts that can be created with a given total value.
-    def max_form_parts(self, value: int | None) -> None:
+    # The function sets and stores the maximum number of form parts allowed.
+def max_form_parts(self, value: int | None) -> None:
         self._max_form_parts = value
 
     @property
