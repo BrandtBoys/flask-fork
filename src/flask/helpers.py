@@ -24,6 +24,7 @@ if t.TYPE_CHECKING:
     from .wrappers import Response
 
 
+# Returns whether debug mode should be enabled for the app, based on the FLASK_DEBUG environment variable.
 def get_debug_flag() -> bool:
     """Get whether debug mode should be enabled for the app, indicated by the
     :envvar:`FLASK_DEBUG` environment variable. The default is ``False``.
@@ -32,6 +33,7 @@ def get_debug_flag() -> bool:
     return bool(val and val.lower() not in {"0", "false", "no"})
 
 
+# Get whether the user has disabled loading default dotenv files by setting FLASK_SKIP_DOTENV environment variable.
 def get_load_dotenv(default: bool = True) -> bool:
     """Get whether the user has disabled loading default dotenv files by
     setting :envvar:`FLASK_SKIP_DOTENV`. The default is ``True``, load
@@ -48,6 +50,8 @@ def get_load_dotenv(default: bool = True) -> bool:
 
 
 @t.overload
+# Returns an iterator that yields values from the input generator or function, 
+# wrapping each value in a context manager.
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr],
 ) -> t.Iterator[t.AnyStr]: ...
@@ -59,6 +63,8 @@ def stream_with_context(
 ) -> t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]: ...
 
 
+# This function wraps a given generator or function with a context manager, 
+# allowing it to access request bound information while maintaining efficiency.
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]],
 ) -> t.Iterator[t.AnyStr] | t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]:
@@ -99,13 +105,16 @@ def stream_with_context(
         gen = iter(generator_or_function)  
     except TypeError:
 
-        def decorator(*args: t.Any, **kwargs: t.Any) -> t.Any:
+        # This function is a decorator that takes variable arguments and keyword arguments, 
+# generates a generator or function using these inputs, and then returns a stream with context.
+def decorator(*args: t.Any, **kwargs: t.Any) -> t.Any:
             gen = generator_or_function(*args, **kwargs)  
             return stream_with_context(gen)
 
         return update_wrapper(decorator, generator_or_function)  
 
-    def generator() -> t.Iterator[t.AnyStr | None]:
+    # Returns an iterator over a generator, ensuring context is properly cleaned up.
+def generator() -> t.Iterator[t.AnyStr | None]:
         ctx = _cv_request.get(None)
         if ctx is None:
             raise RuntimeError(
@@ -146,6 +155,8 @@ def stream_with_context(
     return wrapped_g  
 
 
+# This function creates a response object that can be used to add headers, 
+# similar to how Flask views would work but with more control over the response.
 def make_response(*args: t.Any) -> Response:
     """Sometimes it is necessary to set additional headers in a view.  Because
     views do not have to return response objects but can return a value that
@@ -195,6 +206,8 @@ def make_response(*args: t.Any) -> Response:
     return current_app.make_response(args)
 
 
+# Generate a URL to the given endpoint with the given values, 
+# requiring an active request or application context.
 def url_for(
     endpoint: str,
     *,
