@@ -18,10 +18,10 @@ from .. import typing as ft
 from ..helpers import get_root_path
 from ..templating import _default_template_ctx_processor
 
-if t.TYPE_CHECKING:  # pragma: no cover
+if t.TYPE_CHECKING:  
     from click import Group
 
-# a singleton sentinel value for parameter defaults
+
 _sentinel = object()
 
 F = t.TypeVar("F", bound=t.Callable[..., t.Any])
@@ -80,136 +80,226 @@ class Scaffold:
         template_folder: str | os.PathLike[str] | None = None,
         root_path: str | None = None,
     ):
-        #: The name of the package or module that this object belongs
-        #: to. Do not change this once it is set by the constructor.
+      #: The name of the package or module that this object belongs
+      #: to. Do not change this once it is set by the constructor.
+        
+        
         self.import_name = import_name
 
-        self.static_folder = static_folder  # type: ignore
+        self.static_folder = static_folder  
         self.static_url_path = static_url_path
 
-        #: The path to the templates folder, relative to
-        #: :attr:`root_path`, to add to the template loader. ``None`` if
-        #: templates should not be added.
+      #: The path to the templates folder, relative to
+      #: :attr:`root_path`, to add to the template loader. ``None`` if
+      #: templates should not be added.
+        
+        
+        
         self.template_folder = template_folder
 
         if root_path is None:
             root_path = get_root_path(self.import_name)
 
-        #: Absolute path to the package on the filesystem. Used to look
-        #: up resources contained in the package.
+      #: Absolute path to the package on the filesystem. Used to look
+      #: up resources contained in the package.
+        
+        
         self.root_path = root_path
 
-        #: A dictionary mapping endpoint names to view functions.
-        #:
-        #: To register a view function, use the :meth:`route` decorator.
-        #:
-        #: This data structure is internal. It should not be modified
-        #: directly and its format may change at any time.
+      #: A dictionary mapping endpoint names to view functions.
+      #:
+        
+      #: To register a view function, use the :meth:`route` decorator.
+      #:
+        
+      #: This data structure is internal. It should not be modified
+      #: directly and its format may change at any time.
+        
+        
+        
+        
         self.view_functions: dict[str, ft.RouteCallable] = {}
 
-        #: A data structure of registered error handlers, in the format
-        #: ``{scope: {code: {class: handler}}}``. The ``scope`` key is
-        #: the name of a blueprint the handlers are active for, or
-        #: ``None`` for all requests. The ``code`` key is the HTTP
-        #: status code for ``HTTPException``, or ``None`` for
-        #: other exceptions. The innermost dictionary maps exception
-        #: classes to handler functions.
-        #:
-        #: To register an error handler, use the :meth:`errorhandler`
-        #: decorator.
-        #:
-        #: This data structure is internal. It should not be modified
-        #: directly and its format may change at any time.
+      #: A data structure of registered error handlers, in the format
+      #: ``{scope: {code: {class: handler}}}``. The ``scope`` key is
+      #: the name of a blueprint the handlers are active for, or
+      #: ``None`` for all requests. The ``code`` key is the HTTP
+      #: status code for ``HTTPException``, or ``None`` for
+      #: other exceptions. The innermost dictionary maps exception
+      #: classes to handler functions.
+      #:
+        
+      #: To register an error handler, use the :meth:`errorhandler`
+      #: decorator.
+      #:
+        
+      #: This data structure is internal. It should not be modified
+      #: directly and its format may change at any time.
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         self.error_handler_spec: dict[
             ft.AppOrBlueprintKey,
             dict[int | None, dict[type[Exception], ft.ErrorHandlerCallable]],
         ] = defaultdict(lambda: defaultdict(dict))
 
-        #: A data structure of functions to call at the beginning of
-        #: each request, in the format ``{scope: [functions]}``. The
-        #: ``scope`` key is the name of a blueprint the functions are
-        #: active for, or ``None`` for all requests.
-        #:
-        #: To register a function, use the :meth:`before_request`
-        #: decorator.
-        #:
-        #: This data structure is internal. It should not be modified
-        #: directly and its format may change at any time.
+      #: A data structure of functions to call at the beginning of
+      #: each request, in the format ``{scope: [functions]}``. The
+      #: ``scope`` key is the name of a blueprint the functions are
+      #: active for, or ``None`` for all requests.
+      #:
+        
+      #: To register a function, use the :meth:`before_request`
+      #: decorator.
+      #:
+        
+      #: This data structure is internal. It should not be modified
+      #: directly and its format may change at any time.
+        
+        
+        
+        
+        
+        
+        
+        
         self.before_request_funcs: dict[
             ft.AppOrBlueprintKey, list[ft.BeforeRequestCallable]
         ] = defaultdict(list)
 
-        #: A data structure of functions to call at the end of each
-        #: request, in the format ``{scope: [functions]}``. The
-        #: ``scope`` key is the name of a blueprint the functions are
-        #: active for, or ``None`` for all requests.
-        #:
-        #: To register a function, use the :meth:`after_request`
-        #: decorator.
-        #:
-        #: This data structure is internal. It should not be modified
-        #: directly and its format may change at any time.
+      #: A data structure of functions to call at the end of each
+      #: request, in the format ``{scope: [functions]}``. The
+      #: ``scope`` key is the name of a blueprint the functions are
+      #: active for, or ``None`` for all requests.
+      #:
+        
+      #: To register a function, use the :meth:`after_request`
+      #: decorator.
+      #:
+        
+      #: This data structure is internal. It should not be modified
+      #: directly and its format may change at any time.
+        
+        
+        
+        
+        
+        
+        
+        
         self.after_request_funcs: dict[
             ft.AppOrBlueprintKey, list[ft.AfterRequestCallable[t.Any]]
         ] = defaultdict(list)
 
-        #: A data structure of functions to call at the end of each
-        #: request even if an exception is raised, in the format
-        #: ``{scope: [functions]}``. The ``scope`` key is the name of a
-        #: blueprint the functions are active for, or ``None`` for all
-        #: requests.
-        #:
-        #: To register a function, use the :meth:`teardown_request`
-        #: decorator.
-        #:
-        #: This data structure is internal. It should not be modified
-        #: directly and its format may change at any time.
+      #: A data structure of functions to call at the end of each
+      #: request even if an exception is raised, in the format
+      #: ``{scope: [functions]}``. The ``scope`` key is the name of a
+      #: blueprint the functions are active for, or ``None`` for all
+      #: requests.
+      #:
+        
+      #: To register a function, use the :meth:`teardown_request`
+      #: decorator.
+      #:
+        
+      #: This data structure is internal. It should not be modified
+      #: directly and its format may change at any time.
+        
+        
+        
+        
+        
+        
+        
+        
+        
         self.teardown_request_funcs: dict[
             ft.AppOrBlueprintKey, list[ft.TeardownCallable]
         ] = defaultdict(list)
 
-        #: A data structure of functions to call to pass extra context
-        #: values when rendering templates, in the format
-        #: ``{scope: [functions]}``. The ``scope`` key is the name of a
-        #: blueprint the functions are active for, or ``None`` for all
-        #: requests.
-        #:
-        #: To register a function, use the :meth:`context_processor`
-        #: decorator.
-        #:
-        #: This data structure is internal. It should not be modified
-        #: directly and its format may change at any time.
+      #: A data structure of functions to call to pass extra context
+      #: values when rendering templates, in the format
+      #: ``{scope: [functions]}``. The ``scope`` key is the name of a
+      #: blueprint the functions are active for, or ``None`` for all
+      #: requests.
+      #:
+        
+      #: To register a function, use the :meth:`context_processor`
+      #: decorator.
+      #:
+        
+      #: This data structure is internal. It should not be modified
+      #: directly and its format may change at any time.
+        
+        
+        
+        
+        
+        
+        
+        
+        
         self.template_context_processors: dict[
             ft.AppOrBlueprintKey, list[ft.TemplateContextProcessorCallable]
         ] = defaultdict(list, {None: [_default_template_ctx_processor]})
 
-        #: A data structure of functions to call to modify the keyword
-        #: arguments passed to the view function, in the format
-        #: ``{scope: [functions]}``. The ``scope`` key is the name of a
-        #: blueprint the functions are active for, or ``None`` for all
-        #: requests.
-        #:
-        #: To register a function, use the
-        #: :meth:`url_value_preprocessor` decorator.
-        #:
-        #: This data structure is internal. It should not be modified
-        #: directly and its format may change at any time.
+      #: A data structure of functions to call to modify the keyword
+      #: arguments passed to the view function, in the format
+      #: ``{scope: [functions]}``. The ``scope`` key is the name of a
+      #: blueprint the functions are active for, or ``None`` for all
+      #: requests.
+      #:
+        
+      #: To register a function, use the
+      #: :meth:`url_value_preprocessor` decorator.
+      #:
+        
+      #: This data structure is internal. It should not be modified
+      #: directly and its format may change at any time.
+        
+        
+        
+        
+        
+        
+        
+        
+        
         self.url_value_preprocessors: dict[
             ft.AppOrBlueprintKey,
             list[ft.URLValuePreprocessorCallable],
         ] = defaultdict(list)
 
-        #: A data structure of functions to call to modify the keyword
-        #: arguments when generating URLs, in the format
-        #: ``{scope: [functions]}``. The ``scope`` key is the name of a
-        #: blueprint the functions are active for, or ``None`` for all
-        #: requests.
-        #:
-        #: To register a function, use the :meth:`url_defaults`
-        #: decorator.
-        #:
-        #: This data structure is internal. It should not be modified
-        #: directly and its format may change at any time.
+      #: A data structure of functions to call to modify the keyword
+      #: arguments when generating URLs, in the format
+      #: ``{scope: [functions]}``. The ``scope`` key is the name of a
+      #: blueprint the functions are active for, or ``None`` for all
+      #: requests.
+      #:
+        
+      #: To register a function, use the :meth:`url_defaults`
+      #: decorator.
+      #:
+        
+      #: This data structure is internal. It should not be modified
+      #: directly and its format may change at any time.
+        
+        
+        
+        
+        
+        
+        
+        
+        
         self.url_default_functions: dict[
             ft.AppOrBlueprintKey, list[ft.URLDefaultCallable]
         ] = defaultdict(list)
@@ -706,15 +796,7 @@ def _endpoint_from_view_func(view_func: ft.RouteCallable) -> str:
     return view_func.__name__
 
 
-def _path_is_relative_to(path: pathlib.PurePath, base: str) -> bool:
-    # Path.is_relative_to doesn't exist until Python 3.9
-    try:
-        path.relative_to(base)
-        return True
-    except ValueError:
-        return False
-
-
+  # Path.is_relative_to doesn't exist until Python 3.9
 def _find_package_path(import_name: str) -> str:
     """Find the path that contains the package or module."""
     root_mod_name, _, _ = import_name.partition(".")
@@ -725,39 +807,49 @@ def _find_package_path(import_name: str) -> str:
         if root_spec is None:
             raise ValueError("not found")
     except (ImportError, ValueError):
-        # ImportError: the machinery told us it does not exist
-        # ValueError:
-        #    - the module name was invalid
-        #    - the module name is __main__
-        #    - we raised `ValueError` due to `root_spec` being `None`
+      # ImportError: the machinery told us it does not exist
+      # ValueError:
+      #    - the module name was invalid
+      #    - the module name is __main__
+      #    - we raised `ValueError` due to `root_spec` being `None`
+        
+        
+        
+        
+        
         return os.getcwd()
 
     if root_spec.submodule_search_locations:
         if root_spec.origin is None or root_spec.origin == "namespace":
-            # namespace package
+          # namespace package
+            
             package_spec = importlib.util.find_spec(import_name)
 
             if package_spec is not None and package_spec.submodule_search_locations:
-                # Pick the path in the namespace that contains the submodule.
+              # Pick the path in the namespace that contains the submodule.
+                
                 package_path = pathlib.Path(
                     os.path.commonpath(package_spec.submodule_search_locations)
                 )
                 search_location = next(
                     location
                     for location in root_spec.submodule_search_locations
-                    if _path_is_relative_to(package_path, location)
+                    if package_path.is_relative_to(location)
                 )
             else:
-                # Pick the first path.
+              # Pick the first path.
+                
                 search_location = root_spec.submodule_search_locations[0]
 
             return os.path.dirname(search_location)
         else:
-            # package with __init__.py
+          # package with __init__.py
+            
             return os.path.dirname(os.path.dirname(root_spec.origin))
     else:
-        # module
-        return os.path.dirname(root_spec.origin)  # type: ignore[type-var, return-value]
+      # module
+        
+        return os.path.dirname(root_spec.origin)  
 
 
 def find_package(import_name: str) -> tuple[str | None, str]:
@@ -776,26 +868,32 @@ def find_package(import_name: str) -> tuple[str | None, str]:
     package_path = _find_package_path(import_name)
     py_prefix = os.path.abspath(sys.prefix)
 
-    # installed to the system
-    if _path_is_relative_to(pathlib.PurePath(package_path), py_prefix):
+  # installed to the system
+    
+    if pathlib.PurePath(package_path).is_relative_to(py_prefix):
         return py_prefix, package_path
 
     site_parent, site_folder = os.path.split(package_path)
 
-    # installed to a virtualenv
+  # installed to a virtualenv
+    
     if site_folder.lower() == "site-packages":
         parent, folder = os.path.split(site_parent)
 
-        # Windows (prefix/lib/site-packages)
+      # Windows (prefix/lib/site-packages)
+        
         if folder.lower() == "lib":
             return parent, package_path
 
-        # Unix (prefix/lib/pythonX.Y/site-packages)
+      # Unix (prefix/lib/pythonX.Y/site-packages)
+        
         if os.path.basename(parent).lower() == "lib":
             return os.path.dirname(parent), package_path
 
-        # something else (prefix/site-packages)
+      # something else (prefix/site-packages)
+        
         return site_parent, package_path
 
-    # not installed
+  # not installed
+    
     return None, package_path

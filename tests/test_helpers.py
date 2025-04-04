@@ -43,31 +43,37 @@ class TestSendfile:
         rv.close()
 
     def test_static_file(self, app, req_ctx):
-        # Default max_age is None.
+      # Default max_age is None.
+        
 
-        # Test with static file handler.
+      # Test with static file handler.
+        
         rv = app.send_static_file("index.html")
         assert rv.cache_control.max_age is None
         rv.close()
 
-        # Test with direct use of send_file.
+      # Test with direct use of send_file.
+        
         rv = flask.send_file("static/index.html")
         assert rv.cache_control.max_age is None
         rv.close()
 
         app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 3600
 
-        # Test with static file handler.
+      # Test with static file handler.
+        
         rv = app.send_static_file("index.html")
         assert rv.cache_control.max_age == 3600
         rv.close()
 
-        # Test with direct use of send_file.
+      # Test with direct use of send_file.
+        
         rv = flask.send_file("static/index.html")
         assert rv.cache_control.max_age == 3600
         rv.close()
 
-        # Test with pathlib.Path.
+      # Test with pathlib.Path.
+        
         rv = app.send_static_file(FakePath("index.html"))
         assert rv.cache_control.max_age == 3600
         rv.close()
@@ -79,12 +85,14 @@ class TestSendfile:
         app = StaticFileApp(__name__)
 
         with app.test_request_context():
-            # Test with static file handler.
+          # Test with static file handler.
+            
             rv = app.send_static_file("index.html")
             assert rv.cache_control.max_age == 10
             rv.close()
 
-            # Test with direct use of send_file.
+          # Test with direct use of send_file.
+            
             rv = flask.send_file("static/index.html")
             assert rv.cache_control.max_age == 10
             rv.close()
@@ -120,11 +128,13 @@ class TestUrlFor:
     def test_url_for_with_scheme_not_external(self, app, req_ctx):
         app.add_url_rule("/", endpoint="index")
 
-        # Implicit external with scheme.
+      # Implicit external with scheme.
+        
         url = flask.url_for("index", _scheme="https")
         assert url == "https://localhost/"
 
-        # Error when external=False with scheme
+      # Error when external=False with scheme
+        
         with pytest.raises(ValueError):
             flask.url_for("index", _scheme="https", _external=False)
 
@@ -334,16 +344,27 @@ class TestHelpers:
             assert rv.data == b"Hello"
             assert rv.mimetype == "text/html"
 
-    @pytest.mark.parametrize("mode", ("r", "rb", "rt"))
-    def test_open_resource(self, mode):
-        app = flask.Flask(__name__)
 
-        with app.open_resource("static/index.html", mode) as f:
-            assert "<h1>Hello World!</h1>" in str(f.read())
+@pytest.mark.parametrize("mode", ("r", "rb", "rt"))
+def test_open_resource(mode):
+    app = flask.Flask(__name__)
 
-    @pytest.mark.parametrize("mode", ("w", "x", "a", "r+"))
-    def test_open_resource_exceptions(self, mode):
-        app = flask.Flask(__name__)
+    with app.open_resource("static/index.html", mode) as f:
+        assert "<h1>Hello World!</h1>" in str(f.read())
 
-        with pytest.raises(ValueError):
-            app.open_resource("static/index.html", mode)
+
+@pytest.mark.parametrize("mode", ("w", "x", "a", "r+"))
+def test_open_resource_exceptions(mode):
+    app = flask.Flask(__name__)
+
+    with pytest.raises(ValueError):
+        app.open_resource("static/index.html", mode)
+
+
+@pytest.mark.parametrize("encoding", ("utf-8", "utf-16-le"))
+def test_open_resource_with_encoding(tmp_path, encoding):
+    app = flask.Flask(__name__, root_path=os.fspath(tmp_path))
+    (tmp_path / "test").write_text("test", encoding=encoding)
+
+    with app.open_resource("test", mode="rt", encoding=encoding) as f:
+        assert f.read() == "test"
