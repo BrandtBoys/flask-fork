@@ -16,8 +16,8 @@ if t.TYPE_CHECKING:
 
 
 class Blueprint(SansioBlueprint):
-    # The constructor for a Flask application, initializing its components and setting up the Click command group.
-def __init__(
+  # The constructor for a Flask application, initializing its components and setting up the Click command group.
+    def __init__(
         self,
         name: str,
         import_name: str,
@@ -43,25 +43,24 @@ def __init__(
             cli_group,
         )
 
-      #: The Click command group for registering CLI commands for this
-      #: object. The commands are available from the ``flask`` command
-      #: once the application has been discovered and blueprints have
-      #: been registered.
+    #: The Click command group for registering CLI commands for this
+    #: object. The commands are available from the ``flask`` command
+    #: once the application has been discovered and blueprints have
+    #: been registered.
         
         
         
         
         self.cli = AppGroup()
 
-      # Set the name of the Click group in case someone wants to add
-      # the app's commands to another CLI tool.
+    # Set the name of the Click group in case someone wants to add
+    # the app's commands to another CLI tool.
         
         
         self.cli.name = self.name
 
-    # Returns the maximum age for a file to be cached by the browser, 
-# falling back to the default configuration from Flask's current app.
-def get_send_file_max_age(self, filename: str | None) -> int | None:
+  # Returns the maximum age for a file to be cached by the browser, 
+    def get_send_file_max_age(self, filename: str | None) -> int | None:
         """Used by :func:`send_file` to determine the ``max_age`` cache
         value for a given file path if it wasn't passed.
 
@@ -88,8 +87,8 @@ def get_send_file_max_age(self, filename: str | None) -> int | None:
 
         return value  
 
-    # The view function used to serve files from static_folder, automatically registering a route at static_url_path if set.
-def send_static_file(self, filename: str) -> Response:
+  # The view function used to serve files from static_folder, automatically registering a route at static_url_path if set.
+    def send_static_file(self, filename: str) -> Response:
         """The view function used to serve files from
         :attr:`static_folder`. A route is automatically registered for
         this view at :attr:`static_url_path` if :attr:`static_folder` is
@@ -104,8 +103,8 @@ def send_static_file(self, filename: str) -> Response:
         if not self.has_static_folder:
             raise RuntimeError("'static_folder' must be set to serve static_files.")
 
-      # send_file only knows to call get_send_file_max_age on the app,
-      # call it here so it works for blueprints too.
+    # send_file only knows to call get_send_file_max_age on the app,
+    # call it here so it works for blueprints too.
         
         
         max_age = self.get_send_file_max_age(filename)
@@ -113,8 +112,8 @@ def send_static_file(self, filename: str) -> Response:
             t.cast(str, self.static_folder), filename, max_age=max_age
         )
 
-    # Open a resource file relative to root_path for reading.
-def open_resource(
+  # Open a resource file relative to root_path for reading.
+    def open_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
     ) -> t.IO[t.AnyStr]:
         """Open a resource file relative to :attr:`root_path` for reading. The

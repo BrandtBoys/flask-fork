@@ -30,29 +30,29 @@ class SessionMixin(MutableMapping):
         return self.get("_permanent", False)
 
     @permanent.setter
-    # This function sets a boolean attribute "_permanent" to the provided value.
-def permanent(self, value: bool) -> None:
+  # This function sets a boolean attribute "_permanent" to the provided value.
+    def permanent(self, value: bool) -> None:
         self["_permanent"] = bool(value)
 
-  #: Some implementations can detect whether a session is newly
-  #: created, but that is not guaranteed. Use with caution. The mixin
-  # default is hard-coded ``False``.
+#: Some implementations can detect whether a session is newly
+#: created, but that is not guaranteed. Use with caution. The mixin
+# default is hard-coded ``False``.
     
     
     
     new = False
 
-  #: Some implementations can detect changes to the session and set
-  #: this when that happens. The mixin default is hard coded to
-  #: ``True``.
+#: Some implementations can detect changes to the session and set
+#: this when that happens. The mixin default is hard coded to
+#: ``True``.
     
     
     
     modified = True
 
-  #: Some implementations can detect when session data is read or
-  #: written and set this when that happens. The mixin default is hard
-  #: coded to ``True``.
+#: Some implementations can detect when session data is read or
+#: written and set this when that happens. The mixin default is hard
+#: coded to ``True``.
     
     
     
@@ -69,11 +69,11 @@ class SecureCookieSession(CallbackDict, SessionMixin):
     ``False``.
     """
 
-  #: When data is changed, this is set to ``True``. Only the session
-  #: dictionary itself is tracked; if the session contains mutable
-  #: data (for example a nested dict) then this must be set to
-  #: ``True`` manually when modifying that data. The session cookie
-  #: will only be written to the response if this is ``True``.
+#: When data is changed, this is set to ``True``. Only the session
+#: dictionary itself is tracked; if the session contains mutable
+#: data (for example a nested dict) then this must be set to
+#: ``True`` manually when modifying that data. The session cookie
+#: will only be written to the response if this is ``True``.
     
     
     
@@ -81,27 +81,27 @@ class SecureCookieSession(CallbackDict, SessionMixin):
     
     modified = False
 
-  #: When data is read or written, this is set to ``True``. Used by
-  # :class:`.SecureCookieSessionInterface` to add a ``Vary: Cookie``
-  #: header, which allows caching proxies to cache different pages for
-  #: different users.
+#: When data is read or written, this is set to ``True``. Used by
+# :class:`.SecureCookieSessionInterface` to add a ``Vary: Cookie``
+#: header, which allows caching proxies to cache different pages for
+#: different users.
     
     
     
     
     accessed = False
 
-    # Initializes the object with an optional initial value and sets up the update callback.
-def __init__(self, initial: t.Any = None) -> None:
-        # Update function, marking object as modified and accessed.
-def on_update(self: te.Self) -> None:
+  # Initializes the object with an optional initial value and sets up the update callback.
+    def __init__(self, initial: t.Any = None) -> None:
+      # Update function, marking object as modified and accessed.
+        def on_update(self: te.Self) -> None:
             self.modified = True
             self.accessed = True
 
         super().__init__(initial, on_update)
 
-    # This method overrides the built-in __getitem__ function to track access and delegate to the superclass.
-def __getitem__(self, key: str) -> t.Any:
+  # This method overrides the built-in __getitem__ function to track access and delegate to the superclass.
+    def __getitem__(self, key: str) -> t.Any:
         self.accessed = True
         return super().__getitem__(key)
 
@@ -109,8 +109,8 @@ def __getitem__(self, key: str) -> t.Any:
         self.accessed = True
         return super().get(key, default)
 
-    # Sets a default value if the specified key is not present in the object.
-def setdefault(self, key: str, default: t.Any = None) -> t.Any:
+  # Sets a default value if the specified key is not present in the object.
+    def setdefault(self, key: str, default: t.Any = None) -> t.Any:
         self.accessed = True
         return super().setdefault(key, default)
 
@@ -121,8 +121,8 @@ class NullSession(SecureCookieSession):
     but fail on setting.
     """
 
-    # Raises a RuntimeError indicating that the session is unavailable due to an unconfigured secret key.
-def _fail(self, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:
+  # Raises a RuntimeError indicating that the session is unavailable due to an unconfigured secret key.
+    def _fail(self, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:
         raise RuntimeError(
             "The session is unavailable because no secret "
             "key was set.  Set the secret_key on the "
@@ -170,30 +170,30 @@ class SessionInterface:
     .. versionadded:: 0.8
     """
 
-  #: :meth:`make_null_session` will look here for the class that should
-  #: be created when a null session is requested.  Likewise the
-  #: :meth:`is_null_session` method will perform a typecheck against
-  #: this type.
+#: :meth:`make_null_session` will look here for the class that should
+#: be created when a null session is requested.  Likewise the
+#: :meth:`is_null_session` method will perform a typecheck against
+#: this type.
     
     
     
     
     null_session_class = NullSession
 
-  #: A flag that indicates if the session interface is pickle based.
-  #: This can be used by Flask extensions to make a decision in regards
-  #: to how to deal with the session object.
-  #:
+#: A flag that indicates if the session interface is pickle based.
+#: This can be used by Flask extensions to make a decision in regards
+#: to how to deal with the session object.
+#:
     
-  #: .. versionadded:: 0.10
+#: .. versionadded:: 0.10
     
     
     
     
     pickle_based = False
 
-    # Creates a null session to replace the real session in case of configuration errors, providing a fallback for user experience.
-def make_null_session(self, app: Flask) -> NullSession:
+  # Creates a null session to replace the real session in case of configuration errors, providing a fallback for user experience.
+    def make_null_session(self, app: Flask) -> NullSession:
         """Creates a null session which acts as a replacement object if the
         real session support could not be loaded due to a configuration
         error.  This mainly aids the user experience because the job of the
@@ -205,8 +205,8 @@ def make_null_session(self, app: Flask) -> NullSession:
         """
         return self.null_session_class()
 
-    # Checks if a given object is a null session, indicating it does not need to be saved.
-def is_null_session(self, obj: object) -> bool:
+  # Checks if a given object is a null session, indicating it does not need to be saved.
+    def is_null_session(self, obj: object) -> bool:
         """Checks if a given object is a null session.  Null sessions are
         not asked to be saved.
 
@@ -219,9 +219,8 @@ def is_null_session(self, obj: object) -> bool:
         """The name of the session cookie. Uses``app.config["SESSION_COOKIE_NAME"]``."""
         return app.config["SESSION_COOKIE_NAME"]  
 
-    # The function returns the value of the Domain parameter on the session cookie, 
-# which determines whether cookies are sent to a specific domain or all subdomains.
-def get_cookie_domain(self, app: Flask) -> str | None:
+  # The function returns the value of the Domain parameter on the session cookie, 
+    def get_cookie_domain(self, app: Flask) -> str | None:
         """The value of the ``Domain`` parameter on the session cookie. If not set,
         browsers will only send the cookie to the exact domain it was set from.
         Otherwise, they will send it to any subdomain of the given value as well.
@@ -233,8 +232,8 @@ def get_cookie_domain(self, app: Flask) -> str | None:
         """
         return app.config["SESSION_COOKIE_DOMAIN"]  
 
-    # Returns the path for which the cookie should be valid, falling back to APPLICATION_ROOT or using / if SESSION_COOKIE_PATH is None.
-def get_cookie_path(self, app: Flask) -> str:
+  # Returns the path for which the cookie should be valid, falling back to APPLICATION_ROOT or using / if SESSION_COOKIE_PATH is None.
+    def get_cookie_path(self, app: Flask) -> str:
         """Returns the path for which the cookie should be valid.  The
         default implementation uses the value from the ``SESSION_COOKIE_PATH``
         config var if it's set, and falls back to ``APPLICATION_ROOT`` or
@@ -242,8 +241,8 @@ def get_cookie_path(self, app: Flask) -> str:
         """
         return app.config["SESSION_COOKIE_PATH"] or app.config["APPLICATION_ROOT"]  
 
-    # Returns whether the session cookie should be marked as httponly based on the SESSION_COOKIE_HTTPONLY configuration variable.
-def get_cookie_httponly(self, app: Flask) -> bool:
+  # Returns whether the session cookie should be marked as httponly based on the SESSION_COOKIE_HTTPONLY configuration variable.
+    def get_cookie_httponly(self, app: Flask) -> bool:
         """Returns True if the session cookie should be httponly.  This
         currently just returns the value of the ``SESSION_COOKIE_HTTPONLY``
         config var.
@@ -256,16 +255,16 @@ def get_cookie_httponly(self, app: Flask) -> bool:
         """
         return app.config["SESSION_COOKIE_SECURE"]  
 
-    # Returns the SameSite attribute for a given cookie, either 'Strict' or 'Lax', based on the SESSION_COOKIE_SAMESITE configuration.
-def get_cookie_samesite(self, app: Flask) -> str | None:
+  # Returns the SameSite attribute for a given cookie, either 'Strict' or 'Lax', based on the SESSION_COOKIE_SAMESITE configuration.
+    def get_cookie_samesite(self, app: Flask) -> str | None:
         """Return ``'Strict'`` or ``'Lax'`` if the cookie should use the
         ``SameSite`` attribute. This currently just returns the value of
         the :data:`SESSION_COOKIE_SAMESITE` setting.
         """
         return app.config["SESSION_COOKIE_SAMESITE"]  
 
-    # Returns whether the cookie should be partitioned based on the configuration setting SESSION_COOKIE_PARTITIONED
-def get_cookie_partitioned(self, app: Flask) -> bool:
+  # Returns whether the cookie should be partitioned based on the configuration setting SESSION_COOKIE_PARTITIONED
+    def get_cookie_partitioned(self, app: Flask) -> bool:
         """Returns True if the cookie should be partitioned. By default, uses
         the value of :data:`SESSION_COOKIE_PARTITIONED`.
 
@@ -273,8 +272,8 @@ def get_cookie_partitioned(self, app: Flask) -> bool:
         """
         return app.config["SESSION_COOKIE_PARTITIONED"]  
 
-    # A helper method that returns an expiration date for the session or None if linked to browser session.
-def get_expiration_time(self, app: Flask, session: SessionMixin) -> datetime | None:
+  # A helper method that returns an expiration date for the session or None if linked to browser session.
+    def get_expiration_time(self, app: Flask, session: SessionMixin) -> datetime | None:
         """A helper method that returns an expiration date for the session
         or ``None`` if the session is linked to the browser session.  The
         default implementation returns now + the permanent session
@@ -284,8 +283,8 @@ def get_expiration_time(self, app: Flask, session: SessionMixin) -> datetime | N
             return datetime.now(timezone.utc) + app.permanent_session_lifetime
         return None
 
-    # Used by session backends to determine if a ``Set-Cookie`` header should be set for this session cookie for this response.
-def should_set_cookie(self, app: Flask, session: SessionMixin) -> bool:
+  # Used by session backends to determine if a ``Set-Cookie`` header should be set for this session cookie for this response.
+    def should_set_cookie(self, app: Flask, session: SessionMixin) -> bool:
         """Used by session backends to determine if a ``Set-Cookie`` header
         should be set for this session cookie for this response. If the session
         has been modified, the cookie is set. If the session is permanent and
@@ -341,22 +340,22 @@ class SecureCookieSessionInterface(SessionInterface):
     through the :mod:`itsdangerous` module.
     """
 
-  #: the salt that should be applied on top of the secret key for the
-  #: signing of cookie based sessions.
+#: the salt that should be applied on top of the secret key for the
+#: signing of cookie based sessions.
     
     
     salt = "cookie-session"
-  #: the hash function to use for the signature.  The default is sha1
+#: the hash function to use for the signature.  The default is sha1
     
     digest_method = staticmethod(_lazy_sha1)
-  #: the name of the itsdangerous supported key derivation.  The default
-  #: is hmac.
+#: the name of the itsdangerous supported key derivation.  The default
+#: is hmac.
     
     
     key_derivation = "hmac"
-  #: A python serializer for the payload.  The default is a compact
-  #: JSON derived serializer with support for some extra Python types
-  #: such as datetime objects or tuples.
+#: A python serializer for the payload.  The default is a compact
+#: JSON derived serializer with support for some extra Python types
+#: such as datetime objects or tuples.
     
     
     
@@ -401,13 +400,13 @@ class SecureCookieSessionInterface(SessionInterface):
         samesite = self.get_cookie_samesite(app)
         httponly = self.get_cookie_httponly(app)
 
-      # Add a "Vary: Cookie" header if the session was accessed at all.
+    # Add a "Vary: Cookie" header if the session was accessed at all.
         
         if session.accessed:
             response.vary.add("Cookie")
 
-      # If the session is modified to be empty, remove the cookie.
-      # If the session is empty, return without setting the cookie.
+    # If the session is modified to be empty, remove the cookie.
+    # If the session is empty, return without setting the cookie.
         
         
         if not session:

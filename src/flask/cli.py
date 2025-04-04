@@ -38,14 +38,13 @@ class NoAppException(click.UsageError):
     """Raised if an application cannot be found or loaded."""
 
 
-# Given a module instance, this function attempts to find and return the best possible Flask application within the module. If no suitable application is found, it raises a NoAppException.
 def find_best_app(module: ModuleType) -> Flask:
     """Given a module instance this tries to find the best possible
     application in the module or raises an exception.
     """
     from . import Flask
 
-  # Search for the most common names first.
+# Search for the most common names first.
     
     for attr_name in ("app", "application"):
         app = getattr(module, attr_name, None)
@@ -53,7 +52,7 @@ def find_best_app(module: ModuleType) -> Flask:
         if isinstance(app, Flask):
             return app
 
-  # Otherwise find the only object that is a Flask instance.
+# Otherwise find the only object that is a Flask instance.
     
     matches = [v for v in module.__dict__.values() if isinstance(v, Flask)]
 
@@ -66,7 +65,7 @@ def find_best_app(module: ModuleType) -> Flask:
             " to specify the correct one."
         )
 
-  # Search for app factory functions.
+# Search for app factory functions.
     
     for attr_name in ("create_app", "make_app"):
         app_factory = getattr(module, attr_name, None)
@@ -95,7 +94,6 @@ def find_best_app(module: ModuleType) -> Flask:
     )
 
 
-# Check whether calling a function raised a TypeError due to call failure or factory error.
 def _called_with_wrong_args(f: t.Callable[..., Flask]) -> bool:
     """Check whether calling a function raised a ``TypeError`` because
     the call failed or because something in the factory raised the
@@ -109,33 +107,31 @@ def _called_with_wrong_args(f: t.Callable[..., Flask]) -> bool:
     try:
         while tb is not None:
             if tb.tb_frame.f_code is f.__code__:
-              # In the function, it was called successfully.
+            # In the function, it was called successfully.
                 
                 return False
 
             tb = tb.tb_next
 
-      # Didn't reach the function.
+    # Didn't reach the function.
         
         return True
     finally:
-      # Delete tb to break a circular reference.
-      # https://docs.python.org/2/library/sys.html#sys.exc_info
+    # Delete tb to break a circular reference.
+    # https://docs.python.org/2/library/sys.html#sys.exc_info
         
         
         del tb
 
 
-# Check if the given string is a variable name or a function, 
-# call a function to get the app instance, or return the variable directly.
 def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
     """Check if the given string is a variable name or a function. Call
     a function to get the app instance, or return the variable directly.
     """
     from . import Flask
 
-  # Parse app_name as a single expression to determine if it's a valid
-  # attribute name or function call.
+# Parse app_name as a single expression to determine if it's a valid
+# attribute name or function call.
     
     
     try:
@@ -150,7 +146,7 @@ def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
         args = []
         kwargs = {}
     elif isinstance(expr, ast.Call):
-      # Ensure the function name is an attribute name only.
+    # Ensure the function name is an attribute name only.
         
         if not isinstance(expr.func, ast.Name):
             raise NoAppException(
@@ -159,7 +155,7 @@ def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
 
         name = expr.func.id
 
-      # Parse the positional and keyword arguments as literals.
+    # Parse the positional and keyword arguments as literals.
         
         try:
             args = [ast.literal_eval(arg) for arg in expr.args]
@@ -169,8 +165,8 @@ def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
                 if kw.arg is not None
             }
         except ValueError:
-          # literal_eval gives cryptic error messages, show a generic
-          # message with the full expression instead.
+        # literal_eval gives cryptic error messages, show a generic
+        # message with the full expression instead.
             
             
             raise NoAppException(
@@ -188,8 +184,8 @@ def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
             f"Failed to find attribute {name!r} in {module.__name__!r}."
         ) from e
 
-  # If the attribute is a function, call it with any args and kwargs
-  # to get the real application.
+# If the attribute is a function, call it with any args and kwargs
+# to get the real application.
     
     
     if inspect.isfunction(attr):
@@ -216,7 +212,6 @@ def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
     )
 
 
-# Given a filename, this function attempts to calculate the Python path by adding it to the search path and returning the expected module name.
 def prepare_import(path: str) -> str:
     """Given a filename this will try to calculate the python path, add it
     to the search path and return the actual module name that is expected.
@@ -232,7 +227,7 @@ def prepare_import(path: str) -> str:
 
     module_name = []
 
-  # move up until outside package structure (no __init__.py)
+# move up until outside package structure (no __init__.py)
     
     while True:
         path, name = os.path.split(path)
@@ -254,21 +249,19 @@ def locate_app(
 
 
 @t.overload
-# Returns an instance of a Flask application or None if the specified application cannot be located.
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[False] = ...
 ) -> Flask | None: ...
 
 
-# Import the required modules and raise an exception if they are not found.
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: bool = True
 ) -> Flask | None:
     try:
         __import__(module_name)
     except ImportError:
-      # Reraise the ImportError if it occurred within the imported module.
-      # Determine this by checking whether the trace has a depth > 1.
+    # Reraise the ImportError if it occurred within the imported module.
+    # Determine this by checking whether the trace has a depth > 1.
         
         
         if sys.exc_info()[2].tb_next:  
@@ -289,7 +282,6 @@ def locate_app(
         return find_app_by_string(module, app_name)
 
 
-# Returns the version information of Flask and Werkzeug, along with the Python interpreter version.
 def get_version(ctx: click.Context, param: click.Parameter, value: t.Any) -> None:
     if not value or ctx.resilient_parsing:
         return
@@ -328,24 +320,24 @@ class ScriptInfo:
         Added the ``load_dotenv_defaults`` parameter and attribute.
     """
 
-    # Optionally the import path for the Flask application.
-def __init__(
+  # Optionally the import path for the Flask application.
+    def __init__(
         self,
         app_import_path: str | None = None,
         create_app: t.Callable[..., Flask] | None = None,
         set_debug_flag: bool = True,
         load_dotenv_defaults: bool = True,
     ) -> None:
-      #: Optionally the import path for the Flask application.
+    #: Optionally the import path for the Flask application.
         
         self.app_import_path = app_import_path
-      #: Optionally a function that is passed the script info to create
-      #: the instance of the application.
+    #: Optionally a function that is passed the script info to create
+    #: the instance of the application.
         
         
         self.create_app = create_app
-      #: A dictionary with arbitrary data that can be associated with
-      #: this script info.
+    #: A dictionary with arbitrary data that can be associated with
+    #: this script info.
         
         
         self.data: dict[t.Any, t.Any] = {}
@@ -362,8 +354,8 @@ def __init__(
 
         self._loaded_app: Flask | None = None
 
-    # Loads the Flask app (if not yet loaded) and returns it, handling multiple calls by returning the already loaded app.
-def load_app(self) -> Flask:
+  # Loads the Flask app (if not yet loaded) and returns it, handling multiple calls by returning the already loaded app.
+    def load_app(self) -> Flask:
         """Loads the Flask app (if not yet loaded) and returns it.  Calling
         this multiple times will just result in the already loaded app to
         be returned.
@@ -397,8 +389,8 @@ def load_app(self) -> Flask:
             )
 
         if self.set_debug_flag:
-          # Update the app's debug flag through the descriptor so that
-          # other values repopulate as well.
+        # Update the app's debug flag through the descriptor so that
+        # other values repopulate as well.
             
             
             app.debug = get_debug_flag()
@@ -412,7 +404,6 @@ pass_script_info = click.make_pass_decorator(ScriptInfo, ensure=True)
 F = t.TypeVar("F", bound=t.Callable[..., t.Any])
 
 
-# Wraps a callback to ensure it's executed with the application context.
 def with_appcontext(f: F) -> F:
     """Wraps a callback so that it's guaranteed to be executed with the
     script's application context.
@@ -428,8 +419,8 @@ def with_appcontext(f: F) -> F:
     """
 
     @click.pass_context
-    # Decorator function to wrap a command with an application context, ensuring it loads and runs within the correct app.
-def decorator(ctx: click.Context, /, *args: t.Any, **kwargs: t.Any) -> t.Any:
+  # Decorator function to wrap a command with an application context, ensuring it loads and runs within the correct app.
+    def decorator(ctx: click.Context, /, *args: t.Any, **kwargs: t.Any) -> t.Any:
         if not current_app:
             app = ctx.ensure_object(ScriptInfo).load_app()
             ctx.with_resource(app.app_context())
@@ -447,9 +438,8 @@ class AppGroup(click.Group):
     Not to be confused with :class:`FlaskGroup`.
     """
 
-    # This function creates a decorator for the command method of a click.Group subclass, 
-# wrapping callbacks in with_appcontext unless disabled by passing with_appcontext=False.
-def command(  
+  # This function creates a decorator for the command method of a click.Group subclass, 
+    def command(  
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Callable[[t.Callable[..., t.Any]], click.Command]:
         """This works exactly like the method of the same name on a regular
@@ -458,16 +448,16 @@ def command(
         """
         wrap_for_ctx = kwargs.pop("with_appcontext", True)
 
-        # This function is a custom decorator for creating Click commands, potentially wrapping the provided function in an application context.
-def decorator(f: t.Callable[..., t.Any]) -> click.Command:
+      # This function is a custom decorator for creating Click commands, potentially wrapping the provided function in an application context.
+        def decorator(f: t.Callable[..., t.Any]) -> click.Command:
             if wrap_for_ctx:
                 f = with_appcontext(f)
             return super(AppGroup, self).command(*args, **kwargs)(f)  
 
         return decorator
 
-    # This function creates a custom click Group with default class set to AppGroup.
-def group(  
+  # This function creates a custom click Group with default class set to AppGroup.
+    def group(  
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Callable[[t.Callable[..., t.Any]], click.Group]:
         """This works exactly like the method of the same name on a regular
@@ -478,7 +468,6 @@ def group(
         return super().group(*args, **kwargs)  
 
 
-# This function sets the application import path for a given script, returning the updated path or None if no value was provided.
 def _set_app(ctx: click.Context, param: click.Option, value: str | None) -> str | None:
     if value is None:
         return None
@@ -507,10 +496,9 @@ _app_option = click.Option(
 )
 
 
-# Sets the debug flag for Flask, overriding environment variable if provided.
 def _set_debug(ctx: click.Context, param: click.Option, value: bool) -> bool | None:
-  # If the flag isn't provided, it will default to False. Don't use
-  # that, let debug be set by env in that case.
+# If the flag isn't provided, it will default to False. Don't use
+# that, let debug be set by env in that case.
     
     
     source = ctx.get_parameter_source(param.name)  
@@ -521,8 +509,8 @@ def _set_debug(ctx: click.Context, param: click.Option, value: bool) -> bool | N
     ):
         return None
 
-  # Set with env var instead of ScriptInfo.load so that it can be
-  # accessed early during a factory function.
+# Set with env var instead of ScriptInfo.load so that it can be
+# accessed early during a factory function.
     
     
     os.environ["FLASK_DEBUG"] = "1" if value else "0"
@@ -537,7 +525,6 @@ _debug_option = click.Option(
 )
 
 
-# Load environment variables from a file using python-dotenv. If the library is not installed, it raises an error and prompts to install it.
 def _env_file_callback(
     ctx: click.Context, param: click.Option, value: str | None
 ) -> str | None:
@@ -553,8 +540,8 @@ def _env_file_callback(
                 param=param,
             ) from None
 
-  # Don't check FLASK_SKIP_DOTENV, that only disables automatically
-  # loading .env and .flaskenv files.
+# Don't check FLASK_SKIP_DOTENV, that only disables automatically
+# loading .env and .flaskenv files.
     
     if value is not None or ctx.obj.load_dotenv_defaults:
         load_dotenv(value, load_defaults=ctx.obj.load_dotenv_defaults)
@@ -610,8 +597,8 @@ class FlaskGroup(AppGroup):
         from :file:`.env` and :file:`.flaskenv` files.
     """
 
-    # Initialize the Flask application with customizable options for adding default commands, creating an app instance, and more.
-def __init__(
+  # Initialize the Flask application with customizable options for adding default commands, creating an app instance, and more.
+    def __init__(
         self,
         add_default_commands: bool = True,
         create_app: t.Callable[..., Flask] | None = None,
@@ -621,10 +608,10 @@ def __init__(
         **extra: t.Any,
     ) -> None:
         params: list[click.Parameter] = list(extra.pop("params", None) or ())
-      # Processing is done with option callbacks instead of a group
-      # callback. This allows users to make a custom group callback
-      # without losing the behavior. --env-file must come first so
-      # that it is eagerly evaluated before --app.
+    # Processing is done with option callbacks instead of a group
+    # callback. This allows users to make a custom group callback
+    # without losing the behavior. --env-file must come first so
+    # that it is eagerly evaluated before --app.
         
         
         
@@ -652,17 +639,17 @@ def __init__(
 
         self._loaded_plugin_commands = False
 
-    # Load plugin commands from the Flask commands group, using a backport for Python < 3.10.
-def _load_plugin_commands(self) -> None:
+  # Load plugin commands from the Flask commands group, using a backport for Python < 3.10.
+    def _load_plugin_commands(self) -> None:
         if self._loaded_plugin_commands:
             return
 
         if sys.version_info >= (3, 10):
             from importlib import metadata
         else:
-          # Use a backport on Python < 3.10. We technically have
-          # importlib.metadata on 3.8+, but the API changed in 3.10,
-          # so use the backport for consistency.
+        # Use a backport on Python < 3.10. We technically have
+        # importlib.metadata on 3.8+, but the API changed in 3.10,
+        # so use the backport for consistency.
             
             
             
@@ -673,11 +660,11 @@ def _load_plugin_commands(self) -> None:
 
         self._loaded_plugin_commands = True
 
-    # Returns a command from either built-in commands, plugin commands, or the loaded app's CLI.
-def get_command(self, ctx: click.Context, name: str) -> click.Command | None:
+  # Returns a command from either built-in commands, plugin commands, or the loaded app's CLI.
+    def get_command(self, ctx: click.Context, name: str) -> click.Command | None:
         self._load_plugin_commands()
-      # Look up built-in and plugin commands, which should be
-      # available even if the app fails to load.
+    # Look up built-in and plugin commands, which should be
+    # available even if the app fails to load.
         
         
         rv = super().get_command(ctx, name)
@@ -687,8 +674,8 @@ def get_command(self, ctx: click.Context, name: str) -> click.Command | None:
 
         info = ctx.ensure_object(ScriptInfo)
 
-      # Look up commands provided by the app, showing an error and
-      # continuing if the app couldn't be loaded.
+    # Look up commands provided by the app, showing an error and
+    # continuing if the app couldn't be loaded.
         
         
         try:
@@ -697,9 +684,9 @@ def get_command(self, ctx: click.Context, name: str) -> click.Command | None:
             click.secho(f"Error: {e.format_message()}\n", err=True, fg="red")
             return None
 
-      # Push an app context for the loaded app unless it is already
-      # active somehow. This makes the context available to parameter
-      # and command callbacks without needing @with_appcontext.
+    # Push an app context for the loaded app unless it is already
+    # active somehow. This makes the context available to parameter
+    # and command callbacks without needing @with_appcontext.
         
         
         
@@ -708,29 +695,29 @@ def get_command(self, ctx: click.Context, name: str) -> click.Command | None:
 
         return app.cli.get_command(ctx, name)
 
-    # Returns a list of commands for the given context, including built-in and plugin commands.
-def list_commands(self, ctx: click.Context) -> list[str]:
+  # Returns a list of commands for the given context, including built-in and plugin commands.
+    def list_commands(self, ctx: click.Context) -> list[str]:
         self._load_plugin_commands()
-      # Start with the built-in and plugin commands.
+    # Start with the built-in and plugin commands.
         
         rv = set(super().list_commands(ctx))
         info = ctx.ensure_object(ScriptInfo)
 
-      # Add commands provided by the app, showing an error and
-      # continuing if the app couldn't be loaded.
+    # Add commands provided by the app, showing an error and
+    # continuing if the app couldn't be loaded.
         
         
         try:
             rv.update(info.load_app().cli.list_commands(ctx))
         except NoAppException as e:
-          # When an app couldn't be loaded, show the error message
-          # without the traceback.
+        # When an app couldn't be loaded, show the error message
+        # without the traceback.
             
             
             click.secho(f"Error: {e.format_message()}\n", err=True, fg="red")
         except Exception:
-          # When any other errors occurred during loading, show the
-          # full traceback.
+        # When any other errors occurred during loading, show the
+        # full traceback.
             
             
             click.secho(f"{traceback.format_exc()}\n", err=True, fg="red")
@@ -744,15 +731,15 @@ def list_commands(self, ctx: click.Context) -> list[str]:
         parent: click.Context | None = None,
         **extra: t.Any,
     ) -> click.Context:
-      # Set a flag to tell app.run to become a no-op. If app.run was
-      # not in a __name__ == __main__ guard, it would start the server
-      # when importing, blocking whatever command is being called.
+    # Set a flag to tell app.run to become a no-op. If app.run was
+    # not in a __name__ == __main__ guard, it would start the server
+    # when importing, blocking whatever command is being called.
         
         
         
         os.environ["FLASK_RUN_FROM_CLI"] = "true"
-      # Attempt to load .env and .flask env files. The --env-file
-      # option can cause another file to be loaded.
+    # Attempt to load .env and .flask env files. The --env-file
+    # option can cause another file to be loaded.
 
         if "obj" not in extra and "obj" not in self.context_settings:
             extra["obj"] = ScriptInfo(
@@ -765,9 +752,9 @@ def list_commands(self, ctx: click.Context) -> list[str]:
 
     def parse_args(self, ctx: click.Context, args: list[str]) -> list[str]:
         if not args and self.no_args_is_help:
-          # Attempt to load --env-file and --app early in case they
-          # were given as env vars. Otherwise no_args_is_help will not
-          # see commands from app.cli.
+        # Attempt to load --env-file and --app early in case they
+        # were given as env vars. Otherwise no_args_is_help will not
+        # see commands from app.cli.
             
             
             
@@ -831,8 +818,8 @@ def load_dotenv(
 
         return False
 
-  # Always return after attempting to load a given path, don't load
-  # the default files.
+# Always return after attempting to load a given path, don't load
+# the default files.
     data: dict[str, str | None] = {}
 
     if load_defaults:
@@ -965,7 +952,7 @@ class SeparatedPathType(click.Path):
         self, value: t.Any, param: click.Parameter | None, ctx: click.Context | None
     ) -> t.Any:
         items = self.split_envvar_value(value)
-      # can't call no-arg super() inside list comprehension until Python 3.12
+    # can't call no-arg super() inside list comprehension until Python 3.12
         
         super_convert = super().convert
         return [super_convert(item, param, ctx) for item in items]
@@ -1047,8 +1034,8 @@ def run_command(
         app: WSGIApplication = info.load_app()  
     except Exception as e:
         if is_running_from_reloader():
-          # When reloading, print out the error immediately, but raise
-          # it later so the debugger or server can handle it.
+        # When reloading, print out the error immediately, but raise
+        # it later so the debugger or server can handle it.
             
             
             traceback.print_exc()
@@ -1060,8 +1047,8 @@ def run_command(
                 raise err from None
 
         else:
-          # When not reloading, raise the error immediately so the
-          # command fails.
+        # When not reloading, raise the error immediately so the
+        # command fails.
             
             
             raise e from None
@@ -1111,8 +1098,8 @@ def shell_command() -> None:
     )
     ctx: dict[str, t.Any] = {}
 
-  # Support the regular Python interpreter startup script if someone
-  # is using it.
+# Support the regular Python interpreter startup script if someone
+# is using it.
     
     
     startup = os.environ.get("PYTHONSTARTUP")
@@ -1122,9 +1109,9 @@ def shell_command() -> None:
 
     ctx.update(current_app.make_shell_context())
 
-  # Site, customize, or startup script can set a hook to call when
-  # entering interactive mode. The default one sets up readline with
-  # tab and history completion.
+# Site, customize, or startup script can set a hook to call when
+# entering interactive mode. The default one sets up readline with
+# tab and history completion.
     
     
     
@@ -1137,8 +1124,8 @@ def shell_command() -> None:
         except ImportError:
             pass
         else:
-          # rlcompleter uses __main__.__dict__ by default, which is
-          # flask.__main__. Use the shell context instead.
+        # rlcompleter uses __main__.__dict__ by default, which is
+        # flask.__main__. Use the shell context instead.
             
             
             readline.set_completer(Completer(ctx).complete)

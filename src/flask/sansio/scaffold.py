@@ -39,7 +39,6 @@ T_url_value_preprocessor = t.TypeVar(
 T_route = t.TypeVar("T_route", bound=ft.RouteCallable)
 
 
-# This function sets up a decorator to wrap another function with additional setup and teardown logic.
 def setupmethod(f: F) -> F:
     f_name = f.__name__
 
@@ -73,8 +72,8 @@ class Scaffold:
     _static_folder: str | None = None
     _static_url_path: str | None = None
 
-    # Initialize a Flask application object with configuration options.
-def __init__(
+  # Initialize a Flask application object with configuration options.
+    def __init__(
         self,
         import_name: str,
         static_folder: str | os.PathLike[str] | None = None,
@@ -82,8 +81,8 @@ def __init__(
         template_folder: str | os.PathLike[str] | None = None,
         root_path: str | None = None,
     ):
-      #: The name of the package or module that this object belongs
-      #: to. Do not change this once it is set by the constructor.
+    #: The name of the package or module that this object belongs
+    #: to. Do not change this once it is set by the constructor.
         
         
         self.import_name = import_name
@@ -91,9 +90,9 @@ def __init__(
         self.static_folder = static_folder  
         self.static_url_path = static_url_path
 
-      #: The path to the templates folder, relative to
-      #: :attr:`root_path`, to add to the template loader. ``None`` if
-      #: templates should not be added.
+    #: The path to the templates folder, relative to
+    #: :attr:`root_path`, to add to the template loader. ``None`` if
+    #: templates should not be added.
         
         
         
@@ -102,41 +101,41 @@ def __init__(
         if root_path is None:
             root_path = get_root_path(self.import_name)
 
-      #: Absolute path to the package on the filesystem. Used to look
-      #: up resources contained in the package.
+    #: Absolute path to the package on the filesystem. Used to look
+    #: up resources contained in the package.
         
         
         self.root_path = root_path
 
-      #: A dictionary mapping endpoint names to view functions.
-      #:
+    #: A dictionary mapping endpoint names to view functions.
+    #:
         
-      #: To register a view function, use the :meth:`route` decorator.
-      #:
+    #: To register a view function, use the :meth:`route` decorator.
+    #:
         
-      #: This data structure is internal. It should not be modified
-      #: directly and its format may change at any time.
+    #: This data structure is internal. It should not be modified
+    #: directly and its format may change at any time.
         
         
         
         
         self.view_functions: dict[str, ft.RouteCallable] = {}
 
-      #: A data structure of registered error handlers, in the format
-      #: ``{scope: {code: {class: handler}}}``. The ``scope`` key is
-      #: the name of a blueprint the handlers are active for, or
-      #: ``None`` for all requests. The ``code`` key is the HTTP
-      #: status code for ``HTTPException``, or ``None`` for
-      #: other exceptions. The innermost dictionary maps exception
-      #: classes to handler functions.
-      #:
+    #: A data structure of registered error handlers, in the format
+    #: ``{scope: {code: {class: handler}}}``. The ``scope`` key is
+    #: the name of a blueprint the handlers are active for, or
+    #: ``None`` for all requests. The ``code`` key is the HTTP
+    #: status code for ``HTTPException``, or ``None`` for
+    #: other exceptions. The innermost dictionary maps exception
+    #: classes to handler functions.
+    #:
         
-      #: To register an error handler, use the :meth:`errorhandler`
-      #: decorator.
-      #:
+    #: To register an error handler, use the :meth:`errorhandler`
+    #: decorator.
+    #:
         
-      #: This data structure is internal. It should not be modified
-      #: directly and its format may change at any time.
+    #: This data structure is internal. It should not be modified
+    #: directly and its format may change at any time.
         
         
         
@@ -153,18 +152,18 @@ def __init__(
             dict[int | None, dict[type[Exception], ft.ErrorHandlerCallable]],
         ] = defaultdict(lambda: defaultdict(dict))
 
-      #: A data structure of functions to call at the beginning of
-      #: each request, in the format ``{scope: [functions]}``. The
-      #: ``scope`` key is the name of a blueprint the functions are
-      #: active for, or ``None`` for all requests.
-      #:
+    #: A data structure of functions to call at the beginning of
+    #: each request, in the format ``{scope: [functions]}``. The
+    #: ``scope`` key is the name of a blueprint the functions are
+    #: active for, or ``None`` for all requests.
+    #:
         
-      #: To register a function, use the :meth:`before_request`
-      #: decorator.
-      #:
+    #: To register a function, use the :meth:`before_request`
+    #: decorator.
+    #:
         
-      #: This data structure is internal. It should not be modified
-      #: directly and its format may change at any time.
+    #: This data structure is internal. It should not be modified
+    #: directly and its format may change at any time.
         
         
         
@@ -177,18 +176,18 @@ def __init__(
             ft.AppOrBlueprintKey, list[ft.BeforeRequestCallable]
         ] = defaultdict(list)
 
-      #: A data structure of functions to call at the end of each
-      #: request, in the format ``{scope: [functions]}``. The
-      #: ``scope`` key is the name of a blueprint the functions are
-      #: active for, or ``None`` for all requests.
-      #:
+    #: A data structure of functions to call at the end of each
+    #: request, in the format ``{scope: [functions]}``. The
+    #: ``scope`` key is the name of a blueprint the functions are
+    #: active for, or ``None`` for all requests.
+    #:
         
-      #: To register a function, use the :meth:`after_request`
-      #: decorator.
-      #:
+    #: To register a function, use the :meth:`after_request`
+    #: decorator.
+    #:
         
-      #: This data structure is internal. It should not be modified
-      #: directly and its format may change at any time.
+    #: This data structure is internal. It should not be modified
+    #: directly and its format may change at any time.
         
         
         
@@ -201,19 +200,19 @@ def __init__(
             ft.AppOrBlueprintKey, list[ft.AfterRequestCallable[t.Any]]
         ] = defaultdict(list)
 
-      #: A data structure of functions to call at the end of each
-      #: request even if an exception is raised, in the format
-      #: ``{scope: [functions]}``. The ``scope`` key is the name of a
-      #: blueprint the functions are active for, or ``None`` for all
-      #: requests.
-      #:
+    #: A data structure of functions to call at the end of each
+    #: request even if an exception is raised, in the format
+    #: ``{scope: [functions]}``. The ``scope`` key is the name of a
+    #: blueprint the functions are active for, or ``None`` for all
+    #: requests.
+    #:
         
-      #: To register a function, use the :meth:`teardown_request`
-      #: decorator.
-      #:
+    #: To register a function, use the :meth:`teardown_request`
+    #: decorator.
+    #:
         
-      #: This data structure is internal. It should not be modified
-      #: directly and its format may change at any time.
+    #: This data structure is internal. It should not be modified
+    #: directly and its format may change at any time.
         
         
         
@@ -227,19 +226,19 @@ def __init__(
             ft.AppOrBlueprintKey, list[ft.TeardownCallable]
         ] = defaultdict(list)
 
-      #: A data structure of functions to call to pass extra context
-      #: values when rendering templates, in the format
-      #: ``{scope: [functions]}``. The ``scope`` key is the name of a
-      #: blueprint the functions are active for, or ``None`` for all
-      #: requests.
-      #:
+    #: A data structure of functions to call to pass extra context
+    #: values when rendering templates, in the format
+    #: ``{scope: [functions]}``. The ``scope`` key is the name of a
+    #: blueprint the functions are active for, or ``None`` for all
+    #: requests.
+    #:
         
-      #: To register a function, use the :meth:`context_processor`
-      #: decorator.
-      #:
+    #: To register a function, use the :meth:`context_processor`
+    #: decorator.
+    #:
         
-      #: This data structure is internal. It should not be modified
-      #: directly and its format may change at any time.
+    #: This data structure is internal. It should not be modified
+    #: directly and its format may change at any time.
         
         
         
@@ -253,19 +252,19 @@ def __init__(
             ft.AppOrBlueprintKey, list[ft.TemplateContextProcessorCallable]
         ] = defaultdict(list, {None: [_default_template_ctx_processor]})
 
-      #: A data structure of functions to call to modify the keyword
-      #: arguments passed to the view function, in the format
-      #: ``{scope: [functions]}``. The ``scope`` key is the name of a
-      #: blueprint the functions are active for, or ``None`` for all
-      #: requests.
-      #:
+    #: A data structure of functions to call to modify the keyword
+    #: arguments passed to the view function, in the format
+    #: ``{scope: [functions]}``. The ``scope`` key is the name of a
+    #: blueprint the functions are active for, or ``None`` for all
+    #: requests.
+    #:
         
-      #: To register a function, use the
-      #: :meth:`url_value_preprocessor` decorator.
-      #:
+    #: To register a function, use the
+    #: :meth:`url_value_preprocessor` decorator.
+    #:
         
-      #: This data structure is internal. It should not be modified
-      #: directly and its format may change at any time.
+    #: This data structure is internal. It should not be modified
+    #: directly and its format may change at any time.
         
         
         
@@ -280,19 +279,19 @@ def __init__(
             list[ft.URLValuePreprocessorCallable],
         ] = defaultdict(list)
 
-      #: A data structure of functions to call to modify the keyword
-      #: arguments when generating URLs, in the format
-      #: ``{scope: [functions]}``. The ``scope`` key is the name of a
-      #: blueprint the functions are active for, or ``None`` for all
-      #: requests.
-      #:
+    #: A data structure of functions to call to modify the keyword
+    #: arguments when generating URLs, in the format
+    #: ``{scope: [functions]}``. The ``scope`` key is the name of a
+    #: blueprint the functions are active for, or ``None`` for all
+    #: requests.
+    #:
         
-      #: To register a function, use the :meth:`url_defaults`
-      #: decorator.
-      #:
+    #: To register a function, use the :meth:`url_defaults`
+    #: decorator.
+    #:
         
-      #: This data structure is internal. It should not be modified
-      #: directly and its format may change at any time.
+    #: This data structure is internal. It should not be modified
+    #: directly and its format may change at any time.
         
         
         
@@ -309,13 +308,13 @@ def __init__(
     def __repr__(self) -> str:
         return f"<{type(self).__name__} {self.name!r}>"
 
-    # This method is intended to be overridden by subclasses and should check if the setup process for a given file name has been completed.
-def _check_setup_finished(self, f_name: str) -> None:
+  # This method is intended to be overridden by subclasses and should check if the setup process for a given file name has been completed.
+    def _check_setup_finished(self, f_name: str) -> None:
         raise NotImplementedError
 
     @property
-    # The absolute path to the configured static folder. Returns None if no static folder is set.
-def static_folder(self) -> str | None:
+  # The absolute path to the configured static folder. Returns None if no static folder is set.
+    def static_folder(self) -> str | None:
         """The absolute path to the configured static folder. ``None``
         if no static folder is set.
         """
@@ -325,16 +324,16 @@ def static_folder(self) -> str | None:
             return None
 
     @static_folder.setter
-    # This function sets or updates the static folder path, stripping any trailing slashes and converting to a forward slash.
-def static_folder(self, value: str | os.PathLike[str] | None) -> None:
+  # This function sets or updates the static folder path, stripping any trailing slashes and converting to a forward slash.
+    def static_folder(self, value: str | os.PathLike[str] | None) -> None:
         if value is not None:
             value = os.fspath(value).rstrip(r"\/")
 
         self._static_folder = value
 
     @property
-    # This function checks if the static folder attribute is set on the object instance.
-def has_static_folder(self) -> bool:
+  # This function checks if the static folder attribute is set on the object instance.
+    def has_static_folder(self) -> bool:
         """``True`` if :attr:`static_folder` is set.
 
         .. versionadded:: 0.5
@@ -342,8 +341,8 @@ def has_static_folder(self) -> bool:
         return self.static_folder is not None
 
     @property
-    # The URL prefix that the static route will be accessible from. If it was not configured during init, it is derived from :attr:`static_folder`.
-def static_url_path(self) -> str | None:
+  # The URL prefix that the static route will be accessible from. If it was not configured during init, it is derived from :attr:`static_folder`.
+    def static_url_path(self) -> str | None:
         """The URL prefix that the static route will be accessible from.
 
         If it was not configured during init, it is derived from
@@ -366,9 +365,8 @@ def static_url_path(self) -> str | None:
         self._static_url_path = value
 
     @cached_property
-    # The Jinja loader function returns a BaseLoader instance or None, 
-# depending on whether template_folder is set, using a FileSystemLoader.
-def jinja_loader(self) -> BaseLoader | None:
+  # The Jinja loader function returns a BaseLoader instance or None, 
+    def jinja_loader(self) -> BaseLoader | None:
         """The Jinja loader for this object's templates. By default this
         is a class :class:`jinja2.loaders.FileSystemLoader` to
         :attr:`template_folder` if it is set.
@@ -380,8 +378,8 @@ def jinja_loader(self) -> BaseLoader | None:
         else:
             return None
 
-    # Returns a decorated route method with the specified HTTP method and rule.
-def _method_route(
+  # Returns a decorated route method with the specified HTTP method and rule.
+    def _method_route(
         self,
         method: str,
         rule: str,
@@ -393,8 +391,8 @@ def _method_route(
         return self.route(rule, methods=[method], **options)
 
     @setupmethod
-    # Shortcut function to create a route with GET method for a given rule and options.
-def get(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+  # Shortcut function to create a route with GET method for a given rule and options.
+    def get(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         """Shortcut for :meth:`route` with ``methods=["GET"]``.
 
         .. versionadded:: 2.0
@@ -402,8 +400,8 @@ def get(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         return self._method_route("GET", rule, options)
 
     @setupmethod
-    # Shortcut function to create a route with POST method for a given rule and options.
-def post(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+  # Shortcut function to create a route with POST method for a given rule and options.
+    def post(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         """Shortcut for :meth:`route` with ``methods=["POST"]``.
 
         .. versionadded:: 2.0
@@ -411,8 +409,8 @@ def post(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         return self._method_route("POST", rule, options)
 
     @setupmethod
-    # Shortcut function to create a route with PUT method, similar to `route` but with methods=["PUT"].
-def put(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+  # Shortcut function to create a route with PUT method, similar to `route` but with methods=["PUT"].
+    def put(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         """Shortcut for :meth:`route` with ``methods=["PUT"]``.
 
         .. versionadded:: 2.0
@@ -420,8 +418,8 @@ def put(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         return self._method_route("PUT", rule, options)
 
     @setupmethod
-    # Shortcut function to create a route with DELETE method for a given rule and options.
-def delete(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+  # Shortcut function to create a route with DELETE method for a given rule and options.
+    def delete(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         """Shortcut for :meth:`route` with ``methods=["DELETE"]``.
 
         .. versionadded:: 2.0
@@ -429,8 +427,8 @@ def delete(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         return self._method_route("DELETE", rule, options)
 
     @setupmethod
-    # Shortcut function to create a route patch method with "PATCH" HTTP method.
-def patch(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+  # Shortcut function to create a route patch method with "PATCH" HTTP method.
+    def patch(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         """Shortcut for :meth:`route` with ``methods=["PATCH"]``.
 
         .. versionadded:: 2.0
@@ -438,8 +436,8 @@ def patch(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         return self._method_route("PATCH", rule, options)
 
     @setupmethod
-    # Decorates a view function to register it with the given URL rule and options.
-def route(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
+  # Decorates a view function to register it with the given URL rule and options.
+    def route(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
         """Decorate a view function to register it with the given URL
         rule and options. Calls :meth:`add_url_rule`, which has more
         details about the implementation.
@@ -463,8 +461,8 @@ def route(self, rule: str, **options: t.Any) -> t.Callable[[T_route], T_route]:
             :class:`~werkzeug.routing.Rule` object.
         """
 
-        # Decorator function to register a route with Flask, handling optional "endpoint" parameter.
-def decorator(f: T_route) -> T_route:
+      # Decorator function to register a route with Flask, handling optional "endpoint" parameter.
+        def decorator(f: T_route) -> T_route:
             endpoint = options.pop("endpoint", None)
             self.add_url_rule(rule, endpoint, f, **options)
             return f
@@ -813,7 +811,7 @@ def _endpoint_from_view_func(view_func: ft.RouteCallable) -> str:
     return view_func.__name__
 
 
-  # Path.is_relative_to doesn't exist until Python 3.9
+# Path.is_relative_to doesn't exist until Python 3.9
 def _find_package_path(import_name: str) -> str:
     """Find the path that contains the package or module."""
     root_mod_name, _, _ = import_name.partition(".")
@@ -824,11 +822,11 @@ def _find_package_path(import_name: str) -> str:
         if root_spec is None:
             raise ValueError("not found")
     except (ImportError, ValueError):
-      # ImportError: the machinery told us it does not exist
-      # ValueError:
-      #    - the module name was invalid
-      #    - the module name is __main__
-      #    - we raised `ValueError` due to `root_spec` being `None`
+    # ImportError: the machinery told us it does not exist
+    # ValueError:
+    #    - the module name was invalid
+    #    - the module name is __main__
+    #    - we raised `ValueError` due to `root_spec` being `None`
         
         
         
@@ -838,12 +836,12 @@ def _find_package_path(import_name: str) -> str:
 
     if root_spec.submodule_search_locations:
         if root_spec.origin is None or root_spec.origin == "namespace":
-          # namespace package
+        # namespace package
             
             package_spec = importlib.util.find_spec(import_name)
 
             if package_spec is not None and package_spec.submodule_search_locations:
-              # Pick the path in the namespace that contains the submodule.
+            # Pick the path in the namespace that contains the submodule.
                 
                 package_path = pathlib.Path(
                     os.path.commonpath(package_spec.submodule_search_locations)
@@ -854,17 +852,17 @@ def _find_package_path(import_name: str) -> str:
                     if package_path.is_relative_to(location)
                 )
             else:
-              # Pick the first path.
+            # Pick the first path.
                 
                 search_location = root_spec.submodule_search_locations[0]
 
             return os.path.dirname(search_location)
         else:
-          # package with __init__.py
+        # package with __init__.py
             
             return os.path.dirname(os.path.dirname(root_spec.origin))
     else:
-      # module
+    # module
         
         return os.path.dirname(root_spec.origin)  
 
@@ -885,32 +883,32 @@ def find_package(import_name: str) -> tuple[str | None, str]:
     package_path = _find_package_path(import_name)
     py_prefix = os.path.abspath(sys.prefix)
 
-  # installed to the system
+# installed to the system
     
     if pathlib.PurePath(package_path).is_relative_to(py_prefix):
         return py_prefix, package_path
 
     site_parent, site_folder = os.path.split(package_path)
 
-  # installed to a virtualenv
+# installed to a virtualenv
     
     if site_folder.lower() == "site-packages":
         parent, folder = os.path.split(site_parent)
 
-      # Windows (prefix/lib/site-packages)
+    # Windows (prefix/lib/site-packages)
         
         if folder.lower() == "lib":
             return parent, package_path
 
-      # Unix (prefix/lib/pythonX.Y/site-packages)
+    # Unix (prefix/lib/pythonX.Y/site-packages)
         
         if os.path.basename(parent).lower() == "lib":
             return os.path.dirname(parent), package_path
 
-      # something else (prefix/site-packages)
+    # something else (prefix/site-packages)
         
         return site_parent, package_path
 
-  # not installed
+# not installed
     
     return None, package_path

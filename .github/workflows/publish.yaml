@@ -16,11 +16,11 @@ jobs:
           cache: pip
           cache-dependency-path: requirements*/*.txt
       - run: pip install -r requirements/build.txt
-    # Use the commit date instead of the current date during the build.
+  # Use the commit date instead of the current date during the build.
       
       - run: echo "SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)" >> $GITHUB_ENV
       - run: python -m build
-    # Generate hashes used for provenance.
+  # Generate hashes used for provenance.
       
       - name: generate hash
         id: hash
@@ -34,14 +34,14 @@ jobs:
       actions: read
       id-token: write
       contents: write
-  # Can't pin with hash due to how this workflow works.
+# Can't pin with hash due to how this workflow works.
     
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
     with:
       base64-subjects: ${{ needs.build.outputs.hash }}
   create-release:
-  # Upload the sdist, wheels, and provenance to a GitHub release. They remain
-  # available as build artifacts for a while as well.
+# Upload the sdist, wheels, and provenance to a GitHub release. They remain
+# available as build artifacts for a while as well.
     
     
     needs: [provenance]
@@ -59,8 +59,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
   publish-pypi:
     needs: [provenance]
-  # Wait for approval before attempting to upload to PyPI. This allows reviewing the
-  # files in the draft release.
+# Wait for approval before attempting to upload to PyPI. This allows reviewing the
+# files in the draft release.
     
     
     environment:

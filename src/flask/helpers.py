@@ -59,9 +59,6 @@ def stream_with_context(
 ) -> t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]: ...
 
 
-```python
-# Returns an iterator over a generator, ensuring context is properly cleaned up,
-# allowing for efficient streaming responses while maintaining access to request bound information.
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]],
 ) -> t.Iterator[t.AnyStr] | t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]:
@@ -102,16 +99,16 @@ def stream_with_context(
         gen = iter(generator_or_function)  
     except TypeError:
 
-      # This function is a decorator that takes variable arguments and keyword arguments, 
+    # This function is a decorator that takes variable arguments and keyword arguments, 
         def decorator(*args: t.Any, **kwargs: t.Any) -> t.Any:
             gen = generator_or_function(*args, **kwargs)  
             return stream_with_context(gen)
 
         return update_wrapper(decorator, generator_or_function)  
 
+# Returns an iterator over a generator, ensuring context is properly cleaned up.
   # Returns an iterator over a generator, ensuring context is properly cleaned up.
-    # Returns an iterator over a generator, ensuring context is properly cleaned up.
-def generator() -> t.Iterator[t.AnyStr | None]:
+    def generator() -> t.Iterator[t.AnyStr | None]:
         ctx = _cv_request.get(None)
         if ctx is None:
             raise RuntimeError(
@@ -119,16 +116,16 @@ def generator() -> t.Iterator[t.AnyStr | None]:
                 " context is active, such as in a view function."
             )
         with ctx:
-        # Dummy sentinel.  Has to be inside the context block or we're
-        # not actually keeping the context around.
+      # Dummy sentinel.  Has to be inside the context block or we're
+      # not actually keeping the context around.
             
             
             yield None
 
-        # The try/finally is here so that if someone passes a WSGI level
-        # iterator in we're still running the cleanup logic.  Generators
-        # don't need that because they are closed on their destruction
-        # automatically.
+      # The try/finally is here so that if someone passes a WSGI level
+      # iterator in we're still running the cleanup logic.  Generators
+      # don't need that because they are closed on their destruction
+      # automatically.
             
             
             
@@ -139,10 +136,6 @@ def generator() -> t.Iterator[t.AnyStr | None]:
                 if hasattr(gen, "close"):
                     gen.close()
 
-# The trick is to start the generator.  Then the code execution runs until
-# the first dummy None is yielded at which point the context was already
-# pushed.  This item is discarded.  Then when the iteration continues the
-# real generator is executed.
     
     
     
@@ -152,8 +145,6 @@ def generator() -> t.Iterator[t.AnyStr | None]:
     return wrapped_g  
 
 
-# This function creates a response object that can be used to add headers, 
-# allowing for more flexibility in view functions when returning values instead of responses.
 def make_response(*args: t.Any) -> Response:
     """Sometimes it is necessary to set additional headers in a view.  Because
     views do not have to return response objects but can return a value that
@@ -203,8 +194,6 @@ def make_response(*args: t.Any) -> Response:
     return current_app.make_response(args)
 
 
-# Generate a URL to the given endpoint with the given values, 
-# requiring an active request or application context.
 def url_for(
     endpoint: str,
     *,
@@ -343,15 +332,8 @@ def flash(message: str, category: str = "message") -> None:
                      messages and ``'warning'`` for warnings.  However any
                      kind of string can be used as category.
     """
-# Original implementation:
-#
     
-#     session.setdefault('_flashes', []).append((category, message))
-#
     
-# This assumed that changes made to mutable structures in the session are
-# always in sync with the session object, which is not true for session
-# implementations that use external storage for keeping their keys/values.
     
     
     
@@ -602,14 +584,12 @@ def get_root_path(import_name: str) -> str:
 
     :meta private:
     """
-# Module already imported and has a file attribute. Use that first.
     
     mod = sys.modules.get(import_name)
 
     if mod is not None and hasattr(mod, "__file__") and mod.__file__ is not None:
         return os.path.dirname(os.path.abspath(mod.__file__))
 
-# Next attempt: check the loader.
     
     try:
         spec = importlib.util.find_spec(import_name)
@@ -621,9 +601,6 @@ def get_root_path(import_name: str) -> str:
     else:
         loader = spec.loader
 
-# Loader does not exist or we're referring to an unloaded main
-# module or a main module without path (interactive sessions), go
-# with the current working directory.
     
     
     
@@ -633,15 +610,15 @@ def get_root_path(import_name: str) -> str:
     if hasattr(loader, "get_filename"):
         filepath = loader.get_filename(import_name)  
     else:
-    # Fall back to imports.
+  # Fall back to imports.
         
         __import__(import_name)
         mod = sys.modules[import_name]
         filepath = getattr(mod, "__file__", None)
 
-    # If we don't have a file path it might be because it is a
-    # namespace package. In this case pick the root path from the
-    # first module that is contained in the package.
+  # If we don't have a file path it might be because it is a
+  # namespace package. In this case pick the root path from the
+  # first module that is contained in the package.
         
         
         
@@ -655,7 +632,6 @@ def get_root_path(import_name: str) -> str:
                 " provided."
             )
 
-# filepath is import_name.py for a module, or __init__.py for a package.
     
     return os.path.dirname(os.path.abspath(filepath))  
 

@@ -206,30 +206,30 @@ class Flask(App):
         }
     )
 
-  #: The class that is used for request objects.  See :class:`~flask.Request`
-  #: for more information.
+#: The class that is used for request objects.  See :class:`~flask.Request`
+#: for more information.
     
     
     request_class: type[Request] = Request
 
-  #: The class that is used for response objects.  See
-  #: :class:`~flask.Response` for more information.
+#: The class that is used for response objects.  See
+#: :class:`~flask.Response` for more information.
     
     
     response_class: type[Response] = Response
 
-  #: the session interface to use.  By default an instance of
-  #: :class:`~flask.sessions.SecureCookieSessionInterface` is used here.
-  #:
+#: the session interface to use.  By default an instance of
+#: :class:`~flask.sessions.SecureCookieSessionInterface` is used here.
+#:
     
-  #: .. versionadded:: 0.8
+#: .. versionadded:: 0.8
     
     
     
     session_interface: SessionInterface = SecureCookieSessionInterface()
 
-    # The constructor initializes the Flask application with various configuration options.
-def __init__(
+  # The constructor initializes the Flask application with various configuration options.
+    def __init__(
         self,
         import_name: str,
         static_url_path: str | None = None,
@@ -255,27 +255,27 @@ def __init__(
             root_path=root_path,
         )
 
-      #: The Click command group for registering CLI commands for this
-      #: object. The commands are available from the ``flask`` command
-      #: once the application has been discovered and blueprints have
-      #: been registered.
+    #: The Click command group for registering CLI commands for this
+    #: object. The commands are available from the ``flask`` command
+    #: once the application has been discovered and blueprints have
+    #: been registered.
         
         
         
         
         self.cli = cli.AppGroup()
 
-      # Set the name of the Click group in case someone wants to add
-      # the app's commands to another CLI tool.
+    # Set the name of the Click group in case someone wants to add
+    # the app's commands to another CLI tool.
         
         
         self.cli.name = self.name
 
-      # Add a static route using the provided static_url_path, static_host,
-      # and static_folder if there is a configured static_folder.
-      # Note we do this without checking if static_folder exists.
-      # For one, it might be created while the server is running (e.g. during
-      # development). Also, Google App Engine stores static files somewhere
+    # Add a static route using the provided static_url_path, static_host,
+    # and static_folder if there is a configured static_folder.
+    # Note we do this without checking if static_folder exists.
+    # For one, it might be created while the server is running (e.g. during
+    # development). Also, Google App Engine stores static files somewhere
         
         
         
@@ -285,8 +285,8 @@ def __init__(
             assert (
                 bool(static_host) == host_matching
             ), "Invalid static_host/host_matching combination"
-          # Use a weakref to avoid creating a reference cycle between the app
-          # and the view function (see #3761).
+        # Use a weakref to avoid creating a reference cycle between the app
+        # and the view function (see #3761).
             
             
             self_ref = weakref.ref(self)
@@ -297,9 +297,8 @@ def __init__(
                 view_func=lambda **kw: self_ref().send_static_file(**kw),  
             )
 
-    # Returns the maximum age for a file to be cached by the browser, 
-# falling back to the default configuration from Flask's current app.
-def get_send_file_max_age(self, filename: str | None) -> int | None:
+  # Returns the maximum age for a file to be cached by the browser, 
+    def get_send_file_max_age(self, filename: str | None) -> int | None:
         """Used by :func:`send_file` to determine the ``max_age`` cache
         value for a given file path if it wasn't passed.
 
@@ -326,8 +325,8 @@ def get_send_file_max_age(self, filename: str | None) -> int | None:
 
         return value  
 
-    # The view function used to serve files from static_folder, automatically registering a route at static_url_path if set.
-def send_static_file(self, filename: str) -> Response:
+  # The view function used to serve files from static_folder, automatically registering a route at static_url_path if set.
+    def send_static_file(self, filename: str) -> Response:
         """The view function used to serve files from
         :attr:`static_folder`. A route is automatically registered for
         this view at :attr:`static_url_path` if :attr:`static_folder` is
@@ -342,8 +341,8 @@ def send_static_file(self, filename: str) -> Response:
         if not self.has_static_folder:
             raise RuntimeError("'static_folder' must be set to serve static_files.")
 
-      # send_file only knows to call get_send_file_max_age on the app,
-      # call it here so it works for blueprints too.
+    # send_file only knows to call get_send_file_max_age on the app,
+    # call it here so it works for blueprints too.
         
         
         max_age = self.get_send_file_max_age(filename)
@@ -351,8 +350,8 @@ def send_static_file(self, filename: str) -> Response:
             t.cast(str, self.static_folder), filename, max_age=max_age
         )
 
-    # Open a resource file relative to root_path for reading.
-def open_resource(
+  # Open a resource file relative to root_path for reading.
+    def open_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = None
     ) -> t.IO[t.AnyStr]:
         """Open a resource file relative to :attr:`root_path` for reading.
@@ -385,8 +384,8 @@ def open_resource(
 
         return open(path, mode, encoding=encoding)
 
-    # Open a resource file relative to the application's instance folder.
-def open_instance_resource(
+  # Open a resource file relative to the application's instance folder.
+    def open_instance_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
     ) -> t.IO[t.AnyStr]:
         """Open a resource file relative to the application's instance folder
@@ -408,9 +407,8 @@ def open_instance_resource(
 
         return open(path, mode, encoding=encoding)
 
-    # Create a Jinja environment based on jinja_options and app-related methods, 
-# adding Flask-related globals and filters to the environment.
-def create_jinja_environment(self) -> Environment:
+  # Create a Jinja environment based on jinja_options and app-related methods, 
+    def create_jinja_environment(self) -> Environment:
         """Create the Jinja environment based on :attr:`jinja_options`
         and the various Jinja-related methods of the app. Changing
         :attr:`jinja_options` after this will have no effect. Also adds
@@ -440,9 +438,9 @@ def create_jinja_environment(self) -> Environment:
             url_for=self.url_for,
             get_flashed_messages=get_flashed_messages,
             config=self.config,
-          # request, session and g are normally added with the
-          # context processor for efficiency reasons but for imported
-          # templates we also want the proxies in there.
+        # request, session and g are normally added with the
+        # context processor for efficiency reasons but for imported
+        # templates we also want the proxies in there.
             
             
             
@@ -453,8 +451,8 @@ def create_jinja_environment(self) -> Environment:
         rv.policies["json.dumps_function"] = self.json.dumps
         return rv
 
-    # Creates a URL adapter for the given request, handling various configuration options and version changes.
-def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
+  # Creates a URL adapter for the given request, handling various configuration options and version changes.
+    def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
         """Creates a URL adapter for the given request. The URL adapter
         is created at a point where the request context is not yet set
         up so the request is passed explicitly.
@@ -470,9 +468,9 @@ def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
             matching. Use :attr:`subdomain_matching` instead.
         """
         if request is not None:
-          # If subdomain matching is disabled (the default), use the
-          # default subdomain in all cases. This should be the default
-          # in Werkzeug but it currently does not have that feature.
+        # If subdomain matching is disabled (the default), use the
+        # default subdomain in all cases. This should be the default
+        # in Werkzeug but it currently does not have that feature.
             
             
             
@@ -486,8 +484,8 @@ def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
                 server_name=self.config["SERVER_NAME"],
                 subdomain=subdomain,
             )
-      # We need at the very least the server name to be set for this
-      # to work.
+    # We need at the very least the server name to be set for this
+    # to work.
         
         
         if self.config["SERVER_NAME"] is not None:
@@ -499,9 +497,8 @@ def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
 
         return None
 
-    # Intercept routing exceptions and possibly do something else. In debug mode, 
-# intercept a routing redirect and replace it with an error if the body will be discarded.
-def raise_routing_exception(self, request: Request) -> t.NoReturn:
+  # Intercept routing exceptions and possibly do something else. In debug mode, 
+    def raise_routing_exception(self, request: Request) -> t.NoReturn:
         """Intercept routing exceptions and possibly do something else.
 
         In debug mode, intercept a routing redirect and replace it with
@@ -529,8 +526,8 @@ def raise_routing_exception(self, request: Request) -> t.NoReturn:
 
         raise FormDataRoutingRedirect(request)
 
-    # Update template context with commonly used variables, injecting request, session, config and g into the template context.
-def update_template_context(self, context: dict[str, t.Any]) -> None:
+  # Update template context with commonly used variables, injecting request, session, config and g into the template context.
+    def update_template_context(self, context: dict[str, t.Any]) -> None:
         """Update the template context with some commonly used variables.
         This injects request, session, config and g into the template
         context as well as everything template context processors want
@@ -543,13 +540,13 @@ def update_template_context(self, context: dict[str, t.Any]) -> None:
         """
         names: t.Iterable[str | None] = (None,)
 
-      # A template may be rendered outside a request context.
+    # A template may be rendered outside a request context.
         
         if request:
             names = chain(names, reversed(request.blueprints))
 
-      # The values passed to render_template take precedence. Keep a
-      # copy to re-apply after all context functions.
+    # The values passed to render_template take precedence. Keep a
+    # copy to re-apply after all context functions.
         
         
         orig_ctx = context.copy()
@@ -561,8 +558,8 @@ def update_template_context(self, context: dict[str, t.Any]) -> None:
 
         context.update(orig_ctx)
 
-    # Returns the shell context for an interactive shell for this application, running all registered shell context processors.
-def make_shell_context(self) -> dict[str, t.Any]:
+  # Returns the shell context for an interactive shell for this application, running all registered shell context processors.
+    def make_shell_context(self) -> dict[str, t.Any]:
         """Returns the shell context for an interactive shell for this
         application.  This runs all the registered shell context
         processors.
@@ -574,8 +571,8 @@ def make_shell_context(self) -> dict[str, t.Any]:
             rv.update(processor())
         return rv
 
-    # Run the application on a local development server, enabling or disabling debug mode as specified.
-def run(
+  # Run the application on a local development server, enabling or disabling debug mode as specified.
+    def run(
         self,
         host: str | None = None,
         port: int | None = None,
@@ -638,8 +635,8 @@ def run(
             The default port is now picked from the ``SERVER_NAME``
             variable.
         """
-      # Ignore this call so that it doesn't start another server if
-      # the 'flask run' command is used.
+    # Ignore this call so that it doesn't start another server if
+    # the 'flask run' command is used.
         
         
         if os.environ.get("FLASK_RUN_FROM_CLI") == "true":
@@ -657,12 +654,12 @@ def run(
         if get_load_dotenv(load_dotenv):
             cli.load_dotenv()
 
-          # if set, env var overrides existing value
+        # if set, env var overrides existing value
             
             if "FLASK_DEBUG" in os.environ:
                 self.debug = get_debug_flag()
 
-      # debug passed to method overrides all other sources
+    # debug passed to method overrides all other sources
         
         if debug is not None:
             self.debug = bool(debug)
@@ -697,9 +694,9 @@ def run(
         try:
             run_simple(t.cast(str, host), port, self, **options)
         finally:
-          # reset the first request information if the development server
-          # reset normally.  This makes it possible to restart the server
-          # without reloader and that stuff from an interactive shell.
+        # reset the first request information if the development server
+        # reset normally.  This makes it possible to restart the server
+        # without reloader and that stuff from an interactive shell.
             
             
             
@@ -799,16 +796,16 @@ def run(
 
         .. versionadded:: 0.3
         """
-      # Proxy exceptions don't have error codes.  We want to always return
-      # those unchanged as errors
+    # Proxy exceptions don't have error codes.  We want to always return
+    # those unchanged as errors
         
         
         if e.code is None:
             return e
 
-      # RoutingExceptions are used internally to trigger routing
-      # actions, such as slash redirects raising RequestRedirect. They
-      # are not raised or handled in user code.
+    # RoutingExceptions are used internally to trigger routing
+    # actions, such as slash redirects raising RequestRedirect. They
+    # are not raised or handled in user code.
         
         
         
@@ -888,8 +885,8 @@ def run(
             propagate = self.testing or self.debug
 
         if propagate:
-          # Re-raise if called with an active exception, otherwise
-          # raise the passed in exception.
+        # Re-raise if called with an active exception, otherwise
+        # raise the passed in exception.
             
             
             if exc_info[1] is e:
@@ -935,8 +932,8 @@ def run(
         req = request_ctx.request
         if req.routing_exception is not None:
             self.raise_routing_exception(req)
-      # if we provide automatic options for this URL and the
-      # request came with the OPTIONS method, reply automatically
+    # if we provide automatic options for this URL and the
+    # request came with the OPTIONS method, reply automatically
         rule: Rule = req.url_rule  
         
         
@@ -945,7 +942,7 @@ def run(
             and req.method == "OPTIONS"
         ):
             return self.make_default_options_response()
-      # otherwise dispatch to the handler for that endpoint
+    # otherwise dispatch to the handler for that endpoint
         
         view_args: dict[str, t.Any] = req.view_args  
         return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  
@@ -1112,8 +1109,8 @@ def run(
             url_adapter = req_ctx.url_adapter
             blueprint_name = req_ctx.request.blueprint
 
-          # If the endpoint starts with "." and the request matches a
-          # blueprint, the endpoint is relative to the blueprint.
+        # If the endpoint starts with "." and the request matches a
+        # blueprint, the endpoint is relative to the blueprint.
             
             
             if endpoint[:1] == ".":
@@ -1122,8 +1119,8 @@ def run(
                 else:
                     endpoint = endpoint[1:]
 
-          # When in a request, generate a URL without scheme and
-          # domain by default, unless a scheme is given.
+        # When in a request, generate a URL without scheme and
+        # domain by default, unless a scheme is given.
             
             
             if _external is None:
@@ -1131,9 +1128,9 @@ def run(
         else:
             app_ctx = _cv_app.get(None)
 
-          # If called by helpers.url_for, an app context is active,
-          # use its url_adapter. Otherwise, app.url_for was called
-          # directly, build an adapter.
+        # If called by helpers.url_for, an app context is active,
+        # use its url_adapter. Otherwise, app.url_for was called
+        # directly, build an adapter.
             
             
             
@@ -1150,15 +1147,15 @@ def run(
                     " needed."
                 )
 
-          # When outside a request, generate a URL with scheme and
-          # domain by default.
+        # When outside a request, generate a URL with scheme and
+        # domain by default.
             
             
             if _external is None:
                 _external = True
 
-      # It is an error to set _scheme when _external=False, in order
-      # to avoid accidental insecure URLs.
+    # It is an error to set _scheme when _external=False, in order
+    # to avoid accidental insecure URLs.
         
         
         if _scheme is not None and not _external:
@@ -1246,22 +1243,22 @@ def run(
         status: int | None = None
         headers: HeadersValue | None = None
 
-      # unpack tuple returns
+    # unpack tuple returns
         
         if isinstance(rv, tuple):
             len_rv = len(rv)
 
-          # a 3-tuple is unpacked directly
+        # a 3-tuple is unpacked directly
             
             if len_rv == 3:
                 rv, status, headers = rv  
-          # decide if a 2-tuple has status or headers
+        # decide if a 2-tuple has status or headers
             
             elif len_rv == 2:
                 if isinstance(rv[1], (Headers, dict, tuple, list)):
                     rv, headers = rv  
                 else:
-          # other sized tuples are not allowed
+        # other sized tuples are not allowed
                     rv, status = rv  
             
             else:
@@ -1271,7 +1268,7 @@ def run(
                     " (body, status), or (body, headers)."
                 )
 
-      # the body must not be None
+    # the body must not be None
         
         if rv is None:
             raise TypeError(
@@ -1280,13 +1277,13 @@ def run(
                 " None or ended without a return statement."
             )
 
-      # make sure the body is an instance of the response class
+    # make sure the body is an instance of the response class
         
         if not isinstance(rv, self.response_class):
             if isinstance(rv, (str, bytes, bytearray)) or isinstance(rv, cabc.Iterator):
-              # let the response class set the status and headers instead of
-              # waiting to do it manually, so that the class can handle any
-              # special logic
+            # let the response class set the status and headers instead of
+            # waiting to do it manually, so that the class can handle any
+            # special logic
                 
                 
                 
@@ -1299,8 +1296,8 @@ def run(
             elif isinstance(rv, (dict, list)):
                 rv = self.json.response(rv)
             elif isinstance(rv, BaseResponse) or callable(rv):
-              # evaluate a WSGI callable, or coerce a different response
-              # class to the correct type
+            # evaluate a WSGI callable, or coerce a different response
+            # class to the correct type
                 
                 
                 try:
@@ -1326,7 +1323,7 @@ def run(
                 )
 
         rv = t.cast(Response, rv)
-      # prefer the status if it was provided
+    # prefer the status if it was provided
         
         if status is not None:
             if isinstance(status, (str, bytes, bytearray)):
@@ -1334,7 +1331,7 @@ def run(
             else:
                 rv.status_code = status
 
-      # extend existing headers with provided headers
+    # extend existing headers with provided headers
         
         if headers:
             rv.headers.update(headers)

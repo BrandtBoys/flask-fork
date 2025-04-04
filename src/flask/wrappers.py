@@ -30,17 +30,17 @@ class Request(RequestBase):
 
     json_module: t.Any = json
 
-  #: The internal URL rule that matched the request.  This can be
-  #: useful to inspect which methods are allowed for the URL from
-  #: a before/after handler (``request.url_rule.methods``) etc.
-  #: Though if the request's method was invalid for the URL rule,
-  #: the valid list is available in ``routing_exception.valid_methods``
-  #: instead (an attribute of the Werkzeug exception
-  #: :exc:`~werkzeug.exceptions.MethodNotAllowed`)
-  #: because the request was never internally bound.
-  #:
+#: The internal URL rule that matched the request.  This can be
+#: useful to inspect which methods are allowed for the URL from
+#: a before/after handler (``request.url_rule.methods``) etc.
+#: Though if the request's method was invalid for the URL rule,
+#: the valid list is available in ``routing_exception.valid_methods``
+#: instead (an attribute of the Werkzeug exception
+#: :exc:`~werkzeug.exceptions.MethodNotAllowed`)
+#: because the request was never internally bound.
+#:
     
-  #: .. versionadded:: 0.6
+#: .. versionadded:: 0.6
     
     
     
@@ -52,16 +52,16 @@ class Request(RequestBase):
     
     url_rule: Rule | None = None
 
-  #: A dict of view arguments that matched the request.  If an exception
-  #: happened when matching, this will be ``None``.
+#: A dict of view arguments that matched the request.  If an exception
+#: happened when matching, this will be ``None``.
     
     
     view_args: dict[str, t.Any] | None = None
 
-  #: If matching the URL failed, this is the exception that will be
-  #: raised / was raised as part of the request handling.  This is
-  #: usually a :exc:`~werkzeug.exceptions.NotFound` exception or
-  #: something similar.
+#: If matching the URL failed, this is the exception that will be
+#: raised / was raised as part of the request handling.  This is
+#: usually a :exc:`~werkzeug.exceptions.NotFound` exception or
+#: something similar.
     
     
     
@@ -73,9 +73,8 @@ class Request(RequestBase):
     _max_form_parts: int | None = None
 
     @property
-    # The maximum number of bytes that will be read during this request, 
-# raising a 413 error if exceeded or returning the configured limit.
-def max_content_length(self) -> int | None:
+  # The maximum number of bytes that will be read during this request, 
+    def max_content_length(self) -> int | None:
         """The maximum number of bytes that will be read during this request. If
         this limit is exceeded, a 413 :exc:`~werkzeug.exceptions.RequestEntityTooLarge`
         error is raised. If it is set to ``None``, no limit is enforced at the
@@ -104,13 +103,13 @@ def max_content_length(self) -> int | None:
         return current_app.config["MAX_CONTENT_LENGTH"]  
 
     @max_content_length.setter
-    # The function sets the maximum allowed content length for an object.
-def max_content_length(self, value: int | None) -> None:
+  # The function sets the maximum allowed content length for an object.
+    def max_content_length(self, value: int | None) -> None:
         self._max_content_length = value
 
     @property
-    # The maximum size in bytes any non-file form field may be in a multipart/form-data body.
-def max_form_memory_size(self) -> int | None:
+  # The maximum size in bytes any non-file form field may be in a multipart/form-data body.
+    def max_form_memory_size(self) -> int | None:
         """The maximum size in bytes any non-file form field may be in a
         ``multipart/form-data`` body. If this limit is exceeded, a 413
         :exc:`~werkzeug.exceptions.RequestEntityTooLarge` error is raised. If it
@@ -133,13 +132,13 @@ def max_form_memory_size(self) -> int | None:
         return current_app.config["MAX_FORM_MEMORY_SIZE"]  
 
     @max_form_memory_size.setter
-    # This function sets and returns the maximum form memory size.
-def max_form_memory_size(self, value: int | None) -> None:
+  # This function sets and returns the maximum form memory size.
+    def max_form_memory_size(self, value: int | None) -> None:
         self._max_form_memory_size = value
 
     @property  
-    # The maximum number of fields that may be present in a multipart/form-data body.
-def max_form_parts(self) -> int | None:
+  # The maximum number of fields that may be present in a multipart/form-data body.
+    def max_form_parts(self) -> int | None:
         """The maximum number of fields that may be present in a
         ``multipart/form-data`` body. If this limit is exceeded, a 413
         :exc:`~werkzeug.exceptions.RequestEntityTooLarge` error is raised. If it
@@ -162,13 +161,13 @@ def max_form_parts(self) -> int | None:
         return current_app.config["MAX_FORM_PARTS"]  
 
     @max_form_parts.setter
-    # Returns the maximum number of form parts that can be created with a given total value.
-def max_form_parts(self, value: int | None) -> None:
+  # Returns the maximum number of form parts that can be created with a given total value.
+    def max_form_parts(self, value: int | None) -> None:
         self._max_form_parts = value
 
     @property
-    # The endpoint that matched the request URL, returning None if matching failed or has not been performed yet.
-def endpoint(self) -> str | None:
+  # The endpoint that matched the request URL, returning None if matching failed or has not been performed yet.
+    def endpoint(self) -> str | None:
         """The endpoint that matched the request URL.
 
         This will be ``None`` if matching failed or has not been
@@ -183,8 +182,8 @@ def endpoint(self) -> str | None:
         return None
 
     @property
-    # The blueprint function returns the registered name of the current blueprint, or None if it's not part of a blueprint.
-def blueprint(self) -> str | None:
+  # The blueprint function returns the registered name of the current blueprint, or None if it's not part of a blueprint.
+    def blueprint(self) -> str | None:
         """The registered name of the current blueprint.
 
         This will be ``None`` if the endpoint is not part of a
@@ -203,8 +202,8 @@ def blueprint(self) -> str | None:
         return None
 
     @property
-    # The function returns a list of blueprint names from the current blueprint upwards through parent blueprints.
-def blueprints(self) -> list[str]:
+  # The function returns a list of blueprint names from the current blueprint upwards through parent blueprints.
+    def blueprints(self) -> list[str]:
         """The registered names of the current blueprint upwards through
         parent blueprints.
 
@@ -220,12 +219,12 @@ def blueprints(self) -> list[str]:
 
         return _split_blueprint_path(name)
 
-    # In debug mode, replace the files multidict with an ad-hoc subclass that raises a different error for key errors.
-def _load_form_data(self) -> None:
+  # In debug mode, replace the files multidict with an ad-hoc subclass that raises a different error for key errors.
+    def _load_form_data(self) -> None:
         super()._load_form_data()
 
-      # In debug mode we're replacing the files multidict with an ad-hoc
-      # subclass that raises a different error for key errors.
+    # In debug mode we're replacing the files multidict with an ad-hoc
+    # subclass that raises a different error for key errors.
         
         
         if (
@@ -282,6 +281,6 @@ class Response(ResponseBase):
         if current_app:
             return current_app.config["MAX_COOKIE_SIZE"]  
 
-      # return Werkzeug's default when not in an app context
+    # return Werkzeug's default when not in an app context
         
         return super().max_cookie_size

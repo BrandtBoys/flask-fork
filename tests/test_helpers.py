@@ -18,8 +18,8 @@ class FakePath:
     def __init__(self, path):
         self.path = path
 
-    # The fspath method returns the path attribute of the object.
-def __fspath__(self):
+  # The fspath method returns the path attribute of the object.
+    def __fspath__(self):
         return self.path
 
 
@@ -27,14 +27,14 @@ class PyBytesIO:
     def __init__(self, *args, **kwargs):
         self._io = io.BytesIO(*args, **kwargs)
 
-    # This method is used to dynamically retrieve an attribute from the underlying io object.
-def __getattr__(self, name):
+  # This method is used to dynamically retrieve an attribute from the underlying io object.
+    def __getattr__(self, name):
         return getattr(self._io, name)
 
 
 class TestSendfile:
-    # Tests sending a file using Flask's send_file function, verifying direct passthrough and MIME type.
-def test_send_file(self, app, req_ctx):
+  # Tests sending a file using Flask's send_file function, verifying direct passthrough and MIME type.
+    def test_send_file(self, app, req_ctx):
         rv = flask.send_file("static/index.html")
         assert rv.direct_passthrough
         assert rv.mimetype == "text/html"
@@ -45,18 +45,18 @@ def test_send_file(self, app, req_ctx):
 
         rv.close()
 
-    # Test static file functionality in Flask application, including default max_age and custom configuration.
-def test_static_file(self, app, req_ctx):
-      # Default max_age is None.
+  # Test static file functionality in Flask application, including default max_age and custom configuration.
+    def test_static_file(self, app, req_ctx):
+    # Default max_age is None.
         
 
-      # Test with static file handler.
+    # Test with static file handler.
         
         rv = app.send_static_file("index.html")
         assert rv.cache_control.max_age is None
         rv.close()
 
-      # Test with direct use of send_file.
+    # Test with direct use of send_file.
         
         rv = flask.send_file("static/index.html")
         assert rv.cache_control.max_age is None
@@ -64,19 +64,19 @@ def test_static_file(self, app, req_ctx):
 
         app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 3600
 
-      # Test with static file handler.
+    # Test with static file handler.
         
         rv = app.send_static_file("index.html")
         assert rv.cache_control.max_age == 3600
         rv.close()
 
-      # Test with direct use of send_file.
+    # Test with direct use of send_file.
         
         rv = flask.send_file("static/index.html")
         assert rv.cache_control.max_age == 3600
         rv.close()
 
-      # Test with pathlib.Path.
+    # Test with pathlib.Path.
         
         rv = app.send_static_file(FakePath("index.html"))
         assert rv.cache_control.max_age == 3600
@@ -89,20 +89,20 @@ def test_static_file(self, app, req_ctx):
         app = StaticFileApp(__name__)
 
         with app.test_request_context():
-          # Test with static file handler.
+        # Test with static file handler.
             
             rv = app.send_static_file("index.html")
             assert rv.cache_control.max_age == 10
             rv.close()
 
-          # Test with direct use of send_file.
+        # Test with direct use of send_file.
             
             rv = flask.send_file("static/index.html")
             assert rv.cache_control.max_age == 10
             rv.close()
 
-    # Tests sending a file from a directory using Flask's send_from_directory method.
-def test_send_from_directory(self, app, req_ctx):
+  # Tests sending a file from a directory using Flask's send_from_directory method.
+    def test_send_from_directory(self, app, req_ctx):
         app.root_path = os.path.join(
             os.path.dirname(__file__), "test_apps", "subdomaintestmodule"
         )
@@ -113,17 +113,17 @@ def test_send_from_directory(self, app, req_ctx):
 
 
 class TestUrlFor:
-    # This function tests if the `url_for` method correctly handles anchor tags in URLs.
-def test_url_for_with_anchor(self, app, req_ctx):
+  # This function tests if the `url_for` method correctly handles anchor tags in URLs.
+    def test_url_for_with_anchor(self, app, req_ctx):
         @app.route("/")
-        # This function returns a hardcoded value, often used as a placeholder for a more dynamic or user-provided response.
-def index():
+      # This function returns a hardcoded value, often used as a placeholder for a more dynamic or user-provided response.
+        def index():
             return "42"
 
         assert flask.url_for("index", _anchor="x y") == "/#x%20y"
 
-    # This function tests that the `url_for` function correctly generates a URL with a scheme when using the `_external` parameter.
-def test_url_for_with_scheme(self, app, req_ctx):
+  # This function tests that the `url_for` function correctly generates a URL with a scheme when using the `_external` parameter.
+    def test_url_for_with_scheme(self, app, req_ctx):
         @app.route("/")
         def index():
             return "42"
@@ -136,12 +136,12 @@ def test_url_for_with_scheme(self, app, req_ctx):
     def test_url_for_with_scheme_not_external(self, app, req_ctx):
         app.add_url_rule("/", endpoint="index")
 
-      # Implicit external with scheme.
+    # Implicit external with scheme.
         
         url = flask.url_for("index", _scheme="https")
         assert url == "https://localhost/"
 
-      # Error when external=False with scheme
+    # Error when external=False with scheme
         
         with pytest.raises(ValueError):
             flask.url_for("index", _scheme="https", _external=False)

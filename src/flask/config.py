@@ -32,8 +32,8 @@ class ConfigAttribute(t.Generic[T]):
     @t.overload
     def __get__(self, obj: App, owner: type[App]) -> T: ...
 
-    # Implements the getter method for a property, allowing access to its configuration and potentially converting it.
-def __get__(self, obj: App | None, owner: type[App] | None = None) -> T | te.Self:
+  # Implements the getter method for a property, allowing access to its configuration and potentially converting it.
+    def __get__(self, obj: App | None, owner: type[App] | None = None) -> T | te.Self:
         if obj is None:
             return self
 
@@ -44,8 +44,8 @@ def __get__(self, obj: App | None, owner: type[App] | None = None) -> T | te.Sel
 
         return rv  
 
-    # Sets the configuration value for the current object instance.
-def __set__(self, obj: App, value: t.Any) -> None:
+  # Sets the configuration value for the current object instance.
+    def __set__(self, obj: App, value: t.Any) -> None:
         obj.config[self.__name__] = value
 
 
@@ -163,24 +163,24 @@ class Config(dict):
             try:
                 value = loads(value)
             except Exception:
-              # Keep the value as a string if loading failed.
+            # Keep the value as a string if loading failed.
                 
                 pass
 
-          # Change to key.removeprefix(prefix) on Python >= 3.9.
+        # Change to key.removeprefix(prefix) on Python >= 3.9.
             if "__" not in key:
-              # A non-nested key, set directly.
+            # A non-nested key, set directly.
                 
                 self[key] = value
                 continue
 
-          # Traverse nested dictionaries with keys separated by "__".
+        # Traverse nested dictionaries with keys separated by "__".
             
             current = self
             *parts, tail = key.split("__")
 
             for part in parts:
-              # If an intermediate dict does not exist, create it.
+            # If an intermediate dict does not exist, create it.
                 
                 if part not in current:
                     current[part] = {}

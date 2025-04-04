@@ -13,7 +13,7 @@ ResponseValue = t.Union[
     str,
     bytes,
     list[t.Any],
-  # Only dict is actually accepted, but Mapping allows for TypedDict.
+# Only dict is actually accepted, but Mapping allows for TypedDict.
     
     t.Mapping[str, t.Any],
     t.Iterator[str],

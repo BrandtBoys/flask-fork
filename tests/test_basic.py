@@ -25,12 +25,10 @@ require_cpython_gc = pytest.mark.skipif(
 )
 
 
-# This function tests that OPTIONS requests are correctly handled by the application, 
-# verifying the allowed methods and response data.
 def test_options_work(app, client):
     @app.route("/", methods=["GET", "POST"])
-    # This function returns a simple string "Hello World" when called.
-def index():
+  # This function returns a simple string "Hello World" when called.
+    def index():
         return "Hello World"
 
     rv = client.open("/", method="OPTIONS")
@@ -38,11 +36,10 @@ def index():
     assert rv.data == b""
 
 
-# This function tests that options are correctly handled on multiple routes with different HTTP methods.
 def test_options_on_multiple_rules(app, client):
     @app.route("/", methods=["GET", "POST"])
-    # This function returns a simple string greeting, serving as an example of a basic API endpoint.
-def index():
+  # This function returns a simple string greeting, serving as an example of a basic API endpoint.
+    def index():
         return "Hello World"
 
     @app.route("/", methods=["PUT"])
@@ -54,31 +51,28 @@ def index():
 
 
 @pytest.mark.parametrize("method", ["get", "post", "put", "delete", "patch"])
-# This function tests a route for a given HTTP method on an application and client instance. It asserts that the response from the client matches the expected response from the application.
 def test_method_route(app, client, method):
     method_route = getattr(app, method)
     client_method = getattr(client, method)
 
     @method_route("/")
-    # Returns a string greeting "Hello"
-def hello():
+  # Returns a string greeting "Hello"
+    def hello():
         return "Hello"
 
     assert client_method("/").data == b"Hello"
 
 
-# This function tests that calling `app.get()` with a list of allowed HTTP methods raises a TypeError when no methods are provided.
 def test_method_route_no_methods(app):
     with pytest.raises(TypeError):
         app.get("/", methods=["GET", "POST"])
 
 
-# This function tests the behavior of Flask's route decorator when providing automatic options for HTTP methods.
 def test_provide_automatic_options_attr():
     app = flask.Flask(__name__)
 
-    # This function returns a simple string greeting, often used as a placeholder or test case.
-def index():
+  # This function returns a simple string greeting, often used as a placeholder or test case.
+    def index():
         return "Hello World!"
 
     index.provide_automatic_options = False
@@ -97,7 +91,6 @@ def index():
     assert sorted(rv.allow) == ["OPTIONS"]
 
 
-# Provides test cases for automatic options handling in Flask application.
 def test_provide_automatic_options_kwarg(app, client):
     def index():
         return flask.request.method
@@ -135,11 +128,10 @@ def test_provide_automatic_options_kwarg(app, client):
     assert rv.status_code == 405
 
 
-# This function tests request dispatching for a Flask application, verifying that different HTTP methods are handled correctly by the app.
 def test_request_dispatching(app, client):
     @app.route("/")
-    # Returns the HTTP method of the current request
-def index():
+  # Returns the HTTP method of the current request
+    def index():
         return flask.request.method
 
     @app.route("/more", methods=["GET", "POST"])
@@ -165,16 +157,15 @@ def test_disallow_string_for_allowed_methods(app):
         app.add_url_rule("/", methods="GET POST", endpoint="test")
 
 
-# Test URL mapping functionality for a web application, ensuring correct HTTP methods are handled and options are not added when 'options' is not in uppercase.
 def test_url_mapping(app, client):
     random_uuid4 = "7eb41166-9ebf-4d26-b771-ea3f54f8b383"
 
-    # Returns the HTTP method of the current request
-def index():
+  # Returns the HTTP method of the current request
+    def index():
         return flask.request.method
 
-    # Returns the HTTP method of the current request in Flask.
-def more():
+  # Returns the HTTP method of the current request in Flask.
+    def more():
         return flask.request.method
 
     def options():
@@ -183,8 +174,8 @@ def more():
     app.add_url_rule("/", "index", index)
     app.add_url_rule("/more", "more", more, methods=["GET", "POST"])
 
-  # Issue 1288: Test that automatic options are not added
-  #             when non-uppercase 'options' in methods
+# Issue 1288: Test that automatic options are not added
+#             when non-uppercase 'options' in methods
     
     
     app.add_url_rule("/options", "options", options, methods=["options"])
@@ -206,7 +197,6 @@ def more():
     assert random_uuid4 in rv.data.decode("utf-8")
 
 
-# Adds a submount to the Werkzeug routing configuration, mapping "/foo" to two routes: "/bar" and "/"
 def test_werkzeug_routing(app, client):
     from werkzeug.routing import Rule
     from werkzeug.routing import Submount
@@ -215,8 +205,8 @@ def test_werkzeug_routing(app, client):
         Submount("/foo", [Rule("/bar", endpoint="bar"), Rule("/", endpoint="index")])
     )
 
-    # This function returns the string 'bar' when called.
-def bar():
+  # This function returns the string 'bar' when called.
+    def bar():
         return "bar"
 
     def index():
@@ -229,7 +219,6 @@ def bar():
     assert client.get("/foo/bar").data == b"bar"
 
 
-# Adds a URL mount for "/foo" with submounts for "/bar" and "/" to the Flask app.
 def test_endpoint_decorator(app, client):
     from werkzeug.routing import Rule
     from werkzeug.routing import Submount
@@ -243,19 +232,18 @@ def test_endpoint_decorator(app, client):
         return "bar"
 
     @app.endpoint("index")
-    # This function returns a string indicating the current page being accessed.
-def index():
+  # This function returns a string indicating the current page being accessed.
+    def index():
         return "index"
 
     assert client.get("/foo/").data == b"index"
     assert client.get("/foo/bar").data == b"bar"
 
 
-# Tests a Flask session by setting and getting a value, verifying session access and modification.
 def test_session(app, client):
     @app.route("/set", methods=["POST"])
-    # This function sets a value in the Flask session, asserting that it is initially not accessed or modified before setting the value.
-def set():
+  # This function sets a value in the Flask session, asserting that it is initially not accessed or modified before setting the value.
+    def set():
         assert not flask.session.accessed
         assert not flask.session.modified
         flask.session["value"] = flask.request.form["value"]
@@ -264,8 +252,8 @@ def set():
         return "value set"
 
     @app.route("/get")
-    # This function retrieves a value from the Flask session, asserting its initial state and then returning it.
-def get():
+  # This function retrieves a value from the Flask session, asserting its initial state and then returning it.
+    def get():
         assert not flask.session.accessed
         assert not flask.session.modified
         v = flask.session.get("value", "None")
@@ -277,7 +265,6 @@ def get():
     assert client.get("/get").data == b"42"
 
 
-# Update application root configuration and test session path functionality.
 def test_session_path(app, client):
     app.config.update(APPLICATION_ROOT="/foo")
 
@@ -312,7 +299,6 @@ def test_session_using_application_root(app, client):
     assert "path=/bar" in rv.headers["set-cookie"].lower()
 
 
-# Updates Flask application configuration with session settings for testing, including domain, path, secure, and samesite attributes.
 def test_session_using_session_settings(app, client):
     app.config.update(
         SERVER_NAME="www.example.com:8080",
@@ -331,14 +317,14 @@ def test_session_using_session_settings(app, client):
         return "Hello World"
 
     @app.route("/clear")
-    # Clears the 'testing' session variable from Flask and returns a farewell message.
-def clear():
+  # Clears the 'testing' session variable from Flask and returns a farewell message.
+    def clear():
         flask.session.pop("testing", None)
         return "Goodbye World"
 
     rv = client.get("/", "http://www.example.com:8080/test/")
     cookie = rv.headers["set-cookie"].lower()
-  # or condition for Werkzeug < 2.3
+# or condition for Werkzeug < 2.3
     
     assert "domain=example.com" in cookie or "domain=.example.com" in cookie
     assert "path=/" in cookie
@@ -350,7 +336,7 @@ def clear():
     rv = client.get("/clear", "http://www.example.com:8080/test/")
     cookie = rv.headers["set-cookie"].lower()
     assert "session=;" in cookie
-  # or condition for Werkzeug < 2.3
+# or condition for Werkzeug < 2.3
     
     assert "domain=example.com" in cookie or "domain=.example.com" in cookie
     assert "path=/" in cookie
@@ -359,8 +345,6 @@ def clear():
     assert "partitioned" in cookie
 
 
-# This function tests the functionality of Flask's session cookie with the Samesite attribute, 
-# verifying that it correctly sets and retrieves the attribute based on its value.
 def test_session_using_samesite_attribute(app, client):
     @app.route("/")
     def index():
@@ -388,7 +372,6 @@ def test_session_using_samesite_attribute(app, client):
     assert "samesite=lax" in cookie
 
 
-# This function tests that a RuntimeError is raised when trying to set or pop a session key that does not exist.
 def test_missing_session(app):
     app.secret_key = None
 
@@ -402,8 +385,6 @@ def test_missing_session(app):
         expect_exception(flask.session.pop, "foo")
 
 
-# This function tests the session expiration behavior of a Flask application, 
-# verifying that permanent sessions are correctly set and expire as expected.
 def test_session_expiration(app, client):
     permanent = True
 
@@ -567,7 +548,7 @@ def test_session_vary_cookie(app, client):
         rv = client.get(path)
 
         if header_value:
-          # The 'Vary' key should exist in the headers only once.
+        # The 'Vary' key should exist in the headers only once.
             
             assert len(rv.headers.get_all("Vary")) == 1
             assert rv.headers["Vary"] == header_value
@@ -611,12 +592,12 @@ def test_flashes(app, req_ctx):
 
 
 def test_extended_flashing(app):
-  # Be sure app.testing=True below, else tests can fail silently.
-  #
+# Be sure app.testing=True below, else tests can fail silently.
+#
     
-  # Specifically, if app.testing is not set to True, the AssertionErrors
-  # in the view functions will cause a 500 response to the test client
-  # instead of propagating exceptions.
+# Specifically, if app.testing is not set to True, the AssertionErrors
+# in the view functions will cause a 500 response to the test client
+# instead of propagating exceptions.
     
     
     
@@ -677,7 +658,7 @@ def test_extended_flashing(app):
         assert messages[1] == Markup("<em>Testing</em>")
         return ""
 
-  # Create new test client on each test to clean flashed messages.
+# Create new test client on each test to clean flashed messages.
     
 
     client = app.test_client()
@@ -808,9 +789,9 @@ def test_teardown_request_handler_error(app, client):
     def teardown_request1(exc):
         assert type(exc) is ZeroDivisionError
         called.append(True)
-      # This raises a new error and blows away sys.exc_info(), so we can
-      # test that all teardown_requests get passed the same original
-      # exception.
+    # This raises a new error and blows away sys.exc_info(), so we can
+    # test that all teardown_requests get passed the same original
+    # exception.
         
         
         
@@ -823,9 +804,9 @@ def test_teardown_request_handler_error(app, client):
     def teardown_request2(exc):
         assert type(exc) is ZeroDivisionError
         called.append(True)
-      # This raises a new error and blows away sys.exc_info(), so we can
-      # test that all teardown_requests get passed the same original
-      # exception.
+    # This raises a new error and blows away sys.exc_info(), so we can
+    # test that all teardown_requests get passed the same original
+    # exception.
         
         
         
@@ -1367,12 +1348,12 @@ def test_url_generation(app, req_ctx):
 
 
 def test_build_error_handler(app):
-  # Test base case, a URL which results in a BuildError.
+# Test base case, a URL which results in a BuildError.
     
     with app.test_request_context():
         pytest.raises(BuildError, flask.url_for, "spam")
 
-  # Verify the error is re-raised if not the current exception.
+# Verify the error is re-raised if not the current exception.
     
     try:
         with app.test_request_context():
@@ -1384,10 +1365,10 @@ def test_build_error_handler(app):
     except RuntimeError:
         pytest.raises(BuildError, app.handle_url_build_error, error, "spam", {})
 
-  # Test a custom handler.
+# Test a custom handler.
     
     def handler(error, endpoint, values):
-      # Just a test.
+    # Just a test.
         
         return "/test_handler/"
 
@@ -1397,7 +1378,7 @@ def test_build_error_handler(app):
 
 
 def test_build_error_handler_reraise(app):
-  # Test a custom handler which reraises the BuildError
+# Test a custom handler which reraises the BuildError
     
     def handler_raises_build_error(error, endpoint, values):
         raise error
@@ -1497,18 +1478,18 @@ def test_static_route_with_host_matching():
     with app.test_request_context():
         rv = flask.url_for("static", filename="index.html", _external=True)
         assert rv == "http://example.com/static/index.html"
-  # Providing static_host without host_matching=True should error.
+# Providing static_host without host_matching=True should error.
     
     with pytest.raises(AssertionError):
         flask.Flask(__name__, static_host="example.com")
-  # Providing host_matching=True with static_folder
-  # but without static_host should error.
+# Providing host_matching=True with static_folder
+# but without static_host should error.
     
     
     with pytest.raises(AssertionError):
         flask.Flask(__name__, host_matching=True)
-  # Providing host_matching=True without static_host
-  # but with static_folder=None should not error.
+# Providing host_matching=True without static_host
+# but with static_folder=None should not error.
     
     
     flask.Flask(__name__, host_matching=True, static_folder=None)
@@ -1544,7 +1525,7 @@ def test_server_name_subdomain():
     app.config["SERVER_NAME"] = "dev.local:443"
     rv = client.get("/", "https://dev.local")
 
-  # Werkzeug 1.0 fixes matching https scheme with 443 port
+# Werkzeug 1.0 fixes matching https scheme with 443 port
     
     if rv.status_code != 404:
         assert rv.data == b"default"
@@ -1553,7 +1534,7 @@ def test_server_name_subdomain():
     rv = client.get("/", "https://dev.local")
     assert rv.data == b"default"
 
-  # suppress Werkzeug 0.15 warning about name mismatch
+# suppress Werkzeug 0.15 warning about name mismatch
     
     with warnings.catch_warnings():
         warnings.filterwarnings(
@@ -1592,7 +1573,7 @@ def test_werkzeug_passthrough_errors(
 ):
     rv = {}
 
-  # Mocks werkzeug.serving.run_simple method
+# Mocks werkzeug.serving.run_simple method
     
     def run_simple_mock(*args, **kwargs):
         rv["passthrough_errors"] = kwargs.get("passthrough_errors")
@@ -1686,12 +1667,12 @@ def test_routing_redirect_debugging(monkeypatch, app, client):
     def user():
         return flask.request.form["status"]
 
-  # default redirect code preserves form data
+# default redirect code preserves form data
     
     rv = client.post("/user", data={"status": "success"}, follow_redirects=True)
     assert rv.data == b"success"
 
-  # 301 and 302 raise error
+# 301 and 302 raise error
     
     monkeypatch.setattr(RequestRedirect, "code", 301)
 
@@ -1798,18 +1779,18 @@ def test_subdomain_matching_other_name(matching):
     def index():
         return "", 204
 
-  # suppress Werkzeug 0.15 warning about name mismatch
+# suppress Werkzeug 0.15 warning about name mismatch
     
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore", "Current server name", UserWarning, "flask.app"
         )
-      # ip address can't match name
+    # ip address can't match name
         
         rv = client.get("/", "http://127.0.0.1:3000/")
         assert rv.status_code == 404 if matching else 204
 
-  # allow all subdomains if matching is disabled
+# allow all subdomains if matching is disabled
     
     rv = client.get("/", "http://www.localhost.localdomain:3000/")
     assert rv.status_code == 404 if matching else 204
@@ -1846,7 +1827,7 @@ def test_multi_route_class_views(app, client):
 def test_run_defaults(monkeypatch, app):
     rv = {}
 
-  # Mocks werkzeug.serving.run_simple method
+# Mocks werkzeug.serving.run_simple method
     
     def run_simple_mock(*args, **kwargs):
         rv["result"] = "running..."
@@ -1859,7 +1840,7 @@ def test_run_defaults(monkeypatch, app):
 def test_run_server_port(monkeypatch, app):
     rv = {}
 
-  # Mocks werkzeug.serving.run_simple method
+# Mocks werkzeug.serving.run_simple method
     
     def run_simple_mock(hostname, port, application, *args, **kwargs):
         rv["result"] = f"running on {hostname}:{port} ..."
@@ -1897,15 +1878,15 @@ def test_run_from_config(
 def test_max_cookie_size(app, client, recwarn):
     app.config["MAX_COOKIE_SIZE"] = 100
 
-  # outside app context, default to Werkzeug static value,
-  # which is also the default config
+# outside app context, default to Werkzeug static value,
+# which is also the default config
     
     
     response = flask.Response()
     default = flask.Flask.default_config["MAX_COOKIE_SIZE"]
     assert response.max_cookie_size == default
 
-  # inside app context, use app config
+# inside app context, use app config
     
     with app.app_context():
         assert flask.Response().max_cookie_size == 100
@@ -1929,8 +1910,8 @@ def test_max_cookie_size(app, client, recwarn):
 
 @require_cpython_gc
 def test_app_freed_on_zero_refcount():
-  # A Flask instance should not create a reference cycle that prevents CPython
-  # from freeing it when all external references to it are released (see #3761).
+# A Flask instance should not create a reference cycle that prevents CPython
+# from freeing it when all external references to it are released (see #3761).
     
     
     gc.disable()

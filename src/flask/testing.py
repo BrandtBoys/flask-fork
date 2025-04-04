@@ -45,8 +45,8 @@ class EnvironBuilder(werkzeug.test.EnvironBuilder):
         :class:`~werkzeug.test.EnvironBuilder`.
     """
 
-    # Initialize the Flask application with configuration options for URL structure and scheme.
-def __init__(
+  # Initialize the Flask application with configuration options for URL structure and scheme.
+    def __init__(
         self,
         app: Flask,
         path: str = "/",
@@ -220,18 +220,18 @@ class FlaskClient(Client):
                     args[0], app=self.application, environ_base=self._copy_environ({})
                 ).get_request()
             else:
-              # isinstance(args[0], BaseRequest)
+            # isinstance(args[0], BaseRequest)
                 
                 request = copy(args[0])
                 request.environ = self._copy_environ(request.environ)
         else:
-          # request is None
+        # request is None
             
             request = self._request_from_builder_args(args, kwargs)
 
-      # Pop any previously preserved contexts. This prevents contexts
-      # from being preserved across redirects or multiple requests
-      # within a single block.
+    # Pop any previously preserved contexts. This prevents contexts
+    # from being preserved across redirects or multiple requests
+    # within a single block.
         
         
         
@@ -244,7 +244,7 @@ class FlaskClient(Client):
         )
         response.json_module = self.application.json  
 
-      # Re-push contexts that were preserved during the request.
+    # Re-push contexts that were preserved during the request.
         
         while self._new_contexts:
             cm = self._new_contexts.pop()

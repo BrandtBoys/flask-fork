@@ -153,16 +153,16 @@ class App(Scaffold):
         automatically, such as for namespace packages.
     """
 
-  #: The class of the object assigned to :attr:`aborter`, created by
-  #: :meth:`create_aborter`. That object is called by
-  #: :func:`flask.abort` to raise HTTP errors, and can be
-  #: called directly as well.
-  #:
+#: The class of the object assigned to :attr:`aborter`, created by
+#: :meth:`create_aborter`. That object is called by
+#: :func:`flask.abort` to raise HTTP errors, and can be
+#: called directly as well.
+#:
     
-  #: Defaults to :class:`werkzeug.exceptions.Aborter`.
-  #:
+#: Defaults to :class:`werkzeug.exceptions.Aborter`.
+#:
     
-  #: .. versionadded:: 2.2
+#: .. versionadded:: 2.2
     
     
     
@@ -171,32 +171,32 @@ class App(Scaffold):
     
     aborter_class = Aborter
 
-  #: The class that is used for the Jinja environment.
-  #:
+#: The class that is used for the Jinja environment.
+#:
     
-  #: .. versionadded:: 0.11
+#: .. versionadded:: 0.11
     
     
     jinja_environment = Environment
 
-  #: The class that is used for the :data:`~flask.g` instance.
-  #:
+#: The class that is used for the :data:`~flask.g` instance.
+#:
     
-  #: Example use cases for a custom class:
-  #:
+#: Example use cases for a custom class:
+#:
     
-  #: 1. Store arbitrary attributes on flask.g.
-  #: 2. Add a property for lazy per-request database connectors.
-  #: 3. Return None instead of AttributeError on unexpected attributes.
-  #: 4. Raise exception if an unexpected attr is set, a "controlled" flask.g.
-  #:
+#: 1. Store arbitrary attributes on flask.g.
+#: 2. Add a property for lazy per-request database connectors.
+#: 3. Return None instead of AttributeError on unexpected attributes.
+#: 4. Raise exception if an unexpected attr is set, a "controlled" flask.g.
+#:
     
-  #: In Flask 0.9 this property was called `request_globals_class` but it
-  #: was changed in 0.10 to :attr:`app_ctx_globals_class` because the
-  #: flask.g object is now application context scoped.
-  #:
+#: In Flask 0.9 this property was called `request_globals_class` but it
+#: was changed in 0.10 to :attr:`app_ctx_globals_class` because the
+#: flask.g object is now application context scoped.
+#:
     
-  #: .. versionadded:: 0.10
+#: .. versionadded:: 0.10
     
     
     
@@ -209,18 +209,18 @@ class App(Scaffold):
     
     app_ctx_globals_class = _AppCtxGlobals
 
-  #: The class that is used for the ``config`` attribute of this app.
-  #: Defaults to :class:`~flask.Config`.
-  #:
+#: The class that is used for the ``config`` attribute of this app.
+#: Defaults to :class:`~flask.Config`.
+#:
     
-  #: Example use cases for a custom class:
-  #:
+#: Example use cases for a custom class:
+#:
     
-  #: 1. Default values for certain config options.
-  #: 2. Access to config values through attributes in addition to keys.
-  #:
+#: 1. Default values for certain config options.
+#: 2. Access to config values through attributes in addition to keys.
+#:
     
-  #: .. versionadded:: 0.11
+#: .. versionadded:: 0.11
     
     
     
@@ -229,18 +229,18 @@ class App(Scaffold):
     
     config_class = Config
 
-  #: The testing flag.  Set this to ``True`` to enable the test mode of
-  #: Flask extensions (and in the future probably also Flask itself).
-  #: For example this might activate test helpers that have an
-  #: additional runtime cost which should not be enabled by default.
-  #:
+#: The testing flag.  Set this to ``True`` to enable the test mode of
+#: Flask extensions (and in the future probably also Flask itself).
+#: For example this might activate test helpers that have an
+#: additional runtime cost which should not be enabled by default.
+#:
     
-  #: If this is enabled and PROPAGATE_EXCEPTIONS is not changed from the
-  #: default it's implicitly enabled.
-  #:
+#: If this is enabled and PROPAGATE_EXCEPTIONS is not changed from the
+#: default it's implicitly enabled.
+#:
     
-  #: This attribute can also be configured from the config with the
-  #: ``TESTING`` configuration key.  Defaults to ``False``.
+#: This attribute can also be configured from the config with the
+#: ``TESTING`` configuration key.  Defaults to ``False``.
     
     
     
@@ -251,13 +251,13 @@ class App(Scaffold):
     
     testing = ConfigAttribute[bool]("TESTING")
 
-  #: If a secret key is set, cryptographic components can use this to
-  #: sign cookies and other things. Set this to a complex random value
-  #: when you want to use the secure cookie for instance.
-  #:
+#: If a secret key is set, cryptographic components can use this to
+#: sign cookies and other things. Set this to a complex random value
+#: when you want to use the secure cookie for instance.
+#:
     
-  #: This attribute can also be configured from the config with the
-  #: :data:`SECRET_KEY` configuration key. Defaults to ``None``.
+#: This attribute can also be configured from the config with the
+#: :data:`SECRET_KEY` configuration key. Defaults to ``None``.
     
     
     
@@ -265,14 +265,14 @@ class App(Scaffold):
     
     secret_key = ConfigAttribute[t.Union[str, bytes, None]]("SECRET_KEY")
 
-  #: A :class:`~datetime.timedelta` which is used to set the expiration
-  #: date of a permanent session.  The default is 31 days which makes a
-  #: permanent session survive for roughly one month.
-  #:
+#: A :class:`~datetime.timedelta` which is used to set the expiration
+#: date of a permanent session.  The default is 31 days which makes a
+#: permanent session survive for roughly one month.
+#:
     
-  #: This attribute can also be configured from the config with the
-  #: ``PERMANENT_SESSION_LIFETIME`` configuration key.  Defaults to
-  #: ``timedelta(days=31)``
+#: This attribute can also be configured from the config with the
+#: ``PERMANENT_SESSION_LIFETIME`` configuration key.  Defaults to
+#: ``timedelta(days=31)``
     
     
     
@@ -296,16 +296,16 @@ class App(Scaffold):
     .. versionadded:: 2.2
     """
 
-  #: Options that are passed to the Jinja environment in
-  #: :meth:`create_jinja_environment`. Changing these options after
-  #: the environment is created (accessing :attr:`jinja_env`) will
-  #: have no effect.
-  #:
+#: Options that are passed to the Jinja environment in
+#: :meth:`create_jinja_environment`. Changing these options after
+#: the environment is created (accessing :attr:`jinja_env`) will
+#: have no effect.
+#:
     
-  #: .. versionchanged:: 1.1.0
-  #:     This is a ``dict`` instead of an ``ImmutableDict`` to allow
-  #:     easier configuration.
-  #:
+#: .. versionchanged:: 1.1.0
+#:     This is a ``dict`` instead of an ``ImmutableDict`` to allow
+#:     easier configuration.
+#:
     
     
     
@@ -316,43 +316,43 @@ class App(Scaffold):
     
     jinja_options: dict[str, t.Any] = {}
 
-  #: The rule object to use for URL rules created.  This is used by
-  #: :meth:`add_url_rule`.  Defaults to :class:`werkzeug.routing.Rule`.
-  #:
+#: The rule object to use for URL rules created.  This is used by
+#: :meth:`add_url_rule`.  Defaults to :class:`werkzeug.routing.Rule`.
+#:
     
-  #: .. versionadded:: 0.7
+#: .. versionadded:: 0.7
     
     
     
     url_rule_class = Rule
 
-  #: The map object to use for storing the URL rules and routing
-  #: configuration parameters. Defaults to :class:`werkzeug.routing.Map`.
-  #:
+#: The map object to use for storing the URL rules and routing
+#: configuration parameters. Defaults to :class:`werkzeug.routing.Map`.
+#:
     
-  #: .. versionadded:: 1.1.0
+#: .. versionadded:: 1.1.0
     
     
     
     url_map_class = Map
 
-  #: The :meth:`test_client` method creates an instance of this test
-  #: client class. Defaults to :class:`~flask.testing.FlaskClient`.
-  #:
+#: The :meth:`test_client` method creates an instance of this test
+#: client class. Defaults to :class:`~flask.testing.FlaskClient`.
+#:
     
-  #: .. versionadded:: 0.7
+#: .. versionadded:: 0.7
     
     
     
     test_client_class: type[FlaskClient] | None = None
 
-  #: The :class:`~click.testing.CliRunner` subclass, by default
-  #: :class:`~flask.testing.FlaskCliRunner` that is used by
-  #: :meth:`test_cli_runner`. Its ``__init__`` method should take a
-  #: Flask app object as the first argument.
-  #:
+#: The :class:`~click.testing.CliRunner` subclass, by default
+#: :class:`~flask.testing.FlaskCliRunner` that is used by
+#: :meth:`test_cli_runner`. Its ``__init__`` method should take a
+#: Flask app object as the first argument.
+#:
     
-  #: .. versionadded:: 1.0
+#: .. versionadded:: 1.0
     
     
     
@@ -363,8 +363,8 @@ class App(Scaffold):
     default_config: dict[str, t.Any]
     response_class: type[Response]
 
-    # Initialize a new Flask application instance with various configuration options.
-def __init__(
+  # Initialize a new Flask application instance with various configuration options.
+    def __init__(
         self,
         import_name: str,
         static_url_path: str | None = None,
@@ -393,29 +393,29 @@ def __init__(
                 " A relative path was given instead."
             )
 
-      #: Holds the path to the instance folder.
-      #:
+    #: Holds the path to the instance folder.
+    #:
         
-      #: .. versionadded:: 0.8
+    #: .. versionadded:: 0.8
         
         
         self.instance_path = instance_path
 
-      #: The configuration dictionary as :class:`Config`.  This behaves
-      #: exactly like a regular dictionary but supports additional methods
-      #: to load a config from files.
+    #: The configuration dictionary as :class:`Config`.  This behaves
+    #: exactly like a regular dictionary but supports additional methods
+    #: to load a config from files.
         
         
         
         self.config = self.make_config(instance_relative_config)
 
-      #: An instance of :attr:`aborter_class` created by
-      #: :meth:`make_aborter`. This is called by :func:`flask.abort`
-      #: to raise HTTP errors, and can be called directly as well.
-      #:
+    #: An instance of :attr:`aborter_class` created by
+    #: :meth:`make_aborter`. This is called by :func:`flask.abort`
+    #: to raise HTTP errors, and can be called directly as well.
+    #:
         
-      #: .. versionadded:: 2.2
-      #:     Moved from ``flask.abort``, which calls this object.
+    #: .. versionadded:: 2.2
+    #:     Moved from ``flask.abort``, which calls this object.
         
         
         
@@ -439,15 +439,15 @@ def __init__(
         .. versionadded:: 2.2
         """
 
-      #: A list of functions that are called by
-      #: :meth:`handle_url_build_error` when :meth:`.url_for` raises a
-      #: :exc:`~werkzeug.routing.BuildError`. Each function is called
-      #: with ``error``, ``endpoint`` and ``values``. If a function
-      #: returns ``None`` or raises a ``BuildError``, it is skipped.
-      #: Otherwise, its return value is returned by ``url_for``.
-      #:
+    #: A list of functions that are called by
+    #: :meth:`handle_url_build_error` when :meth:`.url_for` raises a
+    #: :exc:`~werkzeug.routing.BuildError`. Each function is called
+    #: with ``error``, ``endpoint`` and ``values``. If a function
+    #: returns ``None`` or raises a ``BuildError``, it is skipped.
+    #: Otherwise, its return value is returned by ``url_for``.
+    #:
         
-      #: .. versionadded:: 0.9
+    #: .. versionadded:: 0.9
         
         
         
@@ -459,13 +459,13 @@ def __init__(
             t.Callable[[Exception, str, dict[str, t.Any]], str]
         ] = []
 
-      #: A list of functions that are called when the application context
-      #: is destroyed.  Since the application context is also torn down
-      #: if the request ends this is the place to store code that disconnects
-      #: from databases.
-      #:
+    #: A list of functions that are called when the application context
+    #: is destroyed.  Since the application context is also torn down
+    #: if the request ends this is the place to store code that disconnects
+    #: from databases.
+    #:
         
-      #: .. versionadded:: 0.9
+    #: .. versionadded:: 0.9
         
         
         
@@ -473,23 +473,23 @@ def __init__(
         
         self.teardown_appcontext_funcs: list[ft.TeardownCallable] = []
 
-      #: A list of shell context processor functions that should be run
-      #: when a shell context is created.
-      #:
+    #: A list of shell context processor functions that should be run
+    #: when a shell context is created.
+    #:
         
-      #: .. versionadded:: 0.11
+    #: .. versionadded:: 0.11
         
         
         
         self.shell_context_processors: list[ft.ShellContextProcessorCallable] = []
 
-      #: Maps registered blueprint names to blueprint objects. The
-      #: dict retains the order the blueprints were registered in.
-      #: Blueprints can be registered multiple times, this dict does
-      #: not track how often they were attached.
-      #:
+    #: Maps registered blueprint names to blueprint objects. The
+    #: dict retains the order the blueprints were registered in.
+    #: Blueprints can be registered multiple times, this dict does
+    #: not track how often they were attached.
+    #:
         
-      #: .. versionadded:: 0.7
+    #: .. versionadded:: 0.7
         
         
         
@@ -497,17 +497,17 @@ def __init__(
         
         self.blueprints: dict[str, Blueprint] = {}
 
-      #: a place where extensions can store application specific state.  For
-      #: example this is where an extension could store database engines and
-      #: similar things.
-      #:
+    #: a place where extensions can store application specific state.  For
+    #: example this is where an extension could store database engines and
+    #: similar things.
+    #:
         
-      #: The key must match the name of the extension module. For example in
-      #: case of a "Flask-Foo" extension in `flask_foo`, the key would be
-      #: ``'foo'``.
-      #:
+    #: The key must match the name of the extension module. For example in
+    #: case of a "Flask-Foo" extension in `flask_foo`, the key would be
+    #: ``'foo'``.
+    #:
         
-      #: .. versionadded:: 0.7
+    #: .. versionadded:: 0.7
         
         
         
@@ -517,24 +517,24 @@ def __init__(
         
         self.extensions: dict[str, t.Any] = {}
 
-      #: The :class:`~werkzeug.routing.Map` for this instance.  You can use
-      #: this to change the routing converters after the class was created
-      #: but before any routes are connected.  Example::
-      #:
+    #: The :class:`~werkzeug.routing.Map` for this instance.  You can use
+    #: this to change the routing converters after the class was created
+    #: but before any routes are connected.  Example::
+    #:
         
-      #:    from werkzeug.routing import BaseConverter
-      #:
+    #:    from werkzeug.routing import BaseConverter
+    #:
         
-      #:    class ListConverter(BaseConverter):
-      #:        def to_python(self, value):
-      #:            return value.split(',')
-      #:        def to_url(self, values):
-      #:            return ','.join(super(ListConverter, self).to_url(value)
-      #:                            for value in values)
-      #:
+    #:    class ListConverter(BaseConverter):
+    #:        def to_python(self, value):
+    #:            return value.split(',')
+    #:        def to_url(self, values):
+    #:            return ','.join(super(ListConverter, self).to_url(value)
+    #:                            for value in values)
+    #:
         
-      #:    app = Flask(__name__)
-      #:    app.url_map.converters['list'] = ListConverter
+    #:    app = Flask(__name__)
+    #:    app.url_map.converters['list'] = ListConverter
         
         
         
@@ -551,14 +551,14 @@ def __init__(
 
         self.subdomain_matching = subdomain_matching
 
-      # tracks internally if the application already handled at least one
-      # request.
+    # tracks internally if the application already handled at least one
+    # request.
         
         
         self._got_first_request = False
 
-    # Check if setup method has been finished and raise assertion error if not.
-def _check_setup_finished(self, f_name: str) -> None:
+  # Check if setup method has been finished and raise assertion error if not.
+    def _check_setup_finished(self, f_name: str) -> None:
         if self._got_first_request:
             raise AssertionError(
                 f"The setup method '{f_name}' can no longer be called"
@@ -571,8 +571,8 @@ def _check_setup_finished(self, f_name: str) -> None:
             )
 
     @cached_property
-    # The name of the application, returning a display name used by Flask when needed.
-def name(self) -> str:  
+  # The name of the application, returning a display name used by Flask when needed.
+    def name(self) -> str:  
         """The name of the application.  This is usually the import name
         with the difference that it's guessed from the run file if the
         import name is main.  This name is used as a display name when
@@ -589,9 +589,8 @@ def name(self) -> str:
         return self.import_name
 
     @cached_property
-    # A standard Python logging.Logger instance for the app, with the same name as `name`, 
-# and defaulting to a debug level in debug mode if no handlers are configured.
-def logger(self) -> logging.Logger:
+  # A standard Python logging.Logger instance for the app, with the same name as `name`, 
+    def logger(self) -> logging.Logger:
         """A standard Python :class:`~logging.Logger` for the app, with
         the same name as :attr:`name`.
 
@@ -618,8 +617,8 @@ def logger(self) -> logging.Logger:
         return create_logger(self)
 
     @cached_property
-    # The Jinja environment used to load templates, created on first access and with immutable jinja_options.
-def jinja_env(self) -> Environment:
+  # The Jinja environment used to load templates, created on first access and with immutable jinja_options.
+    def jinja_env(self) -> Environment:
         """The Jinja environment used to load templates.
 
         The environment is created the first time this property is
@@ -631,8 +630,8 @@ def jinja_env(self) -> Environment:
     def create_jinja_environment(self) -> Environment:
         raise NotImplementedError()
 
-    # Used to create the config attribute by the Flask constructor, handling instance-relative configuration.
-def make_config(self, instance_relative: bool = False) -> Config:
+  # Used to create the config attribute by the Flask constructor, handling instance-relative configuration.
+    def make_config(self, instance_relative: bool = False) -> Config:
         """Used to create the config attribute by the Flask constructor.
         The `instance_relative` parameter is passed in from the constructor
         of Flask (there named `instance_relative_config`) and indicates if
@@ -648,8 +647,8 @@ def make_config(self, instance_relative: bool = False) -> Config:
         defaults["DEBUG"] = get_debug_flag()
         return self.config_class(root_path, defaults)
 
-    # Create the object to assign to :attr:`aborter`, used by :func:`flask.abort` to raise HTTP errors and can be called directly as well.
-def make_aborter(self) -> Aborter:
+  # Create the object to assign to :attr:`aborter`, used by :func:`flask.abort` to raise HTTP errors and can be called directly as well.
+    def make_aborter(self) -> Aborter:
         """Create the object to assign to :attr:`aborter`. That object
         is called by :func:`flask.abort` to raise HTTP errors, and can
         be called directly as well.
@@ -769,9 +768,9 @@ def make_aborter(self) -> Aborter:
         options["endpoint"] = endpoint
         methods = options.pop("methods", None)
 
-      # if the methods are not given and the view_func object knows its
-      # methods we can use that instead.  If neither exists, we go with
-      # a tuple of only ``GET`` as default.
+    # if the methods are not given and the view_func object knows its
+    # methods we can use that instead.  If neither exists, we go with
+    # a tuple of only ``GET`` as default.
         
         
         
@@ -784,12 +783,12 @@ def make_aborter(self) -> Aborter:
             )
         methods = {item.upper() for item in methods}
 
-      # Methods that should always be added
+    # Methods that should always be added
         
         required_methods: set[str] = set(getattr(view_func, "required_methods", ()))
 
-      # starting with Flask 0.8 the view_func object can disable and
-      # force-enable the automatic options handling.
+    # starting with Flask 0.8 the view_func object can disable and
+    # force-enable the automatic options handling.
         
         
         if provide_automatic_options is None:
@@ -804,7 +803,7 @@ def make_aborter(self) -> Aborter:
             else:
                 provide_automatic_options = False
 
-      # Add the required methods now.
+    # Add the required methods now.
         
         methods |= required_methods
 
@@ -1028,7 +1027,7 @@ def make_aborter(self) -> Aborter:
 
         trap_bad_request = self.config["TRAP_BAD_REQUEST_ERRORS"]
 
-      # if unset, trap key errors in debug mode
+    # if unset, trap key errors in debug mode
         
         if (
             trap_bad_request is None
@@ -1079,8 +1078,8 @@ def make_aborter(self) -> Aborter:
         """
         names: t.Iterable[str | None] = (None,)
 
-      # url_for may be called outside a request context, parse the
-      # passed endpoint instead of using request.blueprints.
+    # url_for may be called outside a request context, parse the
+    # passed endpoint instead of using request.blueprints.
         
         
         if "." in endpoint:
@@ -1114,15 +1113,15 @@ def make_aborter(self) -> Aborter:
             try:
                 rv = handler(error, endpoint, values)
             except BuildError as e:
-              # make error available outside except block
+            # make error available outside except block
                 
                 error = e
             else:
                 if rv is not None:
                     return rv
 
-      # Re-raise if called with an active exception, otherwise raise
-      # the passed in exception.
+    # Re-raise if called with an active exception, otherwise raise
+    # the passed in exception.
         
         
         if error is sys.exc_info()[1]:
