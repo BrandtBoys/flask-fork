@@ -1,0 +1,15 @@
+on: [push]
+
+jobs:
+  DocTide_job:
+    runs-on: ubuntu-latest
+    name: Run Doctide
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: run DocTide action
+        id: doctide
+        uses: ./
+        with:
+          testing: true
