@@ -1138,7 +1138,6 @@ Raises:
     TypeError: If the view function did not return a valid response.
 """
 
-
         status = headers = None
 
         # unpack tuple returns
