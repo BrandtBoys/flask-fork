@@ -323,7 +323,7 @@ load_dotenv_defaults (bool): Whether default ``.flaskenv`` and ``.env`` files sh
 Returns:
 None
 """
-self.app_import_path = app_import_path
+        self.app_import_path = app_import_path
         #: Optionally a function that is passed the script info to create
         #: the instance of the application.
         self.create_app = create_app
@@ -360,7 +360,6 @@ Note that calling this function multiple times will result in the same loaded ap
 Raises:
     NoAppException: If no Flask application can be found or created.
 """
-
         if self._loaded_app is not None:
             return self._loaded_app
         app: Flask | None = None
@@ -519,6 +518,7 @@ _debug_option = click.Option(
 def _env_file_callback(
     ctx: click.Context, param: click.Option, value: str | None
 ) -> str | None:
+    try:
     """
 Loads an environment file using the python-dotenv library.
 
@@ -534,7 +534,6 @@ Raises:
 Returns:
     str | None: The loaded environment value or None if no value was passed.
 """
-try:
         import dotenv  # noqa: F401
     except ImportError:
         # Only show an error if a value was passed, otherwise we still want to
@@ -626,7 +625,7 @@ Parameters:
 Returns:
     None
 """
-params: list[click.Parameter] = list(extra.pop("params", None) or ())
+        params: list[click.Parameter] = list(extra.pop("params", None) or ())
         # Processing is done with option callbacks instead of a group
         # callback. This allows users to make a custom group callback
         # without losing the behavior. --env-file must come first so
@@ -741,7 +740,7 @@ Args:
 Returns:
     click.Context: The created Click context.
 """
-os.environ["FLASK_RUN_FROM_CLI"] = "true"
+        os.environ["FLASK_RUN_FROM_CLI"] = "true"
 
         if "obj" not in extra and "obj" not in self.context_settings:
             extra["obj"] = ScriptInfo(
@@ -786,7 +785,6 @@ tip message suggesting to install `python-dotenv`.
 .. _python-dotenv: https://github.com/theskumar/python-dotenv#readme
 
 Parameters
-----------
 path : str | os.PathLike[str] | None
     The path to the dotenv file to load. If not provided, the function will
     search for .env and .flaskenv files in the current directory.
@@ -795,11 +793,9 @@ load_defaults : bool
     files.
 
 Returns
-----------
 bool
     True if at least one environment variable was loaded, False otherwise.
 """
-
     try:
         import dotenv
     except ImportError:
@@ -1037,7 +1033,6 @@ Parameters:
 Returns:
     None
 """
-
     try:
         app: WSGIApplication = info.load_app()  # pyright: ignore
     except Exception as e:

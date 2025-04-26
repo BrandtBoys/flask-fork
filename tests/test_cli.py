@@ -411,7 +411,7 @@ Returns:
 Raises:
     AssertionError: If any assertion fails
 """
-from flask.cli import cli
+    from flask.cli import cli
 
     try:
         runner = CliRunner(mix_stderr=False)
@@ -432,7 +432,7 @@ Tests the functionality of the `test_help_echo_loading_error` function.
 This test checks if the Flask CLI can be invoked successfully with the `--help` option,
 and verifies that the expected output is displayed, including the FLASK_APP environment variable.
 """
-from flask.cli import cli
+    from flask.cli import cli
 
     try:
         runner = CliRunner(mix_stderr=False)
@@ -458,7 +458,7 @@ This test checks that:
 
 Note: This test assumes Click version 8.2 or higher, where the `CliRunner` class has been updated to suppress stderr output by default.
 """
-def create_app():
+    def create_app():
         raise Exception("oh no")
 
     cli = FlaskGroup(create_app=create_app)
@@ -584,7 +584,7 @@ Returns:
 Raises:
     AssertionError: If any assertion fails.
 """
-for item in ("FOO", "BAR", "SPAM", "HAM"):
+    for item in ("FOO", "BAR", "SPAM", "HAM"):
         monkeypatch._setitem.append((os.environ, item, notset))
 
     monkeypatch.setenv("EGGS", "3")

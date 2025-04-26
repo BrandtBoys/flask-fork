@@ -24,7 +24,7 @@ Args:
 Returns:
     None
 """
-app.config["MAX_CONTENT_LENGTH"] = 50
+    app.config["MAX_CONTENT_LENGTH"] = 50
 
     @app.post("/")
     def index():
@@ -33,11 +33,12 @@ Raises an AssertionError when attempting to access the 'myfile' key in the reque
 
 Note: This function is not intended for production use and should be used for testing purposes only.
 """
-request.form["myfile"]
+        request.form["myfile"]
         AssertionError()
 
     @app.errorhandler(413)
     def catcher(error):
+        return "42"
         """
 Catcher Function
 
@@ -49,7 +50,6 @@ error (any): The error to be caught, but this parameter is not used within the f
 Returns:
 str: A constant string '42' regardless of the input error.
 """
-return "42"
 
     rv = client.post("/", data={"myfile": "foo" * 50})
     assert rv.data == b"42"
@@ -70,7 +70,7 @@ Args:
 Returns:
     None
 """
-app.config["MAX_CONTENT_LENGTH"] = 100
+    app.config["MAX_CONTENT_LENGTH"] = 100
     app.config["MAX_FORM_MEMORY_SIZE"] = 50
     app.config["MAX_FORM_PARTS"] = 3
     r = Request({})

@@ -355,15 +355,7 @@ class Flask(App):
 
         if mode == "rb":
             return open(path, mode)  # pyright: ignore
-        """Opens a resource from the application's instance folder
-        (:attr:`instance_path`).  Otherwise works like
-        :meth:`open_resource`.  Instance resources can also be opened for
-        writing.
 
-        :param resource: the name of the resource.  To access resources within
-                         subfolders use forward slashes as separator.
-        :param mode: resource file opening mode, default is 'rb'.
-        """
         return open(path, mode, encoding=encoding)
 
     def open_instance_resource(
@@ -384,7 +376,7 @@ Args:
 Returns:
     t.IO[t.AnyStr]: A file object opened at the specified resource path.
 """
-path = os.path.join(self.instance_path, resource)
+        path = os.path.join(self.instance_path, resource)
 
         if "b" in mode:
             return open(path, mode)
@@ -1127,6 +1119,8 @@ path = os.path.join(self.instance_path, resource)
 Converts the return value from a view function to an instance of 
 :attr:`response_class`. The view function must return a response. 
 
+        status: int | None = None
+        headers: HeadersValue | None = None
 The following types are allowed for ``view_rv``:
 
 - ``str``
@@ -1170,7 +1164,6 @@ This function has been updated in the following versions:
 Raises:
     TypeError: If the view function did not return a valid response.
 """
-
 
         # unpack tuple returns
         if isinstance(rv, tuple):

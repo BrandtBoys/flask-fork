@@ -724,7 +724,6 @@ Returns:
 Raises:
     ValueError: If the package or module does not exist.
 """
-
     root_mod_name, _, _ = import_name.partition(".")
 
     try:

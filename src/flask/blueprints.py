@@ -108,25 +108,20 @@ class Blueprint(SansioBlueprint):
 Opens a resource file relative to :attr:`root_path` for reading.
 
 Parameters
-----------
 resource (str): Path to the resource relative to :attr:`root_path`.
 mode (str, optional): Open the file in this mode. Only reading is supported,
     valid values are "r" (or "rt") and "rb". Defaults to "rb".
 encoding (str | None, optional): Encoding of the file. Defaults to "utf-8".
 
 Returns
--------
 t.IO[t.AnyStr]: A file object opened for reading.
 
 Raises
-------
 ValueError: If the mode is not one of "r", "rt", or "rb".
 
 Note
----
 This function duplicates the same method in the Flask class.
 """
-
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 

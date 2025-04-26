@@ -141,7 +141,6 @@ Specific items in nested dicts can be set by separating the keys with double und
 
 .. versionadded:: 2.1
 """
-
         prefix = f"{prefix}_"
 
         for key in sorted(os.environ):

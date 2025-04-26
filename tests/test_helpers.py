@@ -351,7 +351,7 @@ Returns:
 Raises:
     AssertionError: If the expected string is not found in the resource contents.
 """
-app = flask.Flask(__name__)
+    app = flask.Flask(__name__)
 
     with app.open_resource("static/index.html", mode) as f:
         assert "<h1>Hello World!</h1>" in str(f.read())
@@ -384,7 +384,7 @@ Returns:
 Raises:
     AssertionError: If the contents of the opened file do not match the original string.
 """
-app = flask.Flask(__name__, root_path=os.fspath(tmp_path))
+    app = flask.Flask(__name__, root_path=os.fspath(tmp_path))
     (tmp_path / "test").write_text("test", encoding=encoding)
 
     with app.open_resource("test", mode="rt", encoding=encoding) as f:

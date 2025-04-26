@@ -78,7 +78,7 @@ url_scheme (str | None): The scheme to use for the URL (if provided, it must be 
 Returns:
 None
 """
-assert not (base_url or subdomain or url_scheme) or (
+        assert not (base_url or subdomain or url_scheme) or (
             base_url is not None
         ) != bool(
             subdomain or url_scheme

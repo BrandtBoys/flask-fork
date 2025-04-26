@@ -585,7 +585,6 @@ Raises:
     ValueError: If the module cannot be found.
     RuntimeError: If the module is a namespace package and no file path can be found.
 """
-
     # Module already imported and has a file attribute. Use that first.
     mod = sys.modules.get(import_name)
 

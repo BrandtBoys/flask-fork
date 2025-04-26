@@ -72,7 +72,6 @@ Args:
 Returns:
     int | None: The maximum allowed content length, or None if not set.
 """
-
         if self._max_content_length is not None:
             return self._max_content_length
 
@@ -92,7 +91,7 @@ Args:
 Raises:
     TypeError: If value is not an integer or NoneType.
 """
-self._max_content_length = value
+        self._max_content_length = value
 
     @property
     def max_form_memory_size(self) -> int | None:
@@ -122,7 +121,7 @@ Note:
     This method should be called before any forms are created to ensure that
     the system has enough memory allocated for them.
 """
-self._max_form_memory_size = value
+        self._max_form_memory_size = value
 
     @property  # type: ignore[override]
     def max_form_parts(self) -> int | None:
@@ -138,7 +137,7 @@ Returns:
     int | None: The maximum number of form parts allowed, or None if not
         applicable.
 """
-if self._max_form_parts is not None:
+        if self._max_form_parts is not None:
             return self._max_form_parts
 
         if not current_app:
@@ -157,7 +156,7 @@ Args:
 Raises:
     TypeError: If value is not an integer or None.
 """
-self._max_form_parts = value
+        self._max_form_parts = value
 
     @property
     def endpoint(self) -> str | None:
