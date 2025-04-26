@@ -1,0 +1,12 @@
+on: [push]
+
+jobs:
+  DocTide_job:
+    runs-on: ubuntu-latest
+    name: Run Doctide
+    steps:
+      - name: run DocTide action
+        id: doctide
+        uses: BrandtBoys/Bachelor@v4
+        with:
+          testing: true
