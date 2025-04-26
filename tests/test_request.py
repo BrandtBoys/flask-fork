@@ -24,6 +24,7 @@ Args:
 Returns:
     None
 """
+
     app.config["MAX_CONTENT_LENGTH"] = 50
 
     @app.post("/")
@@ -70,6 +71,7 @@ Args:
 Returns:
     None
 """
+
     app.config["MAX_CONTENT_LENGTH"] = 100
     app.config["MAX_FORM_MEMORY_SIZE"] = 50
     app.config["MAX_FORM_PARTS"] = 3

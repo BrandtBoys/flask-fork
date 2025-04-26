@@ -83,7 +83,7 @@ Returns:
     @max_content_length.setter
     def max_content_length(self, value: int | None) -> None:
         """
-Returns the maximum content length.
+Sets the maximum content length.
 
 Args:
     value (int | None): The maximum content length. If None, no limit is set.
@@ -91,6 +91,7 @@ Args:
 Raises:
     TypeError: If value is not an integer or NoneType.
 """
+
         self._max_content_length = value
 
     @property
@@ -105,38 +106,35 @@ Raises:
 
     @max_form_memory_size.setter
     def max_form_memory_size(self, value: int | None) -> None:
-        """
-Sets the maximum form memory size.
+        # Sets the maximum form memory size. 
+# This method sets the maximum amount of memory that can be allocated to a form.
+# It does not return any value and is intended for internal use only.
 
-This method sets the maximum amount of memory that can be allocated to a form.
-It does not return any value and is intended for internal use only.
+# Args:
+#     value (int | None): The maximum form memory size. If None, no limit is set.
 
-Args:
-    value (int | None): The maximum form memory size. If None, no limit is set.
+# Raises:
+#     TypeError: If the input value is not an integer or NoneType.
 
-Raises:
-    TypeError: If the input value is not an integer or NoneType.
+# Note:
+#     This method should be called before any forms are created to ensure that
+#     the system has enough memory allocated for them.
 
-Note:
-    This method should be called before any forms are created to ensure that
-    the system has enough memory allocated for them.
-"""
         self._max_form_memory_size = value
 
     @property  # type: ignore[override]
     def max_form_parts(self) -> int | None:
-        """
-Returns the maximum number of form parts allowed.
+        # Returns the maximum number of form parts allowed.
+#
+# If `self._max_form_parts` is set, returns its value. Otherwise, checks if a
+# current application context exists and returns the configured maximum form
+# parts from it. If no current application context is available, falls back to
+# the parent class's implementation.
+#
+# Returns:
+#     int | None: The maximum number of form parts allowed, or None if not
+#         applicable.
 
-If `self._max_form_parts` is set, returns its value. Otherwise, checks if a
-current application context exists and returns the configured maximum form
-parts from it. If no current application context is available, falls back to
-the parent class's implementation.
-
-Returns:
-    int | None: The maximum number of form parts allowed, or None if not
-        applicable.
-"""
         if self._max_form_parts is not None:
             return self._max_form_parts
 

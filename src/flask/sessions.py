@@ -234,6 +234,7 @@ Args:
 Returns:
     bool: True if the session cookie is partitioned, False otherwise.
 """
+
         return app.config["SESSION_COOKIE_PARTITIONED"]  # type: ignore[no-any-return]
 
     def get_expiration_time(self, app: Flask, session: SessionMixin) -> datetime | None:

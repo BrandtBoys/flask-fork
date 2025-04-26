@@ -327,27 +327,27 @@ class Flask(App):
     def open_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = None
     ) -> t.IO[t.AnyStr]:
-        """Open a resource file relative to :attr:`root_path` for
-        reading.
-
-        For example, if the file ``schema.sql`` is next to the file
-        ``app.py`` where the ``Flask`` app is defined, it can be opened
-        with:
-
-        .. code-block:: python
-
-            with app.open_resource("schema.sql") as f:
-                conn.executescript(f.read())
-
-        :param resource: Path to the resource relative to
-            :attr:`root_path`.
-        :param mode: Open the file in this mode. Only reading is
-            supported, valid values are "r" (or "rt") and "rb".
-
-        Note this is a duplicate of the same method in the Flask
-        class.
-
         """
+Opens a resource file relative to :attr:`root_path` for reading.
+
+Parameters
+----------
+resource (str): Path to the resource relative to :attr:`root_path`.
+mode (str, optional): Open the file in this mode. Only reading is supported, valid values are "r" (or "rt") and "rb". Defaults to "rb".
+encoding (str | None, optional): Encoding of the file. Defaults to None.
+
+Returns
+-------
+t.IO[t.AnyStr]: File object opened for reading.
+Raises
+------
+ValueError: If mode is not one of "r", "rt", or "rb".
+
+Note
+---
+This function duplicates the same method in the Flask class.
+"""
+
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
@@ -376,6 +376,7 @@ Args:
 Returns:
     t.IO[t.AnyStr]: A file object opened at the specified resource path.
 """
+
         path = os.path.join(self.instance_path, resource)
 
         if "b" in mode:
@@ -1119,8 +1120,6 @@ Returns:
 Converts the return value from a view function to an instance of 
 :attr:`response_class`. The view function must return a response. 
 
-        status: int | None = None
-        headers: HeadersValue | None = None
 The following types are allowed for ``view_rv``:
 
 - ``str``
@@ -1164,6 +1163,7 @@ This function has been updated in the following versions:
 Raises:
     TypeError: If the view function did not return a valid response.
 """
+
 
         # unpack tuple returns
         if isinstance(rv, tuple):

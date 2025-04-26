@@ -340,7 +340,9 @@ def test_open_resource(mode):
     """
 Test opening a resource from the Flask application.
 
-This function tests if the `open_resource` method of a Flask application can successfully open and read a file. It creates a new Flask application, opens the specified resource, reads its contents, and asserts that the expected string is present in the content.
+This function tests if the `open_resource` method of a Flask application can successfully open and read a file.
+It creates a new Flask application, opens the specified resource, reads its contents,
+and asserts that the expected string is present in the content.
 
 Parameters:
     mode (str): The mode to use when opening the resource. Can be 'r' for reading or 'rb' for binary reading.
@@ -351,6 +353,7 @@ Returns:
 Raises:
     AssertionError: If the expected string is not found in the resource contents.
 """
+
     app = flask.Flask(__name__)
 
     with app.open_resource("static/index.html", mode) as f:

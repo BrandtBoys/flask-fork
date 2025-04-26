@@ -314,15 +314,18 @@ class ScriptInfo:
 Initialize a ScriptInfo object with optional parameters to configure the application.
 
 Parameters:
-app_import_path (str | None): Optionally the import path for the Flask application.
-create_app (Callable[..., Flask] | None): Optionally a function that is passed the script info to create
-                                        the instance of the application.
-set_debug_flag (bool): A dictionary with arbitrary data that can be associated with this script info.
-load_dotenv_defaults (bool): Whether default ``.flaskenv`` and ``.env`` files should be loaded.
+    app_import_path (str | None): Optionally the import path for the Flask application.
+    create_app (Callable[..., Flask] | None): Optionally a function that is passed the script info to create
+                                            the instance of the application.
+    set_debug_flag (bool): A dictionary with arbitrary data that can be associated with this script info.
+    load_dotenv_defaults (bool): Whether default ``.flaskenv`` and ``.env`` files should be loaded.
 
 Returns:
-None
+    None
+
+.. versionadded:: 3.1
 """
+
         self.app_import_path = app_import_path
         #: Optionally a function that is passed the script info to create
         #: the instance of the application.
@@ -534,6 +537,7 @@ Raises:
 Returns:
     str | None: The loaded environment value or None if no value was passed.
 """
+
         import dotenv  # noqa: F401
     except ImportError:
         # Only show an error if a value was passed, otherwise we still want to
@@ -625,6 +629,7 @@ Parameters:
 Returns:
     None
 """
+
         params: list[click.Parameter] = list(extra.pop("params", None) or ())
         # Processing is done with option callbacks instead of a group
         # callback. This allows users to make a custom group callback
@@ -740,6 +745,7 @@ Args:
 Returns:
     click.Context: The created Click context.
 """
+
         os.environ["FLASK_RUN_FROM_CLI"] = "true"
 
         if "obj" not in extra and "obj" not in self.context_settings:
