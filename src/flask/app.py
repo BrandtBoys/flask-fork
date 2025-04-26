@@ -59,6 +59,7 @@ if t.TYPE_CHECKING:  # pragma: no cover
 
     from .testing import FlaskClient
     from .testing import FlaskCliRunner
+    from .typing import HeadersValue
 
 T_shell_context_processor = t.TypeVar(
     "T_shell_context_processor", bound=ft.ShellContextProcessorCallable
@@ -188,9 +189,12 @@ class Flask(App):
             "SESSION_COOKIE_PATH": None,
             "SESSION_COOKIE_HTTPONLY": True,
             "SESSION_COOKIE_SECURE": False,
+            "SESSION_COOKIE_PARTITIONED": False,
             "SESSION_COOKIE_SAMESITE": None,
             "SESSION_REFRESH_EACH_REQUEST": True,
             "MAX_CONTENT_LENGTH": None,
+            "MAX_FORM_MEMORY_SIZE": 500_000,
+            "MAX_FORM_PARTS": 1_000,
             "SEND_FILE_MAX_AGE_DEFAULT": None,
             "TRAP_BAD_REQUEST_ERRORS": None,
             "TRAP_HTTP_EXCEPTIONS": False,
@@ -198,6 +202,7 @@ class Flask(App):
             "PREFERRED_URL_SCHEME": "http",
             "TEMPLATES_AUTO_RELOAD": None,
             "MAX_COOKIE_SIZE": 4093,
+            "PROVIDE_AUTOMATIC_OPTIONS": True,
         }
     )
 
@@ -319,7 +324,9 @@ class Flask(App):
             t.cast(str, self.static_folder), filename, max_age=max_age
         )
 
-    def open_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
+    def open_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = None
+    ) -> t.IO[t.AnyStr]:
         """Open a resource file relative to :attr:`root_path` for
         reading.
 
@@ -344,9 +351,10 @@ class Flask(App):
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
-        return open(os.path.join(self.root_path, resource), mode)
+        path = os.path.join(self.root_path, resource)
 
-    def open_instance_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
+        if mode == "rb":
+            return open(path, mode)  # pyright: ignore
         """Opens a resource from the application's instance folder
         (:attr:`instance_path`).  Otherwise works like
         :meth:`open_resource`.  Instance resources can also be opened for
@@ -356,7 +364,17 @@ class Flask(App):
                          subfolders use forward slashes as separator.
         :param mode: resource file opening mode, default is 'rb'.
         """
-        return open(os.path.join(self.instance_path, resource), mode)
+        return open(path, mode, encoding=encoding)
+
+    def open_instance_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
+    ) -> t.IO[t.AnyStr]:
+        path = os.path.join(self.instance_path, resource)
+
+        if "b" in mode:
+            return open(path, mode)
+
+        return open(path, mode, encoding=encoding)
 
     def create_jinja_environment(self) -> Environment:
         """Create the Jinja environment based on :attr:`jinja_options`
@@ -1093,6 +1111,8 @@ class Flask(App):
         """Convert the return value from a view function to an instance of
         :attr:`response_class`.
 
+        status: int | None = None
+        headers: HeadersValue | None = None
         :param rv: the return value from the view function. The view function
             must return a response. Returning ``None``, or the view ending
             without returning, is not allowed. The following types are allowed
@@ -1146,8 +1166,6 @@ class Flask(App):
            response object.
         """
 
-        status = headers = None
-
         # unpack tuple returns
         if isinstance(rv, tuple):
             len_rv = len(rv)
@@ -1158,7 +1176,7 @@ class Flask(App):
             # decide if a 2-tuple has status or headers
             elif len_rv == 2:
                 if isinstance(rv[1], (Headers, dict, tuple, list)):
-                    rv, headers = rv
+                    rv, headers = rv  # pyright: ignore
                 else:
                     rv, status = rv  # type: ignore[assignment,misc]
             # other sized tuples are not allowed
