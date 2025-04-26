@@ -369,7 +369,22 @@ class Flask(App):
     def open_instance_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
     ) -> t.IO[t.AnyStr]:
-        path = os.path.join(self.instance_path, resource)
+        """
+Opens an instance resource file.
+
+This function opens a file located at the specified `resource` path within the instance's directory.
+The file is opened in the specified `mode`, which can be either "rb" (binary read) or any other mode that includes the "b" character.
+If the mode does not include "b", the file will also be decoded using the specified `encoding`.
+
+Args:
+    resource (str): The path to the resource file within the instance's directory.
+    mode (str, optional): The mode in which to open the file. Defaults to "rb".
+    encoding (str | None, optional): The encoding to use when decoding the file if the mode does not include "b". Defaults to "utf-8".
+
+Returns:
+    t.IO[t.AnyStr]: A file object opened at the specified resource path.
+"""
+path = os.path.join(self.instance_path, resource)
 
         if "b" in mode:
             return open(path, mode)

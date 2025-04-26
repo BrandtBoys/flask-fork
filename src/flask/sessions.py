@@ -225,7 +225,16 @@ class SessionInterface:
         return app.config["SESSION_COOKIE_SAMESITE"]  # type: ignore[no-any-return]
 
     def get_cookie_partitioned(self, app: Flask) -> bool:
-        return app.config["SESSION_COOKIE_PARTITIONED"]  # type: ignore[no-any-return]
+        """
+Returns whether the session cookie is partitioned.
+
+Args:
+    app (Flask): The Flask application instance.
+
+Returns:
+    bool: True if the session cookie is partitioned, False otherwise.
+"""
+return app.config["SESSION_COOKIE_PARTITIONED"]  # type: ignore[no-any-return]
 
     def get_expiration_time(self, app: Flask, session: SessionMixin) -> datetime | None:
         """A helper method that returns an expiration date for the session
@@ -337,7 +346,22 @@ class SecureCookieSessionInterface(SessionInterface):
     def save_session(
         self, app: Flask, session: SessionMixin, response: Response
     ) -> None:
-        name = self.get_cookie_name(app)
+        """
+Saves a session cookie to the client's browser.
+
+This method sets a session cookie based on the provided `app`, `session`, and `response` objects.
+It determines the necessary cookie attributes (name, domain, path, secure, partitioned, samesite, httponly)
+and adds them to the response object. If the session is empty or modified, it removes the cookie accordingly.
+
+Parameters:
+- app (Flask): The Flask application instance
+- session (SessionMixin): The session mixin instance
+- response (Response): The HTTP response object
+
+Returns:
+- None
+"""
+name = self.get_cookie_name(app)
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
         secure = self.get_cookie_secure(app)
