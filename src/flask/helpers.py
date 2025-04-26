@@ -567,14 +567,25 @@ def send_from_directory(
 
 
 def get_root_path(import_name: str) -> str:
-    """Find the root path of a package, or the path that contains a
-    module. If it cannot be found, returns the current working
-    directory.
-
-    Not to be confused with the value returned by :func:`find_package`.
-
-    :meta private:
     """
+Find the root path of a package, or the path that contains a
+module. If it cannot be found, returns the current working directory.
+
+Not to be confused with the value returned by :func:`find_package`.
+
+:meta private:
+
+Parameters:
+    import_name (str): The name of the module to find the root path for.
+
+Returns:
+    str: The root path of the package or module.
+
+Raises:
+    ValueError: If the module cannot be found.
+    RuntimeError: If the module is a namespace package and no file path can be found.
+"""
+
     # Module already imported and has a file attribute. Use that first.
     mod = sys.modules.get(import_name)
 

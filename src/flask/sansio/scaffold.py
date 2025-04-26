@@ -707,7 +707,24 @@ def _endpoint_from_view_func(view_func: ft.RouteCallable) -> str:
 
 
 def _find_package_path(import_name: str) -> str:
-    """Find the path that contains the package or module."""
+    """
+Find the path that contains the package or module.
+
+This function takes an import name as input and returns the path where the corresponding package or module is located. If the package or module does not exist, it raises a ValueError.
+
+If the package or module exists, it checks if it's a namespace package or a package with __init__.py. For namespace packages, it finds the submodule that contains the package and returns its search location. For packages with __init__.py, it returns the path of the package's directory.
+
+For modules, it simply returns the origin of the module's spec.
+
+Args:
+    import_name (str): The name of the package or module to find.
+
+Returns:
+    str: The path where the package or module is located.
+Raises:
+    ValueError: If the package or module does not exist.
+"""
+
     root_mod_name, _, _ = import_name.partition(".")
 
     try:

@@ -104,27 +104,29 @@ class Blueprint(SansioBlueprint):
     def open_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
     ) -> t.IO[t.AnyStr]:
-        """Open a resource file relative to :attr:`root_path` for
-        reading.
-
-        For example, if the file ``schema.sql`` is next to the file
-        ``app.py`` where the ``Flask`` app is defined, it can be opened
-        with:
-
-        .. code-block:: python
-
-            with app.open_resource("schema.sql") as f:
-                conn.executescript(f.read())
-
-        :param resource: Path to the resource relative to
-            :attr:`root_path`.
-        :param mode: Open the file in this mode. Only reading is
-            supported, valid values are "r" (or "rt") and "rb".
-
-        Note this is a duplicate of the same method in the Flask
-        class.
-
         """
+Opens a resource file relative to :attr:`root_path` for reading.
+
+Parameters
+----------
+resource (str): Path to the resource relative to :attr:`root_path`.
+mode (str, optional): Open the file in this mode. Only reading is supported,
+    valid values are "r" (or "rt") and "rb". Defaults to "rb".
+encoding (str | None, optional): Encoding of the file. Defaults to "utf-8".
+
+Returns
+-------
+t.IO[t.AnyStr]: A file object opened for reading.
+
+Raises
+------
+ValueError: If the mode is not one of "r", "rt", or "rb".
+
+Note
+---
+This function duplicates the same method in the Flask class.
+"""
+
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 

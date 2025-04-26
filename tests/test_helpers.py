@@ -337,7 +337,21 @@ class TestHelpers:
 
 @pytest.mark.parametrize("mode", ("r", "rb", "rt"))
 def test_open_resource(mode):
-    app = flask.Flask(__name__)
+    """
+Test opening a resource from the Flask application.
+
+This function tests if the `open_resource` method of a Flask application can successfully open and read a file. It creates a new Flask application, opens the specified resource, reads its contents, and asserts that the expected string is present in the content.
+
+Parameters:
+    mode (str): The mode to use when opening the resource. Can be 'r' for reading or 'rb' for binary reading.
+
+Returns:
+    None
+
+Raises:
+    AssertionError: If the expected string is not found in the resource contents.
+"""
+app = flask.Flask(__name__)
 
     with app.open_resource("static/index.html", mode) as f:
         assert "<h1>Hello World!</h1>" in str(f.read())
@@ -353,7 +367,24 @@ def test_open_resource_exceptions(mode):
 
 @pytest.mark.parametrize("encoding", ("utf-8", "utf-16-le"))
 def test_open_resource_with_encoding(tmp_path, encoding):
-    app = flask.Flask(__name__, root_path=os.fspath(tmp_path))
+    """
+Tests opening a resource with the specified encoding.
+
+This function creates a Flask application, writes a test string to a file,
+and then opens the file using the `open_resource` method. It asserts that
+the contents of the opened file match the original string.
+
+Parameters:
+    tmp_path (pathlib.Path): A temporary path for creating the test file.
+    encoding (str): The encoding to use when writing and reading the file.
+
+Returns:
+    None
+
+Raises:
+    AssertionError: If the contents of the opened file do not match the original string.
+"""
+app = flask.Flask(__name__, root_path=os.fspath(tmp_path))
     (tmp_path / "test").write_text("test", encoding=encoding)
 
     with app.open_resource("test", mode="rt", encoding=encoding) as f:

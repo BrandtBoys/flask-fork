@@ -310,7 +310,20 @@ class ScriptInfo:
         load_dotenv_defaults: bool = True,
     ) -> None:
         #: Optionally the import path for the Flask application.
-        self.app_import_path = app_import_path
+        """
+Initialize a ScriptInfo object with optional parameters to configure the application.
+
+Parameters:
+app_import_path (str | None): Optionally the import path for the Flask application.
+create_app (Callable[..., Flask] | None): Optionally a function that is passed the script info to create
+                                        the instance of the application.
+set_debug_flag (bool): A dictionary with arbitrary data that can be associated with this script info.
+load_dotenv_defaults (bool): Whether default ``.flaskenv`` and ``.env`` files should be loaded.
+
+Returns:
+None
+"""
+self.app_import_path = app_import_path
         #: Optionally a function that is passed the script info to create
         #: the instance of the application.
         self.create_app = create_app
@@ -331,10 +344,23 @@ class ScriptInfo:
         self._loaded_app: Flask | None = None
 
     def load_app(self) -> Flask:
-        """Loads the Flask app (if not yet loaded) and returns it.  Calling
-        this multiple times will just result in the already loaded app to
-        be returned.
         """
+Loads the Flask app (if not yet loaded) and returns it.  Calling this multiple times will just result in the already loaded app to be returned.
+
+If no app is found, a `NoAppException` is raised with instructions on how to locate or create a Flask application.
+
+The function uses various methods to load an app, including:
+
+- Creating a new app using the `create_app` method
+- Importing an existing app from a file (e.g. 'wsgi.py', 'app.py')
+- Using environment variables and command-line options
+
+Note that calling this function multiple times will result in the same loaded app being returned each time, as it caches the loaded app instance.
+
+Raises:
+    NoAppException: If no Flask application can be found or created.
+"""
+
         if self._loaded_app is not None:
             return self._loaded_app
         app: Flask | None = None
@@ -493,7 +519,22 @@ _debug_option = click.Option(
 def _env_file_callback(
     ctx: click.Context, param: click.Option, value: str | None
 ) -> str | None:
-    try:
+    """
+Loads an environment file using the python-dotenv library.
+
+If a value was passed to the function, it will attempt to load the environment file.
+If no value is passed and `load_dotenv_defaults` is set in the context object,
+it will also load default files. If neither condition is met, the function
+will return None.
+
+Raises:
+    click.BadParameter: If python-dotenv must be installed but was not found.
+    Exception: Any other exception that occurs during file loading.
+
+Returns:
+    str | None: The loaded environment value or None if no value was passed.
+"""
+try:
         import dotenv  # noqa: F401
     except ImportError:
         # Only show an error if a value was passed, otherwise we still want to
@@ -569,7 +610,23 @@ class FlaskGroup(AppGroup):
         set_debug_flag: bool = True,
         **extra: t.Any,
     ) -> None:
-        params: list[click.Parameter] = list(extra.pop("params", None) or ())
+        """
+Initialize the Flask application with customizable parameters.
+
+This function initializes a new instance of the Flask application, allowing users to customize various aspects of the application's behavior and configuration.
+
+Parameters:
+    add_default_commands (bool): Whether to include default commands in the application. Defaults to True.
+    create_app (callable): A callable that creates a new Flask application instance. Defaults to None.
+    add_version_option (bool): Whether to include the version option in the application. Defaults to True.
+    load_dotenv (bool): Whether to load environment variables from a .env file. Defaults to True.
+    set_debug_flag (bool): Whether to set the debug flag for the application. Defaults to True.
+    **extra: Any additional keyword arguments to pass to the parent class.
+
+Returns:
+    None
+"""
+params: list[click.Parameter] = list(extra.pop("params", None) or ())
         # Processing is done with option callbacks instead of a group
         # callback. This allows users to make a custom group callback
         # without losing the behavior. --env-file must come first so
@@ -672,7 +729,19 @@ class FlaskGroup(AppGroup):
         # Set a flag to tell app.run to become a no-op. If app.run was
         # not in a __name__ == __main__ guard, it would start the server
         # when importing, blocking whatever command is being called.
-        os.environ["FLASK_RUN_FROM_CLI"] = "true"
+        """
+Creates a Click context with optional information and extra settings.
+
+Args:
+    info_name (str | None): The name of the information to include in the context.
+    args (list[str]): A list of arguments to pass to the command.
+    parent (click.Context | None, optional): The parent context. Defaults to None.
+    **extra (t.Any): Additional keyword arguments to customize the context.
+
+Returns:
+    click.Context: The created Click context.
+"""
+os.environ["FLASK_RUN_FROM_CLI"] = "true"
 
         if "obj" not in extra and "obj" not in self.context_settings:
             extra["obj"] = ScriptInfo(
@@ -704,31 +773,33 @@ def _path_is_ancestor(path: str, other: str) -> bool:
 def load_dotenv(
     path: str | os.PathLike[str] | None = None, load_defaults: bool = True
 ) -> bool:
-    """Load "dotenv" files in order of precedence to set environment variables.
-
-    If an env var is already set it is not overwritten, so earlier files in the
-    list are preferred over later files.
-
-    This is a no-op if `python-dotenv`_ is not installed.
-
-    .. _python-dotenv: https://github.com/theskumar/python-dotenv#readme
-
-    :param path: Load the file at this location instead of searching.
-    :return: ``True`` if a file was loaded.
-
-    .. versionchanged:: 2.0
-        The current directory is not changed to the location of the
-        loaded file.
-
-    .. versionchanged:: 2.0
-        When loading the env files, set the default encoding to UTF-8.
-
-    .. versionchanged:: 1.1.0
-        Returns ``False`` when python-dotenv is not installed, or when
-        the given path isn't a file.
-
-    .. versionadded:: 1.0
     """
+Loads environment variables from dotenv files.
+
+This function loads the dotenv files in order of precedence to set environment
+variables. If an env var is already set, it is not overwritten, so earlier
+files in the list are preferred over later files.
+
+If `python-dotenv`_ is not installed, this function returns False and prints a
+tip message suggesting to install `python-dotenv`.
+
+.. _python-dotenv: https://github.com/theskumar/python-dotenv#readme
+
+Parameters
+----------
+path : str | os.PathLike[str] | None
+    The path to the dotenv file to load. If not provided, the function will
+    search for .env and .flaskenv files in the current directory.
+load_defaults : bool
+    Whether to load default environment variables from .flaskenv and .env
+    files.
+
+Returns
+----------
+bool
+    True if at least one environment variable was loaded, False otherwise.
+"""
+
     try:
         import dotenv
     except ImportError:
@@ -943,14 +1014,30 @@ def run_command(
     extra_files: list[str] | None,
     exclude_patterns: list[str] | None,
 ) -> None:
-    """Run a local development server.
-
-    This server is for development purposes only. It does not provide
-    the stability, security, or performance of production WSGI servers.
-
-    The reloader and debugger are enabled by default with the '--debug'
-    option.
     """
+Run a local development server.
+
+This server is for development purposes only. It does not provide
+the stability, security, or performance of production WSGI servers.
+
+The reloader and debugger are enabled by default with the '--debug'
+option.
+
+Parameters:
+    info (ScriptInfo): Script information.
+    host (str): Host to bind to.
+    port (int): Port to bind to.
+    reload (bool): Enable reloader. Defaults to `debug`.
+    debugger (bool): Enable debugger. Defaults to `debug`.
+    with_threads (bool): Run in threads. Defaults to False.
+    cert (ssl.SSLContext | tuple[str, str | None] | t.Literal["adhoc"] | None): SSL context or certificate.
+    extra_files (list[str] | None): Extra files to serve. Defaults to None.
+    exclude_patterns (list[str] | None): Exclude patterns for serving. Defaults to None.
+
+Returns:
+    None
+"""
+
     try:
         app: WSGIApplication = info.load_app()  # pyright: ignore
     except Exception as e:
