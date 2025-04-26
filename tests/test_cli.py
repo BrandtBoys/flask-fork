@@ -396,7 +396,22 @@ def test_flaskgroup_nested(app, runner):
 
 
 def test_no_command_echo_loading_error():
-    from flask.cli import cli
+    """
+Test case for CLI command 'test_no_command_echo_loading_error'.
+
+This test checks the behavior of the CliRunner when invoked with a missing command.
+It verifies that the exit code is 2 and that the stderr contains expected error messages.
+
+Args:
+    None
+
+Returns:
+    None
+
+Raises:
+    AssertionError: If any assertion fails
+"""
+from flask.cli import cli
 
     try:
         runner = CliRunner(mix_stderr=False)
@@ -411,7 +426,13 @@ def test_no_command_echo_loading_error():
 
 
 def test_help_echo_loading_error():
-    from flask.cli import cli
+    """
+Tests the functionality of the `test_help_echo_loading_error` function.
+
+This test checks if the Flask CLI can be invoked successfully with the `--help` option,
+and verifies that the expected output is displayed, including the FLASK_APP environment variable.
+"""
+from flask.cli import cli
 
     try:
         runner = CliRunner(mix_stderr=False)
@@ -426,7 +447,18 @@ def test_help_echo_loading_error():
 
 
 def test_help_echo_exception():
-    def create_app():
+    """
+Test the functionality of the `CliRunner` class when invoking the `--help` command.
+
+This test checks that:
+
+- The `CliRunner` class can handle the `--help` command without raising a deprecation warning.
+- The exception message is correctly displayed in the stderr output.
+- A usage message is displayed in the stdout output.
+
+Note: This test assumes Click version 8.2 or higher, where the `CliRunner` class has been updated to suppress stderr output by default.
+"""
+def create_app():
         raise Exception("oh no")
 
     cli = FlaskGroup(create_app=create_app)
@@ -535,7 +567,24 @@ need_dotenv = pytest.mark.skipif(
 @need_dotenv
 def test_load_dotenv(monkeypatch):
     # can't use monkeypatch.delitem since the keys don't exist yet
-    for item in ("FOO", "BAR", "SPAM", "HAM"):
+    """
+Test the functionality of the `load_dotenv` function.
+
+This test checks that the function correctly loads environment variables from a `.env` file,
+overwrites existing variables, and handles non-existent files. It also tests the behavior when
+`load_defaults` is set to `False`.
+
+Args:
+    monkeypatch: A MonkeyPatch object used for mocking the environment.
+    test_path: The path of the test directory.
+
+Returns:
+    None
+
+Raises:
+    AssertionError: If any assertion fails.
+"""
+for item in ("FOO", "BAR", "SPAM", "HAM"):
         monkeypatch._setitem.append((os.environ, item, notset))
 
     monkeypatch.setenv("EGGS", "3")

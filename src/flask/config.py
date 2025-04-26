@@ -126,29 +126,22 @@ class Config(dict):  # type: ignore[type-arg]
     def from_prefixed_env(
         self, prefix: str = "FLASK", *, loads: t.Callable[[str], t.Any] = json.loads
     ) -> bool:
-        """Load any environment variables that start with ``FLASK_``,
-        dropping the prefix from the env key for the config key. Values
-        are passed through a loading function to attempt to convert them
-        to more specific types than strings.
-
-        Keys are loaded in :func:`sorted` order.
-
-        The default loading function attempts to parse values as any
-        valid JSON type, including dicts and lists.
-
-        Specific items in nested dicts can be set by separating the
-        keys with double underscores (``__``). If an intermediate key
-        doesn't exist, it will be initialized to an empty dict.
-
-        :param prefix: Load env vars that start with this prefix,
-            separated with an underscore (``_``).
-        :param loads: Pass each string value to this function and use
-            the returned value as the config value. If any error is
-            raised it is ignored and the value remains a string. The
-            default is :func:`json.loads`.
-
-        .. versionadded:: 2.1
         """
+Loads environment variables that start with the specified prefix,
+dropping the prefix from the env key for the config key. Values are passed through a loading function to attempt to convert them to more specific types than strings.
+
+Keys are loaded in sorted order.
+
+The default loading function attempts to parse values as any valid JSON type, including dicts and lists.
+
+Specific items in nested dicts can be set by separating the keys with double underscores (``__``). If an intermediate key doesn't exist, it will be initialized to an empty dict.
+
+:param prefix: Load env vars that start with this prefix, separated with an underscore (``_``).
+:param loads: Pass each string value to this function and use the returned value as the config value. If any error is raised it is ignored and the value remains a string. The default is :func:`json.loads`.
+
+.. versionadded:: 2.1
+"""
+
         prefix = f"{prefix}_"
 
         for key in sorted(os.environ):

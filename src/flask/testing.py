@@ -55,7 +55,30 @@ class EnvironBuilder(werkzeug.test.EnvironBuilder):
         *args: t.Any,
         **kwargs: t.Any,
     ) -> None:
-        assert not (base_url or subdomain or url_scheme) or (
+        """
+Initialize the application.
+
+This method initializes a new instance of the class. It takes in several parameters:
+
+- `app`: The Flask application instance.
+- `path`: The path to serve the application at (defaults to "/").
+- `base_url`: The base URL for the application (can be set, but not used if `subdomain` or `url_scheme` are provided).
+- `subdomain`: The subdomain for the application (if provided, it must be used with `base_url`, otherwise it is ignored).
+- `url_scheme`: The scheme to use for the URL (if provided, it must be used with `base_url`, otherwise it is determined by the Flask configuration).
+
+The method will automatically set up the base URL and path based on the provided parameters.
+
+Parameters:
+app (Flask): The Flask application instance.
+path (str): The path to serve the application at (defaults to "/").
+base_url (str | None): The base URL for the application (can be set, but not used if `subdomain` or `url_scheme` are provided).
+subdomain (str | None): The subdomain for the application (if provided, it must be used with `base_url`, otherwise it is ignored).
+url_scheme (str | None): The scheme to use for the URL (if provided, it must be used with `base_url`, otherwise it is determined by the Flask configuration).
+
+Returns:
+None
+"""
+assert not (base_url or subdomain or url_scheme) or (
             base_url is not None
         ) != bool(
             subdomain or url_scheme
