@@ -966,7 +966,7 @@ Args:
 Returns:
     None
 """
-app.subdomain_matching = True
+    app.subdomain_matching = True
     app.config["SERVER_NAME"] = "example.test"
     client.allow_subdomain_redirects = True
 
@@ -998,7 +998,7 @@ client (Client): The client instance used to make HTTP requests.
 Returns:
 None
 """
-app.subdomain_matching = True
+    app.subdomain_matching = True
     app.config["SERVER_NAME"] = "example.test"
     client.allow_subdomain_redirects = True
 
@@ -1022,7 +1022,7 @@ str: The string 'child'
 Raises:
 No exceptions are expected to be raised by this function.
 """
-return "child"
+        return "child"
 
     parent.register_blueprint(child)
     app.register_blueprint(parent, subdomain="parent")
