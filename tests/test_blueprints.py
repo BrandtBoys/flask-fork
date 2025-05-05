@@ -992,12 +992,13 @@ This test case verifies that when using a subdomain, the correct route is matche
 It also checks that without a subdomain, a 404 error is returned.
 
 Parameters:
-app (Flask): The Flask application instance.
-client (Client): The client instance used to make HTTP requests.
+    app (Flask): The Flask application instance.
+    client (Client): The client instance used to make HTTP requests.
 
 Returns:
-None
+    None
 """
+
     app.subdomain_matching = True
     app.config["SERVER_NAME"] = "example.test"
     client.allow_subdomain_redirects = True
@@ -1013,15 +1014,15 @@ Returns the string 'child'.
 This function is likely part of a larger application or framework and serves as an index or entry point. The returned value suggests that it may be used to navigate to a child component or page.
 
 Args:
-
-None
+    None
 
 Returns:
-str: The string 'child'
+    str: The string 'child'
 
 Raises:
-No exceptions are expected to be raised by this function.
+    No exceptions are expected to be raised by this function.
 """
+
         return "child"
 
     parent.register_blueprint(child)
