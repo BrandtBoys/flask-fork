@@ -180,6 +180,7 @@ Args:
 Returns:
     tuple[str, int]: A tuple containing the status message and the HTTP status code.
 """
+
     return "hello", code
 
 
@@ -222,6 +223,7 @@ Args:
 Returns:
     tuple[str, dict[str, str]]: A tuple containing a string and a dictionary.
 """
+
     return "Hello, World!", {"Content-Type": "text/plain"}
 
 
@@ -236,7 +238,14 @@ Args:
 
 Returns:
     str: The rendered HTML template.
+
+Raises:
+    Exception: If the 'index.html' template file is not found.
+
+Note:
+This function uses Jinja2 templating engine for rendering the HTML template.
 """
+
     return render_template("index.html", name=name)
 
 
@@ -283,7 +292,7 @@ No exceptions are raised by this function.
 class RenderTemplateView(View):
     def __init__(self: RenderTemplateView, template_name: str) -> None:
         """
-Initializes a new instance of `RenderTemplateView`.
+Initializes a new instance of RenderTemplateView.
 
 Args:
     template_name (str): The name of the template to render.
@@ -291,6 +300,7 @@ Args:
 Returns:
     None
 """
+
         self.template_name = template_name
 
     def dispatch_request(self: RenderTemplateView) -> str:
