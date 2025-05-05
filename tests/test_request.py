@@ -67,10 +67,11 @@ app (Flask): The Flask application instance.
 Returns:
 None
 """
-app.config["TRUSTED_HOSTS"] = ["example.test", ".other.test"]
+    app.config["TRUSTED_HOSTS"] = ["example.test", ".other.test"]
 
     @app.get("/")
     def index() -> str:
+        return ""
         """
 Returns an empty string. This function is intended to serve as a placeholder or a starting point for further development.
 
@@ -82,7 +83,6 @@ Returns:
 
     str: An empty string.
 """
-return ""
 
     client = app.test_client()
     r = client.get(base_url="http://example.test")
