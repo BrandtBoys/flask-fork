@@ -1566,19 +1566,6 @@ Returns:
     @app.route("/", subdomain="<name>", host="<name>.example.test")
     def index(name: str) -> str:
         return name
-        """
-Returns the input string as is.
-
-Args:
-    name (str): The input string to be returned.
-
-Returns:
-    str: The input string.
-
-Example:
-    >>> x("Hello, World!")
-    'Hello, World!'
-"""
 
     client = app.test_client()
 
