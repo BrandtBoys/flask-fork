@@ -24,7 +24,7 @@ None
 Returns:
 str: The HTML paragraph string.
 """
-return "<p>Hello, World!</p>"
+    return "<p>Hello, World!</p>"
 
 
 @app.route("/bytes")
@@ -44,7 +44,7 @@ Example:
 >>> hello_bytes()
 b'<p>Hello, World!</p>'
 """
-return b"<p>Hello, World!</p>"
+    return b"<p>Hello, World!</p>"
 
 
 @app.route("/json")
@@ -64,7 +64,7 @@ Raises:
 
 None
 """
-return jsonify("Hello, World!")
+    return jsonify("Hello, World!")
 
 
 @app.route("/json/dict")
@@ -84,7 +84,7 @@ Example:
     >>> hello_json_dict()
     {'response': 'Hello, World!'}
 """
-return {"response": "Hello, World!"}
+    return {"response": "Hello, World!"}
 
 
 @app.route("/json/dict")
@@ -113,7 +113,7 @@ Raises:
 
 None
 """
-return {"status": "ok"}
+    return {"status": "ok"}
 
 
 @app.route("/generator")
@@ -124,14 +124,14 @@ Generates a generator that yields a string with the format "data:<number>\n\n" f
 Returns:
     t.Generator[str, None, None]: A generator that produces strings in the specified format.
 """
-def show() -> t.Generator[str, None, None]:
+    def show() -> t.Generator[str, None, None]:
         """
 Generates a sequence of strings representing data points.
 
 Yields:
     A generator that produces strings in the format "data:<int>\n\n" for each integer from 0 to 99.
 """
-for x in range(100):
+        for x in range(100):
             yield f"data:{x}\n\n"
 
     return show()
@@ -145,7 +145,7 @@ Generates an iterator of bytes containing a 'hello' message repeated 100 times.
 Returns:
     Iterator[bytes]: An iterator yielding bytes representing the 'hello' message.
 """
-return (f"data:{x}\n\n".encode() for x in range(100))
+    return (f"data:{x}\n\n".encode() for x in range(100))
 
 
 @app.route("/iterator")
@@ -165,7 +165,7 @@ Yields:
 Raises:
     None
 """
-return iter([f"data:{x}\n\n" for x in range(100)])
+    return iter([f"data:{x}\n\n" for x in range(100)])
 
 
 @app.route("/status")
@@ -180,7 +180,7 @@ Args:
 Returns:
     tuple[str, int]: A tuple containing the status message and the HTTP status code.
 """
-return "hello", code
+    return "hello", code
 
 
 @app.route("/status-enum")
@@ -206,7 +206,7 @@ Example:
     result = tuple_status_enum()
     print(result)  # Output: ('hello', 200)
 """
-return "hello", HTTPStatus.OK
+    return "hello", HTTPStatus.OK
 
 
 @app.route("/headers")
@@ -222,7 +222,7 @@ Args:
 Returns:
     tuple[str, dict[str, str]]: A tuple containing a string and a dictionary.
 """
-return "Hello, World!", {"Content-Type": "text/plain"}
+    return "Hello, World!", {"Content-Type": "text/plain"}
 
 
 @app.route("/template")
@@ -237,7 +237,7 @@ Args:
 Returns:
     str: The rendered HTML template.
 """
-return render_template("index.html", name=name)
+    return render_template("index.html", name=name)
 
 
 @app.route("/template")
@@ -255,7 +255,7 @@ Args:
 Returns:
     Iterator[str]: An iterator over the lines in the template.
 """
-return stream_template("index.html", name="Hello")
+    return stream_template("index.html", name="Hello")
 
 
 @app.route("/async")
@@ -277,7 +277,7 @@ Raises:
 
 No exceptions are raised by this function.
 """
-return "Hello"
+    return "Hello"
 
 
 class RenderTemplateView(View):
@@ -291,7 +291,7 @@ Args:
 Returns:
     None
 """
-self.template_name = template_name
+        self.template_name = template_name
 
     def dispatch_request(self: RenderTemplateView) -> str:
         """
@@ -304,7 +304,7 @@ Args:
 Returns:
     str: The rendered HTML template.
 """
-return render_template(self.template_name)
+        return render_template(self.template_name)
 
 
 app.add_url_rule(

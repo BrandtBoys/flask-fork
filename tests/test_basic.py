@@ -382,7 +382,7 @@ This test case covers three scenarios:
 
 This test ensures that Flask's session handling behaves correctly in different scenarios, providing a robust and secure way to store user data.
 """
-@app.post("/")
+    @app.post("/")
     def set_session() -> str:
         """
 Sets a session variable 'a' to 1 and returns an empty string.
@@ -400,7 +400,7 @@ Example:
     >>> set_session()
     ''
 """
-flask.session["a"] = 1
+        flask.session["a"] = 1
         return ""
 
     @app.get("/")
@@ -417,7 +417,7 @@ Args:
 Returns:
     dict[str, t.Any]: The current session as a dictionary
 """
-return dict(flask.session)
+        return dict(flask.session)
 
     # Set session with initial secret key
     client.post()
