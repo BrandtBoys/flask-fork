@@ -58,15 +58,3 @@ Returns:
 @app.errorhandler(404)
 def handle_multiple(e: BadRequest | NotFound) -> str:
     return ""
-    """
-Handles exceptions raised by API endpoints.
-
-This function takes an exception object of type `BadRequest` or `NotFound` and returns a string response.
-If no exception is provided, it returns an empty string.
-
-Args:
-    e (BadRequest | NotFound): The exception to be handled.
-
-Returns:
-    str: A string representation of the error response.
-"""
