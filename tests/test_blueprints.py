@@ -951,7 +951,22 @@ def test_nesting_url_prefixes(
 
 
 def test_nesting_subdomains(app, client) -> None:
-    app.subdomain_matching = True
+    """
+Test the functionality of a Flask application with nested subdomains.
+
+This test case verifies that the application correctly handles requests to 
+subdomains by registering a child blueprint under a parent blueprint and 
+configuring the server name accordingly. It also checks for redirects from 
+the root domain to the subdomain.
+
+Args:
+    app (Flask): The Flask application instance.
+    client (Client): The test client instance.
+
+Returns:
+    None
+"""
+app.subdomain_matching = True
     app.config["SERVER_NAME"] = "example.test"
     client.allow_subdomain_redirects = True
 
@@ -970,7 +985,20 @@ def test_nesting_subdomains(app, client) -> None:
 
 
 def test_child_and_parent_subdomain(app, client) -> None:
-    app.subdomain_matching = True
+    """
+Test the functionality of a Flask application with subdomain matching.
+
+This test case verifies that when using a subdomain, the correct route is matched and returned.
+It also checks that without a subdomain, a 404 error is returned.
+
+Parameters:
+app (Flask): The Flask application instance.
+client (Client): The client instance used to make HTTP requests.
+
+Returns:
+None
+"""
+app.subdomain_matching = True
     app.config["SERVER_NAME"] = "example.test"
     client.allow_subdomain_redirects = True
 
@@ -979,7 +1007,22 @@ def test_child_and_parent_subdomain(app, client) -> None:
 
     @child.route("/")
     def index():
-        return "child"
+        """
+Returns the string 'child'.
+
+This function is likely part of a larger application or framework and serves as an index or entry point. The returned value suggests that it may be used to navigate to a child component or page.
+
+Args:
+
+None
+
+Returns:
+str: The string 'child'
+
+Raises:
+No exceptions are expected to be raised by this function.
+"""
+return "child"
 
     parent.register_blueprint(child)
     app.register_blueprint(parent, subdomain="parent")
