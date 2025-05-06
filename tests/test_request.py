@@ -55,11 +55,34 @@ def test_limit_config(app: Flask):
 
 
 def test_trusted_hosts_config(app: Flask) -> None:
-    app.config["TRUSTED_HOSTS"] = ["example.test", ".other.test"]
+    """
+Test trusted hosts configuration for Flask application.
+
+This function tests the Flask application's trusted hosts configuration by sending GET requests to different URLs.
+It asserts that requests to trusted hosts return a 200 status code, while requests to non-trusted hosts return a 400 status code.
+
+Parameters:
+app (Flask): The Flask application instance.
+
+Returns:
+None
+"""
+app.config["TRUSTED_HOSTS"] = ["example.test", ".other.test"]
 
     @app.get("/")
     def index() -> str:
-        return ""
+        """
+Returns an empty string. This function is intended to serve as a placeholder or a starting point for further development.
+
+Args:
+
+    None
+
+Returns:
+
+    str: An empty string.
+"""
+return ""
 
     client = app.test_client()
     r = client.get(base_url="http://example.test")

@@ -1554,6 +1554,7 @@ Parameters:
 Returns:
     None
 """
+
     app = flask.Flask(
         __name__,
         subdomain_matching=subdomain_matching,
@@ -1565,7 +1566,20 @@ Returns:
     @app.route("/", defaults={"name": "default"}, host="<name>")
     @app.route("/", subdomain="<name>", host="<name>.example.test")
     def index(name: str) -> str:
-        return name
+        """
+Returns the input string as is.
+
+Args:
+    name (str): The input string to be returned.
+
+Returns:
+    str: The input string.
+
+Example:
+    >>> x("Hello, World!")
+    'Hello, World!'
+"""
+return name
 
     client = app.test_client()
 
