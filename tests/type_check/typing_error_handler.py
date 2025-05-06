@@ -23,7 +23,7 @@ Args:
 Returns:
     str: An empty string indicating that the request was not processed.
 """
-return ""
+    return ""
 
 
 @app.errorhandler(ValueError)
@@ -37,7 +37,7 @@ Args:
 Returns:
     str: An empty string.
 """
-return ""
+    return ""
 
 
 @app.errorhandler(ValueError)
@@ -51,12 +51,13 @@ Args:
 Returns:
     str: An empty string indicating successful handling of the exception.
 """
-return ""
+    return ""
 
 
 @app.errorhandler(BadRequest)
 @app.errorhandler(404)
 def handle_multiple(e: BadRequest | NotFound) -> str:
+    return ""
     """
 Handles exceptions raised by API endpoints.
 
@@ -69,4 +70,3 @@ Args:
 Returns:
     str: A string representation of the error response.
 """
-return ""

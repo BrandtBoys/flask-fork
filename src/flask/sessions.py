@@ -326,7 +326,7 @@ Returns:
     URLSafeTimedSerializer | None: A serializer instance for signing purposes,
         or None if the secret key is not set.
 """
-if not app.secret_key:
+        if not app.secret_key:
             return None
 
         keys: list[str | bytes] = [app.secret_key]
