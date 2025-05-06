@@ -180,7 +180,6 @@ Args:
 Returns:
     tuple[str, int]: A tuple containing the status message and the HTTP status code.
 """
-
     return "hello", code
 
 
@@ -223,7 +222,6 @@ Args:
 Returns:
     tuple[str, dict[str, str]]: A tuple containing a string and a dictionary.
 """
-
     return "Hello, World!", {"Content-Type": "text/plain"}
 
 
@@ -245,7 +243,6 @@ Raises:
 Note:
 This function uses Jinja2 templating engine for rendering the HTML template.
 """
-
     return render_template("index.html", name=name)
 
 
@@ -300,7 +297,6 @@ Args:
 Returns:
     None
 """
-
         self.template_name = template_name
 
     def dispatch_request(self: RenderTemplateView) -> str:
