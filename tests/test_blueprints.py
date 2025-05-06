@@ -998,7 +998,6 @@ Parameters:
 Returns:
     None
 """
-
     app.subdomain_matching = True
     app.config["SERVER_NAME"] = "example.test"
     client.allow_subdomain_redirects = True
@@ -1022,7 +1021,6 @@ Returns:
 Raises:
     No exceptions are expected to be raised by this function.
 """
-
         return "child"
 
     parent.register_blueprint(child)
