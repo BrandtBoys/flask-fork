@@ -317,6 +317,7 @@ Args:
 Returns:
     t.Any: The input data structure with all tags removed.
 """
+
         if isinstance(value, dict):
             # untag each item recursively
             value = {k: self._untag_scan(v) for k, v in value.items()}
