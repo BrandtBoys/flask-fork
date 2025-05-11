@@ -268,23 +268,6 @@ def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[True] = True
 ) -> Flask:
     ...
-    """
-Locate an application within a given Flask module.
-
-This function takes in the name of the module and the application to locate,
-as well as an optional parameter to raise an exception if the application is not found.
-
-Args:
-    - `module_name` (str): The name of the module to search for.
-    - `app_name` (str | None): The name of the application to locate. If None, all applications will be returned.
-    - `raise_if_not_found` (bool, optional): Whether to raise an exception if the application is not found. Defaults to True.
-
-Returns:
-    Flask: The located Flask application object.
-
-Raises:
-    ValueError: If `app_name` is not provided and `raise_if_not_found` is False.
-"""
 
 
 @t.overload
@@ -292,23 +275,6 @@ def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[False] = ...
 ) -> Flask | None:
     ...
-    """
-Locate an application within a given module.
-
-This function searches for an application with the specified name within a given module.
-It returns the found application or `None` if not found. If `raise_if_not_found` is set to `True`, it raises a `ValueError` if the application is not found.
-
-Args:
-    - **module_name** (str): The name of the module to search in.
-    - **app_name** (str | None): The name of the application to locate. If `None`, all applications will be returned.
-    - **raise_if_not_found** (bool, optional): Whether to raise an error if the application is not found. Defaults to `False`.
-
-Returns:
-    - Flask | None: The located application or `None` if not found.
-
-Raises:
-    ValueError: If `raise_if_not_found` is set to `True` and the application is not found.
-"""
 
 
 def locate_app(
@@ -370,7 +336,6 @@ Args:
 Returns:
     None
 """
-
     if not value or ctx.resilient_parsing:
         return
 
@@ -562,20 +527,7 @@ class AppGroup(click.Group):
         wrap_for_ctx = kwargs.pop("with_appcontext", True)
 
         def decorator(f: t.Callable[..., t.Any]) -> click.Command:
-            """
-Decorates a function to create a Click command.
-
-This decorator wraps the provided function in an AppGroup context if `wrap_for_ctx` is True.
-It then calls the `super()` method on the AppGroup class, passing the original function as an argument,
-and returns the result of this call. The `# type: ignore[no-any-return]` comment suppresses a type check warning.
-
-Args:
-    f (t.Callable[..., t.Any]): The function to be decorated.
-
-Returns:
-    click.Command: The decorated Click command.
-"""
-if wrap_for_ctx:
+            if wrap_for_ctx:
             """
 Decorates a function to create a Click command.
 
@@ -774,7 +726,6 @@ Args:
 Returns:
     None
 """
-
         if self._loaded_plugin_commands:
             return
 
@@ -850,7 +801,6 @@ Args:
 Returns:
     list[str]: A sorted list of all available commands.
 """
-
         self._load_plugin_commands()
         # Start with the built-in and plugin commands.
         rv = set(super().list_commands(ctx))
@@ -1048,7 +998,6 @@ Returns:
 Raises:
     click.BadParameter: If the conversion fails or if a required library is not installed.
 """
-
             import ssl
         except ImportError:
             raise click.BadParameter(
@@ -1236,7 +1185,6 @@ Args:
 Returns:
     None
 """
-
     try:
         app: WSGIApplication = info.load_app()
     except Exception as e:
@@ -1249,16 +1197,7 @@ Returns:
             def app(
                 environ: WSGIEnvironment, start_response: StartResponse
             ) -> cabc.Iterable[bytes]:
-                """
-WSGI Application Function.
-
-This function serves as the entry point for a web application. It takes in an environment object and a response object,
-and returns an iterable of bytes.
-
-Raises:
-    err: An exception to be raised when the application is unable to handle the request.
-"""
-raise err from None
+                raise err from None
                 """
 WSGI Application Function.
 

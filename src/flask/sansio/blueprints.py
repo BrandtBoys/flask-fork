@@ -457,17 +457,6 @@ Returns:
             bp_dict: dict[ft.AppOrBlueprintKey, list[t.Any]],
             parent_dict: dict[ft.AppOrBlueprintKey, list[t.Any]],
         ) -> None:
-            """
-Extends the `parent_dict` with the items from `bp_dict`, 
-overwriting any existing keys.
-
-Args:
-    - **bp_dict**: A dictionary mapping blueprint or app keys to lists of values.
-    - **parent_dict**: The dictionary to extend, also mapping blueprint or app keys to lists of values.
-
-Returns:
-    None
-"""
             for key, values in bp_dict.items():
                 key = name if key is None else f"{name}.{key}"
                 parent_dict[key].extend(values)
@@ -702,7 +691,6 @@ Returns:
 Raises:
     Exception: If an error occurs during error handling.
 """
-
 
         def decorator(f: T_error_handler) -> T_error_handler:
             """

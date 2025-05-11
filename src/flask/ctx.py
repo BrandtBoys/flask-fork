@@ -252,7 +252,6 @@ Args:
 Returns:
     None
 """
-
         self.app = app
         self.url_adapter = app.create_url_adapter(None)
         self.g: _AppCtxGlobals = app.app_ctx_globals_class()
@@ -346,7 +345,6 @@ Parameters:
 Returns:
 None
 """
-
         self.app = app
         if request is None:
             request = app.request_class(environ)

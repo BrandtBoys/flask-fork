@@ -261,7 +261,6 @@ Returns:
 Raises:
     ValueError: If the provided arguments are invalid.
 """
-
         if args and isinstance(
             args[0], (werkzeug.test.EnvironBuilder, dict, BaseRequest)
         ):

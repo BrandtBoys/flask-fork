@@ -75,7 +75,6 @@ Returns:
 
 If `EXPLAIN_TEMPLATE_LOADING` is enabled in the application configuration, this function will return an explained source code. Otherwise, it will use a faster method to retrieve the source code.
 """
-
         if self.app.config["EXPLAIN_TEMPLATE_LOADING"]:
             return self._get_source_explained(environment, template)
         return self._get_source_fast(environment, template)
@@ -102,7 +101,6 @@ Raises:
 Note:
     This function uses a debug helper to log the loading attempts for the given template.
 """
-
         attempts = []
         rv: tuple[str, str | None, t.Callable[[], bool] | None] | None
         trv: None | (tuple[str, str | None, t.Callable[[], bool] | None]) = None
@@ -140,7 +138,6 @@ Returns:
 Raises:
     TemplateNotFound: If the specified template cannot be found.
 """
-
         for _srcobj, loader in self._iter_loaders(template):
             try:
                 return loader.get_source(environment, template)
@@ -162,7 +159,6 @@ Args:
 Returns:
     t.Iterator[tuple[Scaffold, BaseLoader]]: An iterator yielding tuples of scaffold and base loader instances.
 """
-
         loader = self.app.jinja_loader
         if loader is not None:
             yield self.app, loader

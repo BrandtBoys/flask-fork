@@ -86,7 +86,6 @@ Args:
 Returns:
     None
 """
-
             self.modified = True
             self.accessed = True
 
@@ -224,7 +223,6 @@ Args:
 Returns:
     str | None: The domain for which cookies are sent with this session cookie, or None if not set.
 """
-
         return app.config["SESSION_COOKIE_DOMAIN"]  # type: ignore[no-any-return]
 
     def get_cookie_path(self, app: Flask) -> str:

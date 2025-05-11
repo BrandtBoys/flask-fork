@@ -75,7 +75,6 @@ Returns:
 Raises:
     RequestRedirect: A custom exception with information about the redirect.
 """
-
         exc = request.routing_exception
         assert isinstance(exc, RequestRedirect)
         buf = [
@@ -110,21 +109,7 @@ Patch `request.files.__getitem__` to raise a descriptive error about `enctype=mu
 
     class newcls(oldcls):  # type: ignore[valid-type, misc]
         def __getitem__(self, key: str) -> t.Any:
-            """
             try:
-Raises a `DebugFilesKeyError` exception when the provided key is not found in the request form.
-If the key is present but raises a KeyError, it will be re-raised with additional context.
-
-Args:
-    key (str): The key to look up in the request form.
-
-Returns:
-    t.Any: The value associated with the key if found, otherwise raises an exception.
-
-Raises:
-    DebugFilesKeyError: If the key is not found in the request form.
-    KeyError: If the key is present but raises a KeyError.
-"""
                 return super().__getitem__(key)
             except KeyError as e:
                 if key not in request.form:
