@@ -91,10 +91,28 @@ class BlueprintSetupState:
         view_func: ft.RouteCallable | None = None,
         **options: t.Any,
     ) -> None:
-        """A helper method to register a rule (and optionally a view function)
-        to the application.  The endpoint is automatically prefixed with the
-        blueprint's name.
         """
+Adds a URL rule to the application.
+
+This method registers a new route with the given `rule` and optional
+`endpoint`. The `view_func` is used to determine the endpoint if not provided.
+The `options` dictionary can be used to pass additional configuration options.
+
+If `self.url_prefix` is set, it will be prepended to the rule. If no rule is
+provided, only the prefix will be used.
+
+Note that this method modifies the application's URL routing configuration.
+
+Args:
+    rule (str): The URL rule to register.
+    endpoint (str | None): The endpoint for the route. Defaults to None.
+    view_func (ft.RouteCallable | None): The view function for the route. Defaults to None.
+    **options: t.Any: Additional options to pass to the `add_url_rule` method.
+
+Returns:
+    None
+"""
+
         if self.url_prefix is not None:
             if rule:
                 rule = "/".join((self.url_prefix.rstrip("/"), rule.lstrip("/")))
@@ -184,7 +202,35 @@ class Blueprint(Scaffold):
         root_path: str | None = None,
         cli_group: str | None = _sentinel,  # type: ignore[assignment]
     ):
-        super().__init__(
+        """
+Initialize a new instance of the class.
+
+Parameters:
+    name (str): The name of the application or module.
+    import_name (str): The import name of the application or module.
+    static_folder (str | os.PathLike[str] | None, optional): The path to the static folder. Defaults to None.
+    static_url_path (str | None, optional): The URL path for static files. Defaults to None.
+    template_folder (str | os.PathLike[str] | None, optional): The path to the template folder. Defaults to None.
+    url_prefix (str | None, optional): The prefix for URLs. Defaults to None.
+    subdomain (str | None, optional): The subdomain for URLs. Defaults to None.
+    url_defaults (dict[str, t.Any] | None, optional): Default values for URL parameters. Defaults to None.
+    root_path (str | None, optional): The path of the application or module. Defaults to None.
+    cli_group (str | None, optional): The CLI group name. Defaults to _sentinel.
+
+Raises:
+    ValueError: If 'name' is empty or contains a dot '.' character.
+
+Attributes:
+    name (str): The name of the application or module.
+    url_prefix (str): The prefix for URLs.
+    subdomain (str): The subdomain for URLs.
+    deferred_functions (list[DeferredSetupFunction]): A list of deferred functions.
+    url_values_defaults (dict[str, t.Any]): Default values for URL parameters.
+    cli_group (str): The CLI group name.
+    _blueprints (list[tuple[Blueprint, dict[str, t.Any]]]): A list of blueprints and their configurations.
+
+"""
+super().__init__(
             import_name=import_name,
             static_folder=static_folder,
             static_url_path=static_url_path,
@@ -222,20 +268,38 @@ class Blueprint(Scaffold):
 
     @setupmethod
     def record(self, func: DeferredSetupFunction) -> None:
-        """Registers a function that is called when the blueprint is
-        registered on the application.  This function is called with the
-        state as argument as returned by the :meth:`make_setup_state`
-        method.
         """
+Records a deferred setup function to be executed upon blueprint registration.
+
+This function is part of the setup process and will be called when the blueprint
+is registered on the application. It takes the state as an argument, which is
+returned by the :meth:`make_setup_state` method.
+
+Args:
+    func (DeferredSetupFunction): The deferred setup function to record.
+
+Returns:
+    None
+"""
+
         self.deferred_functions.append(func)
 
     @setupmethod
     def record_once(self, func: DeferredSetupFunction) -> None:
-        """Works like :meth:`record` but wraps the function in another
-        function that will ensure the function is only called once.  If the
-        blueprint is registered a second time on the application, the
-        function passed is not called.
         """
+Records a function to be called only once during blueprint setup.
+
+This method works similarly to :meth:`record` but wraps the provided
+function in another function that ensures it is only called once. If the
+blueprint is registered a second time on the application, the function
+passed will not be called.
+
+Args:
+    func (DeferredSetupFunction): The function to be recorded and called once.
+Returns:
+    None
+"""
+
 
         def wrapper(state: BlueprintSetupState) -> None:
             if state.first_registration:
@@ -377,11 +441,37 @@ class Blueprint(Scaffold):
             blueprint.register(app, bp_options)
 
     def _merge_blueprint_funcs(self, app: App, name: str) -> None:
-        def extend(
+        """
+Merges blueprint functions into the application's configuration.
+
+This function merges the provided blueprint functions (`bp_dict`) into the
+application's configuration. It updates the `error_handler_spec`, `view_functions`,
+`before_request_funcs`, `after_request_funcs`, `teardown_request_funcs`, `url_default_functions`,
+`url_value_preprocessors`, and `template_context_processors` dictionaries with the merged values.
+
+Args:
+    app (App): The application instance.
+    name (str): The blueprint name to merge functions under.
+
+Returns:
+    None
+"""
+def extend(
             bp_dict: dict[ft.AppOrBlueprintKey, list[t.Any]],
             parent_dict: dict[ft.AppOrBlueprintKey, list[t.Any]],
         ) -> None:
-            for key, values in bp_dict.items():
+            """
+Extends the `parent_dict` with the items from `bp_dict`, 
+overwriting any existing keys.
+
+Args:
+    - **bp_dict**: A dictionary mapping blueprint or app keys to lists of values.
+    - **parent_dict**: The dictionary to extend, also mapping blueprint or app keys to lists of values.
+
+Returns:
+    None
+"""
+for key, values in bp_dict.items():
                 key = name if key is None else f"{name}.{key}"
                 parent_dict[key].extend(values)
 
@@ -596,13 +686,46 @@ class Blueprint(Scaffold):
     def app_errorhandler(
         self, code: type[Exception] | int
     ) -> t.Callable[[T_error_handler], T_error_handler]:
-        """Like :meth:`errorhandler`, but for every request, not only those handled by
-        the blueprint. Equivalent to :meth:`.Flask.errorhandler`.
         """
+Appends an error handler to the application's error handling mechanism.
+
+This function is equivalent to Flask's `errorhandler` method, but it applies to every request,
+not just those handled by a specific blueprint. It takes an exception code or integer as input,
+and returns a decorator that can be used to register an error handler function.
+
+The returned decorator takes another function as an argument, which will be executed when an
+exception occurs with the specified code. The `from_blueprint` method is called on the application's
+error handling state, passing the decorated function and the blueprint setup state.
+
+Args:
+    code (type[Exception] | int): The exception code or integer to use for error handling.
+Returns:
+    T_error_handler: A decorator that can be used to register an error handler function.
+"""
+
 
         def decorator(f: T_error_handler) -> T_error_handler:
-            def from_blueprint(state: BlueprintSetupState) -> None:
-                state.app.errorhandler(code)(f)
+            """
+Decorates an error handler function with the ability to be registered once in a Blueprint's setup.
+
+Args:
+    f (T_error_handler): The error handler function to decorate.
+
+Returns:
+    T_error_handler: The decorated error handler function.
+"""
+def from_blueprint(state: BlueprintSetupState) -> None:
+                """
+Handles error handling for an application using a blueprint setup state.
+
+Args:
+    state (BlueprintSetupState): The current state of the blueprint setup.
+Returns:
+    None
+Raises:
+    Exception: If an error occurs during error handling.
+"""
+state.app.errorhandler(code)(f)
 
             self.record_once(from_blueprint)
             return f

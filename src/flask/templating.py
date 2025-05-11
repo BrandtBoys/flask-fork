@@ -60,14 +60,48 @@ class DispatchingJinjaLoader(BaseLoader):
     def get_source(
         self, environment: BaseEnvironment, template: str
     ) -> tuple[str, str | None, t.Callable[[], bool] | None]:
-        if self.app.config["EXPLAIN_TEMPLATE_LOADING"]:
+        """
+Returns the source code for a given template in an environment.
+
+Args:
+    - `environment`: The BaseEnvironment instance to retrieve the source from.
+    - `template`: The name of the template to get the source for.
+
+Returns:
+    A tuple containing:
+        1. The source code as a string.
+        2. An optional error message as a string, or None if no error occurred.
+        3. An optional callable function that can be used to check if the source is valid, or None if not needed.
+
+If `EXPLAIN_TEMPLATE_LOADING` is enabled in the application configuration, this function will return an explained source code. Otherwise, it will use a faster method to retrieve the source code.
+"""
+if self.app.config["EXPLAIN_TEMPLATE_LOADING"]:
             return self._get_source_explained(environment, template)
         return self._get_source_fast(environment, template)
 
     def _get_source_explained(
         self, environment: BaseEnvironment, template: str
     ) -> tuple[str, str | None, t.Callable[[], bool] | None]:
-        attempts = []
+        """
+Returns the source explanation for a given template in the specified environment.
+
+This function iterates over all loaders for the provided template and attempts to retrieve the source explanation.
+If successful, it returns a tuple containing the source code, error message (if any), and a callable that can be used to check if the source is valid.
+If no loader is able to retrieve the source, it raises a TemplateNotFound exception.
+
+Args:
+    environment (BaseEnvironment): The environment in which to retrieve the source explanation.
+    template (str): The template for which to retrieve the source explanation.
+
+Returns:
+    tuple[str, str | None, t.Callable[[], bool] | None]: A tuple containing the source code, error message (if any), and a callable that can be used to check if the source is valid.
+Raises:
+    TemplateNotFound: If no loader is able to retrieve the source explanation for the provided template.
+
+Note:
+    This function uses a debug helper to log the loading attempts for the given template.
+"""
+attempts = []
         rv: tuple[str, str | None, t.Callable[[], bool] | None] | None
         trv: None | (tuple[str, str | None, t.Callable[[], bool] | None]) = None
 
@@ -91,7 +125,20 @@ class DispatchingJinjaLoader(BaseLoader):
     def _get_source_fast(
         self, environment: BaseEnvironment, template: str
     ) -> tuple[str, str | None, t.Callable[[], bool] | None]:
-        for _srcobj, loader in self._iter_loaders(template):
+        """
+Returns the source code of a given template in the specified environment.
+
+Args:
+    - `environment`: The base environment to use for loading templates.
+    - `template`: The name of the template to retrieve the source code for.
+
+Returns:
+    A tuple containing the source code as a string, and an optional loader function that can be used to load the template. If no loader is found, returns None.
+
+Raises:
+    TemplateNotFound: If the specified template cannot be found.
+"""
+for _srcobj, loader in self._iter_loaders(template):
             try:
                 return loader.get_source(environment, template)
             except TemplateNotFound:
@@ -99,7 +146,20 @@ class DispatchingJinjaLoader(BaseLoader):
         raise TemplateNotFound(template)
 
     def _iter_loaders(self, template: str) -> t.Iterator[tuple[Scaffold, BaseLoader]]:
-        loader = self.app.jinja_loader
+        """
+Yields tuples of scaffold and base loader instances.
+
+This function iterates over the available loaders in the application's Jinja template engine,
+yielding a tuple containing each scaffold and its corresponding base loader. If no loaders are found,
+it returns an empty iterator.
+
+Args:
+    template (str): The current template being processed.
+
+Returns:
+    t.Iterator[tuple[Scaffold, BaseLoader]]: An iterator yielding tuples of scaffold and base loader instances.
+"""
+loader = self.app.jinja_loader
         if loader is not None:
             yield self.app, loader
 

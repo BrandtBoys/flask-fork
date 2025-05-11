@@ -228,7 +228,31 @@ class Flask(App):
         instance_relative_config: bool = False,
         root_path: str | None = None,
     ):
-        super().__init__(
+        """
+Adds a static route to the application using the provided `static_url_path`, 
+`static_host`, and `static_folder`. This is done without checking if 
+`static_folder` exists, as it might be created while the server is running. 
+
+This method uses a weakref to avoid creating a reference cycle between the app 
+and the view function.
+
+Args:
+    import_name (str): The name of the module being imported.
+    static_url_path (str | None): The URL path for serving static files. Defaults to None.
+    static_folder (str | os.PathLike[str] | None): The folder where static files are stored. Defaults to "static".
+    static_host (str | None): The host on which the static route is served. Defaults to None.
+    host_matching (bool): Whether the host should be matched. Defaults to False.
+    subdomain_matching (bool): Whether the subdomain should be matched. Defaults to False.
+    template_folder (str | os.PathLike[str] | None): The folder where templates are stored. Defaults to "templates".
+    instance_path (str | None): The path of the instance. Defaults to None.
+    instance_relative_config (bool): Whether the configuration is relative to the instance. Defaults to False.
+    root_path (str | None): The root path of the application. Defaults to None.
+
+Raises:
+    AssertionError: If `static_host` and `host_matching` do not match, or if 
+        `static_folder` exists but `static_url_path` is not provided.
+"""
+super().__init__(
             import_name=import_name,
             static_url_path=static_url_path,
             static_folder=static_folder,
@@ -429,21 +453,24 @@ class Flask(App):
         return None
 
     def raise_routing_exception(self, request: Request) -> t.NoReturn:
-        """Intercept routing exceptions and possibly do something else.
-
-        In debug mode, intercept a routing redirect and replace it with
-        an error if the body will be discarded.
-
-        With modern Werkzeug this shouldn't occur, since it now uses a
-        308 status which tells the browser to resend the method and
-        body.
-
-        .. versionchanged:: 2.1
-            Don't intercept 307 and 308 redirects.
-
-        :meta private:
-        :internal:
         """
+Raises a routing exception if it's not a redirect and the debug mode is enabled.
+
+Intercepts routing exceptions and possibly does something else. In debug mode,
+intercepts a routing redirect and replaces it with an error if the body will be discarded.
+With modern Werkzeug this shouldn't occur, since it now uses a 308 status which tells
+the browser to resend the method and body.
+
+This function is private and internal, meaning it should not be used directly by users of the class.
+It's intended for internal use only.
+
+.. versionchanged:: 2.1
+    Don't intercept 307 and 308 redirects.
+
+:meta private:
+:internal:
+"""
+
         if (
             not self.debug
             or not isinstance(request.routing_exception, RequestRedirect)
@@ -457,16 +484,23 @@ class Flask(App):
         raise FormDataRoutingRedirect(request)
 
     def update_template_context(self, context: dict[str, t.Any]) -> None:
-        """Update the template context with some commonly used variables.
-        This injects request, session, config and g into the template
-        context as well as everything template context processors want
-        to inject.  Note that the as of Flask 0.6, the original values
-        in the context will not be overridden if a context processor
-        decides to return a value with the same key.
-
-        :param context: the context as a dictionary that is updated in place
-                        to add extra variables.
         """
+Updates the template context with commonly used variables.
+
+This function injects `request`, `session`, `config` and `g` into the
+template context as well as everything template context processors want
+to inject.  Note that as of Flask 0.6, the original values in the
+context will not be overridden if a context processor decides to return
+a value with the same key.
+
+Args:
+    context (dict[str, t.Any]): The context as a dictionary that is updated
+        in place to add extra variables.
+
+Returns:
+    None
+"""
+
         names: t.Iterable[str | None] = (None,)
 
         # A template may be rendered outside a request context.
@@ -830,15 +864,26 @@ class Flask(App):
         )
 
     def dispatch_request(self) -> ft.ResponseReturnValue:
-        """Does the request dispatching.  Matches the URL and returns the
-        return value of the view or error handler.  This does not have to
-        be a response object.  In order to convert the return value to a
-        proper response object, call :func:`make_response`.
-
-        .. versionchanged:: 0.7
-           This no longer does the exception handling, this code was
-           moved to the new :meth:`full_dispatch_request`.
         """
+Dispatches a request to the corresponding view or error handler.
+
+This function matches the URL and returns the return value of the view
+or error handler. It does not have to be a response object. To convert
+the return value to a proper response object, call :func:`make_response`.
+
+Since version 0.7, this function no longer handles exceptions. Instead,
+exception handling has been moved to the new :meth:`full_dispatch_request` method.
+
+Args:
+    None
+
+Returns:
+    ft.ResponseReturnValue: The return value of the view or error handler.
+
+Raises:
+    None
+"""
+
         req = request_ctx.request
         if req.routing_exception is not None:
             self.raise_routing_exception(req)
@@ -917,14 +962,15 @@ class Flask(App):
         return rv
 
     def ensure_sync(self, func: t.Callable[..., t.Any]) -> t.Callable[..., t.Any]:
-        """Ensure that the function is synchronous for WSGI workers.
-        Plain ``def`` functions are returned as-is. ``async def``
-        functions are wrapped to run and wait for the response.
-
-        Override this method to change how the app runs async views.
-
-        .. versionadded:: 2.0
         """
+Ensures that a provided function is synchronous for WSGI workers.
+Plain ``def`` functions are returned as-is. ``async def`` functions are wrapped to run and wait for the response.
+
+Override this method to change how the app runs async views.
+
+.. versionadded:: 2.0
+"""
+
         if iscoroutinefunction(func):
             return self.async_to_sync(func)
 
@@ -933,17 +979,30 @@ class Flask(App):
     def async_to_sync(
         self, func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]
     ) -> t.Callable[..., t.Any]:
-        """Return a sync function that will run the coroutine function.
-
-        .. code-block:: python
-
-            result = app.async_to_sync(func)(*args, **kwargs)
-
-        Override this method to change how the app converts async code
-        to be synchronously callable.
-
-        .. versionadded:: 2.0
         """
+Converts an asynchronous function to a synchronous one.
+
+This function takes an asynchronous function as input and returns a new
+function that, when called, will run the original asynchronous function.
+The returned function can be used in synchronous contexts without having to
+wait for the asynchronous operation to complete.
+
+By default, this method uses `asgiref.sync.async_to_sync` to perform the conversion.
+However, you can override this method to change how the app converts async code
+to be synchronously callable.
+
+Example:
+    result = app.async_to_sync(func)(*args, **kwargs)
+
+Note: This function requires Flask with the 'async' extra installed. If not,
+a RuntimeError will be raised.
+
+Version Added: 2.0
+
+Raises:
+    RuntimeError: If Flask is not installed with the 'async' extra.
+"""
+
         try:
             from asgiref.sync import async_to_sync as asgiref_async_to_sync
         except ImportError:
@@ -1221,15 +1280,17 @@ class Flask(App):
         return rv
 
     def preprocess_request(self) -> ft.ResponseReturnValue | None:
-        """Called before the request is dispatched. Calls
-        :attr:`url_value_preprocessors` registered with the app and the
-        current blueprint (if any). Then calls :attr:`before_request_funcs`
-        registered with the app and the blueprint.
-
-        If any :meth:`before_request` handler returns a non-None value, the
-        value is handled as if it was the return value from the view, and
-        further request handling is stopped.
         """
+Preprocesses the request by calling registered URL value preprocessors and 
+before request functions.
+
+Args:
+    None
+
+Returns:
+    ft.ResponseReturnValue | None: The result of the before request handlers, or None if no handler returns a non-None value.
+"""
+
         names = (None, *reversed(request.blueprints))
 
         for name in names:
@@ -1357,19 +1418,20 @@ class Flask(App):
         return AppContext(self)
 
     def request_context(self, environ: WSGIEnvironment) -> RequestContext:
-        """Create a :class:`~flask.ctx.RequestContext` representing a
-        WSGI environment. Use a ``with`` block to push the context,
-        which will make :data:`request` point at this request.
-
-        See :doc:`/reqcontext`.
-
-        Typically you should not call this from your own code. A request
-        context is automatically pushed by the :meth:`wsgi_app` when
-        handling a request. Use :meth:`test_request_context` to create
-        an environment and context instead of this method.
-
-        :param environ: a WSGI environment
         """
+Creates a :class:`~flask.ctx.RequestContext` representing a WSGI environment.
+Use a ``with`` block to push the context, which will make :data:`request` point at this request.
+
+See :doc:`/reqcontext`.
+
+Typically you should not call this from your own code. A request
+context is automatically pushed by the :meth:`wsgi_app` when handling a request.
+Use :meth:`test_request_context` to create an environment and context instead of this method.
+
+:param environ: a WSGI environment
+:return: a :class:`~flask.ctx.RequestContext`
+"""
+
         return RequestContext(self, environ)
 
     def test_request_context(self, *args: t.Any, **kwargs: t.Any) -> RequestContext:
@@ -1431,30 +1493,36 @@ class Flask(App):
     def wsgi_app(
         self, environ: WSGIEnvironment, start_response: StartResponse
     ) -> cabc.Iterable[bytes]:
-        """The actual WSGI application. This is not implemented in
-        :meth:`__call__` so that middlewares can be applied without
-        losing a reference to the app object. Instead of doing this::
-
-            app = MyMiddleware(app)
-
-        It's a better idea to do this instead::
-
-            app.wsgi_app = MyMiddleware(app.wsgi_app)
-
-        Then you still have the original application object around and
-        can continue to call methods on it.
-
-        .. versionchanged:: 0.7
-            Teardown events for the request and app contexts are called
-            even if an unhandled error occurs. Other events may not be
-            called depending on when an error occurs during dispatch.
-            See :ref:`callbacks-and-errors`.
-
-        :param environ: A WSGI environment.
-        :param start_response: A callable accepting a status code,
-            a list of headers, and an optional exception context to
-            start the response.
         """
+WSGI Application Function.
+
+The actual WSGI application. This is not implemented in
+:meth:`__call__` so that middlewares can be applied without
+losing a reference to the app object. Instead of doing this::
+
+    app = MyMiddleware(app)
+
+It's a better idea to do this instead::
+
+    app.wsgi_app = MyMiddleware(app.wsgi_app)
+
+Then you still have the original application object around and
+can continue to call methods on it.
+
+.. versionchanged:: 0.7
+    Teardown events for the request and app contexts are called
+    even if an unhandled error occurs. Other events may not be
+    called depending on when an error occurs during dispatch.
+    See :ref:`callbacks-and-errors`.
+
+:param environ: A WSGI environment.
+:param start_response: A callable accepting a status code,
+    a list of headers, and an optional exception context to
+    start the response.
+
+:returns: An iterable of bytes representing the response.
+"""
+
         ctx = self.request_context(environ)
         error: BaseException | None = None
         try:
@@ -1481,8 +1549,20 @@ class Flask(App):
     def __call__(
         self, environ: WSGIEnvironment, start_response: StartResponse
     ) -> cabc.Iterable[bytes]:
-        """The WSGI server calls the Flask application object as the
-        WSGI application. This calls :meth:`wsgi_app`, which can be
-        wrapped to apply middleware.
         """
+Call the WSGI server with the provided environment and start response.
+
+This method is called by the WSGI server when it needs to execute the Flask application.
+It calls :meth:`wsgi_app` which can be wrapped to apply middleware.
+
+Args:
+    environ (WSGIEnvironment): The environment in which the application will run.
+    start_response (StartResponse): A callable that takes a status code and
+        response headers as arguments, returning a tuple containing the
+        status code and response headers.
+
+Returns:
+    cabc.Iterable[bytes]: An iterable of bytes representing the response body.
+"""
+
         return self.wsgi_app(environ, start_response)

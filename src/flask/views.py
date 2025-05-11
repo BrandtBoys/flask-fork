@@ -104,7 +104,23 @@ class View:
         if cls.init_every_request:
 
             def view(**kwargs: t.Any) -> ft.ResponseReturnValue:
-                self = view.view_class(  # type: ignore[attr-defined]
+                """
+View a request.
+
+This function is used to handle HTTP requests. It takes in any number of keyword arguments,
+which are then passed to the `dispatch_request` method of the view class instance.
+The result of this method call is returned as an HTTP response.
+
+Args:
+    **kwargs: Any additional keyword arguments to be passed to the view class.
+
+Returns:
+    ft.ResponseReturnValue: The result of the `dispatch_request` method call.
+
+Raises:
+    None
+"""
+self = view.view_class(  # type: ignore[attr-defined]
                     *class_args, **class_kwargs
                 )
                 return current_app.ensure_sync(self.dispatch_request)(**kwargs)  # type: ignore[no-any-return]
@@ -113,7 +129,18 @@ class View:
             self = cls(*class_args, **class_kwargs)
 
             def view(**kwargs: t.Any) -> ft.ResponseReturnValue:
-                return current_app.ensure_sync(self.dispatch_request)(**kwargs)  # type: ignore[no-any-return]
+                """
+View a request.
+
+Dispatches the given request to the appropriate handler and returns the response.
+
+Args:
+    **kwargs (t.Any): Keyword arguments to be passed to the dispatch_request method.
+
+Returns:
+    ft.ResponseReturnValue: The response returned by the dispatched request.
+"""
+return current_app.ensure_sync(self.dispatch_request)(**kwargs)  # type: ignore[no-any-return]
 
         if cls.decorators:
             view.__name__ = name

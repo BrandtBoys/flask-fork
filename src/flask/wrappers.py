@@ -54,7 +54,19 @@ class Request(RequestBase):
 
     @property
     def max_content_length(self) -> int | None:  # type: ignore[override]
-        """Read-only view of the ``MAX_CONTENT_LENGTH`` config key."""
+        """
+Returns the maximum allowed content length as configured in the application.
+
+If `current_app` is available, it returns the value of the ``MAX_CONTENT_LENGTH`` config key.
+Otherwise, it returns `None`.
+
+Args:
+    None
+
+Returns:
+    int | None: The maximum allowed content length or `None` if not configured.
+"""
+
         if current_app:
             return current_app.config["MAX_CONTENT_LENGTH"]  # type: ignore[no-any-return]
         else:
@@ -162,11 +174,14 @@ class Response(ResponseBase):
 
     @property
     def max_cookie_size(self) -> int:  # type: ignore
-        """Read-only view of the :data:`MAX_COOKIE_SIZE` config key.
-
-        See :attr:`~werkzeug.wrappers.Response.max_cookie_size` in
-        Werkzeug's docs.
         """
+Reads the maximum cookie size from either the application configuration or 
+Werkzeug's default value, depending on whether a current application context is available.
+
+Returns:
+    int: The maximum allowed cookie size.
+"""
+
         if current_app:
             return current_app.config["MAX_COOKIE_SIZE"]  # type: ignore[no-any-return]
 

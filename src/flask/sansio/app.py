@@ -428,14 +428,15 @@ class App(Scaffold):
 
     @cached_property
     def name(self) -> str:  # type: ignore
-        """The name of the application.  This is usually the import name
-        with the difference that it's guessed from the run file if the
-        import name is main.  This name is used as a display name when
-        Flask needs the name of the application.  It can be set and overridden
-        to change the value.
-
-        .. versionadded:: 0.8
         """
+Returns the name of the application. This name is usually the import name,
+with the difference that it's guessed from the run file if the import name is main.
+This name is used as a display name when Flask needs the name of the application.
+It can be set and overridden to change the value.
+
+.. versionadded:: 0.8
+"""
+
         if self.import_name == "__main__":
             fn: str | None = getattr(sys.modules["__main__"], "__file__", None)
             if fn is None:
@@ -552,7 +553,18 @@ class App(Scaffold):
 
     @property
     def debug(self) -> bool:
-        return self.config["DEBUG"]  # type: ignore[no-any-return]
+        """
+    Returns whether debug mode is enabled based on the configuration.
+    
+    When using `flask run` to start the development server, an interactive debugger
+    will be shown for unhandled exceptions, and the server will be reloaded when code changes.
+    This maps to the :data:`DEBUG` config key. It may not behave as expected if set late.
+
+    **Do not enable debug mode when deploying in production.**
+
+    Default: ``False``
+"""
+return self.config["DEBUG"]  # type: ignore[no-any-return]
         """Whether debug mode is enabled. When using ``flask run`` to start the
         development server, an interactive debugger will be shown for unhandled
         exceptions, and the server will be reloaded when code changes. This maps to the
@@ -913,12 +925,14 @@ class App(Scaffold):
         )
 
     def inject_url_defaults(self, endpoint: str, values: dict[str, t.Any]) -> None:
-        """Injects the URL defaults for the given endpoint directly into
-        the values dictionary passed.  This is used internally and
-        automatically called on URL building.
-
-        .. versionadded:: 0.7
         """
+Injects the URL defaults for the given endpoint directly into
+the values dictionary passed. This is used internally and
+automatically called on URL building.
+
+.. versionadded:: 0.7
+"""
+
         names: t.Iterable[str | None] = (None,)
 
         # url_for may be called outside a request context, parse the

@@ -55,7 +55,27 @@ class FormDataRoutingRedirect(AssertionError):
     """
 
     def __init__(self, request: Request) -> None:
-        exc = request.routing_exception
+        """
+Raises a custom exception when a request is redirected by the router.
+
+This exception is raised when a request is sent to a URL that is
+redirected by the router, but the redirect was not properly configured.
+The exception provides information about the original and canonical URLs,
+as well as guidance on how to configure routing redirects correctly.
+
+In debug mode only. In production mode, this exception will be caught
+and handled by Flask's default error handling mechanism.
+
+Parameters:
+    request (Request): The original request that caused the redirect.
+
+Returns:
+    None
+
+Raises:
+    RequestRedirect: A custom exception with information about the redirect.
+"""
+exc = request.routing_exception
         assert isinstance(exc, RequestRedirect)
         buf = [
             f"A request was sent to '{request.url}', but routing issued"
@@ -79,17 +99,32 @@ class FormDataRoutingRedirect(AssertionError):
 
 
 def attach_enctype_error_multidict(request: Request) -> None:
-    """Patch ``request.files.__getitem__`` to raise a descriptive error
-    about ``enctype=multipart/form-data``.
-
-    :param request: The request to patch.
-    :meta private:
     """
+Patch `request.files.__getitem__` to raise a descriptive error about `enctype=multipart/form-data`.
+
+:param request: The request to patch.
+:meta private:
+"""
+
     oldcls = request.files.__class__
 
     class newcls(oldcls):  # type: ignore[valid-type, misc]
         def __getitem__(self, key: str) -> t.Any:
-            try:
+            """
+Raises a `DebugFilesKeyError` exception when the provided key is not found in the request form.
+If the key is present but raises a KeyError, it will be re-raised with additional context.
+
+Args:
+    key (str): The key to look up in the request form.
+
+Returns:
+    t.Any: The value associated with the key if found, otherwise raises an exception.
+
+Raises:
+    DebugFilesKeyError: If the key is not found in the request form.
+    KeyError: If the key is present but raises a KeyError.
+"""
+try:
                 return super().__getitem__(key)
             except KeyError as e:
                 if key not in request.form:

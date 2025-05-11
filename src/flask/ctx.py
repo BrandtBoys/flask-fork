@@ -243,7 +243,16 @@ class AppContext:
     """
 
     def __init__(self, app: Flask) -> None:
-        self.app = app
+        """
+Initializes the documentation assistant with a Flask application instance.
+
+Args:
+    app (Flask): The Flask application instance to be used for URL adaptation and context management.
+
+Returns:
+    None
+"""
+self.app = app
         self.url_adapter = app.create_url_adapter(None)
         self.g: _AppCtxGlobals = app.app_ctx_globals_class()
         self._cv_tokens: list[contextvars.Token[AppContext]] = []
@@ -313,7 +322,30 @@ class RequestContext:
         request: Request | None = None,
         session: SessionMixin | None = None,
     ) -> None:
-        self.app = app
+        """
+Initialize a new instance of the class.
+
+This method is called when an object of this class is instantiated. It takes in several parameters:
+
+- `app`: The Flask application instance.
+- `environ`: The WSGI environment.
+- `request`: An optional request object, defaults to None.
+- `session`: An optional session mixin object, defaults to None.
+
+The method initializes the internal state of the class by setting up the request object and creating a URL adapter if possible. It also sets up the flash messages and session objects.
+
+After initialization, any functions that should be executed after the request on the response object can be added to the `_after_request_functions` list.
+
+Parameters:
+app (Flask): The Flask application instance.
+environ (WSGIEnvironment): The WSGI environment.
+request (Request | None): An optional request object. Defaults to None.
+session (SessionMixin | None): An optional session mixin object. Defaults to None.
+
+Returns:
+None
+"""
+self.app = app
         if request is None:
             request = app.request_class(environ)
             request.json_module = app.json

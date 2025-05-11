@@ -136,22 +136,32 @@ class FlaskClient(Client):
     def session_transaction(
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Iterator[SessionMixin]:
-        """When used in combination with a ``with`` statement this opens a
-        session transaction.  This can be used to modify the session that
-        the test client uses.  Once the ``with`` block is left the session is
-        stored back.
-
-        ::
-
-            with client.session_transaction() as session:
-                session['value'] = 42
-
-        Internally this is implemented by going through a temporary test
-        request context and since session handling could depend on
-        request variables this function accepts the same arguments as
-        :meth:`~flask.Flask.test_request_context` which are directly
-        passed through.
         """
+Opens a session transaction.
+
+When used in combination with a ``with`` statement this opens a
+session transaction.  This can be used to modify the session that
+the test client uses.  Once the ``with`` block is left the session is
+stored back.
+
+Internally this is implemented by going through a temporary test
+request context and since session handling could depend on
+request variables this function accepts the same arguments as
+:meth:`~flask.Flask.test_request_context` which are directly
+passed through.
+
+Args:
+    *args (t.Any): Variable length argument list.
+    **kwargs (t.Any): Arbitrary keyword arguments.
+
+Returns:
+    t.Iterator[SessionMixin]: An iterator over a session transaction.
+
+Raises:
+    TypeError: If cookies are disabled and not created with 'use_cookies=True'.
+    RuntimeError: If the session backend did not open a session.
+"""
+
         if self._cookies is None:
             raise TypeError(
                 "Cookies are disabled. Create a client with 'use_cookies=True'."
@@ -183,7 +193,18 @@ class FlaskClient(Client):
         )
 
     def _copy_environ(self, other: WSGIEnvironment) -> WSGIEnvironment:
-        out = {**self.environ_base, **other}
+        """
+Copies the environment of another WSGIEnvironment instance.
+
+This method creates a new dictionary containing all key-value pairs from both `self` and `other`. If `preserve_context` is True, it also adds the `_new_contexts` attribute to the resulting dictionary.
+
+Args:
+    other (WSGIEnvironment): The environment to copy from.
+
+Returns:
+    WSGIEnvironment: A new WSGIEnvironment instance with the copied environment.
+"""
+out = {**self.environ_base, **other}
 
         if self.preserve_context:
             out["werkzeug.debug.preserve_context"] = self._new_contexts.append
@@ -193,7 +214,23 @@ class FlaskClient(Client):
     def _request_from_builder_args(
         self, args: tuple[t.Any, ...], kwargs: dict[str, t.Any]
     ) -> BaseRequest:
-        kwargs["environ_base"] = self._copy_environ(kwargs.get("environ_base", {}))
+        """
+Returns a BaseRequest object created from the provided arguments and keyword arguments.
+
+Args:
+    - args (tuple[t.Any, ...]): A tuple of positional arguments.
+    - kwargs (dict[str, t.Any]): A dictionary of keyword arguments.
+
+Returns:
+    BaseRequest: The created BaseRequest object.
+
+Raises:
+    None
+
+Note:
+    This function creates an EnvironBuilder instance and uses it to get a request. It ensures the builder is properly closed after use.
+"""
+kwargs["environ_base"] = self._copy_environ(kwargs.get("environ_base", {}))
         builder = EnvironBuilder(self.application, *args, **kwargs)
 
         try:
@@ -208,7 +245,24 @@ class FlaskClient(Client):
         follow_redirects: bool = False,
         **kwargs: t.Any,
     ) -> TestResponse:
-        if args and isinstance(
+        """
+Opens a new test session.
+
+This method is used to create a new test environment. It takes in various arguments and keyword arguments that can be used to customize the behavior of the test session.
+
+Args:
+    *args: A variable number of positional arguments. If provided, they are used to initialize the request object.
+    buffered (bool): Whether to buffer the response. Defaults to False.
+    follow_redirects (bool): Whether to follow redirects. Defaults to False.
+    **kwargs: A dictionary of keyword arguments.
+
+Returns:
+    TestResponse: The test response object.
+
+Raises:
+    ValueError: If the provided arguments are invalid.
+"""
+if args and isinstance(
             args[0], (werkzeug.test.EnvironBuilder, dict, BaseRequest)
         ):
             if isinstance(args[0], werkzeug.test.EnvironBuilder):
@@ -275,20 +329,26 @@ class FlaskCliRunner(CliRunner):
     def invoke(  # type: ignore
         self, cli: t.Any = None, args: t.Any = None, **kwargs: t.Any
     ) -> t.Any:
-        """Invokes a CLI command in an isolated environment. See
-        :meth:`CliRunner.invoke <click.testing.CliRunner.invoke>` for
-        full method documentation. See :ref:`testing-cli` for examples.
-
-        If the ``obj`` argument is not given, passes an instance of
-        :class:`~flask.cli.ScriptInfo` that knows how to load the Flask
-        app being tested.
-
-        :param cli: Command object to invoke. Default is the app's
-            :attr:`~flask.app.Flask.cli` group.
-        :param args: List of strings to invoke the command with.
-
-        :return: a :class:`~click.testing.Result` object.
         """
+Invokes a CLI command in an isolated environment.
+
+See :meth:`CliRunner.invoke <click.testing.CliRunner.invoke>` for full method documentation.
+See :ref:`testing-cli` for examples.
+
+If the ``obj`` argument is not given, passes an instance of
+:class:`~flask.cli.ScriptInfo` that knows how to load the Flask
+app being tested.
+
+Parameters:
+    cli (Command object): Command object to invoke. Default is the app's
+        :attr:`~flask.app.Flask.cli` group.
+    args (List of strings): List of strings to invoke the command with.
+    **kwargs: Additional keyword arguments.
+
+Returns:
+    a :class:`~click.testing.Result` object.
+"""
+
         if cli is None:
             cli = self.app.cli
 

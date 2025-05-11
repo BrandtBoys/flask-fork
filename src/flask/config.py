@@ -23,7 +23,17 @@ class ConfigAttribute(t.Generic[T]):
     def __init__(
         self, name: str, get_converter: t.Callable[[t.Any], T] | None = None
     ) -> None:
-        self.__name__ = name
+        """
+Initialize a new instance of the class.
+
+Args:
+    - **name (str)**: The name of the converter.
+    - **get_converter (t.Callable[[t.Any], T] | None, optional)**: A function that converts any type to the target type. Defaults to None.
+
+Returns:
+    None
+"""
+self.__name__ = name
         self.get_converter = get_converter
 
     @t.overload
@@ -32,10 +42,38 @@ class ConfigAttribute(t.Generic[T]):
 
     @t.overload
     def __get__(self, obj: App, owner: type[App]) -> T:
-        ...
+        """
+Gets an attribute from an instance of the class.
+
+This method is used to implement property access in Python. It allows you to define a getter function for a property and use it with the `@property` decorator.
+
+Args:
+    self (object): The instance of the class.
+    obj (App, optional): The object that owns this attribute. Defaults to None.
+    owner (type[App], optional): The type of the App class. Defaults to None.
+
+Returns:
+    T: The value of the attribute.
+"""
+...
 
     def __get__(self, obj: App | None, owner: type[App] | None = None) -> T | te.Self:
-        if obj is None:
+        """
+Gets the configuration value for this descriptor.
+
+If `obj` is provided, it must be an instance of `App`. The method returns
+the configuration value associated with the name of this descriptor. If a
+converter function is set on this descriptor, it will be applied to the
+configuration value before being returned.
+
+Args:
+    obj: An instance of App (optional)
+    owner: The type of the App instance (optional)
+
+Returns:
+    T | te.Self: The configuration value or self if no object was provided.
+"""
+if obj is None:
             return self
 
         rv = obj.config[self.__name__]
@@ -46,7 +84,19 @@ class ConfigAttribute(t.Generic[T]):
         return rv  # type: ignore[no-any-return]
 
     def __set__(self, obj: App, value: t.Any) -> None:
-        obj.config[self.__name__] = value
+        """
+Sets a configuration attribute on an object.
+
+This method is used to set a configuration attribute on an object. The attribute name is determined by the `__name__` attribute of the current instance, and its value is stored in the `config` dictionary of the object's parent class (`App`). 
+
+Args:
+    obj (App): The object that owns this configuration attribute.
+    value (t.Any): The new value for the configuration attribute.
+
+Returns:
+    None
+"""
+obj.config[self.__name__] = value
 
 
 class Config(dict):  # type: ignore[type-arg]
@@ -98,7 +148,19 @@ class Config(dict):  # type: ignore[type-arg]
         root_path: str | os.PathLike[str],
         defaults: dict[str, t.Any] | None = None,
     ) -> None:
-        super().__init__(defaults or {})
+        """
+Initialize the documentation assistant.
+
+### Parameters
+
+- **root_path**: The root path of the documentation. Can be a string or an os.PathLike object.
+- **defaults**: An optional dictionary of default values to use for initialization. Defaults to None.
+
+### Returns
+
+None
+"""
+super().__init__(defaults or {})
         self.root_path = root_path
 
     def from_envvar(self, variable_name: str, silent: bool = False) -> bool:
@@ -192,20 +254,22 @@ class Config(dict):  # type: ignore[type-arg]
     def from_pyfile(
         self, filename: str | os.PathLike[str], silent: bool = False
     ) -> bool:
-        """Updates the values in the config from a Python file.  This function
-        behaves as if the file was imported as module with the
-        :meth:`from_object` function.
-
-        :param filename: the filename of the config.  This can either be an
-                         absolute filename or a filename relative to the
-                         root path.
-        :param silent: set to ``True`` if you want silent failure for missing
-                       files.
-        :return: ``True`` if the file was loaded successfully.
-
-        .. versionadded:: 0.7
-           `silent` parameter.
         """
+Updates the values in the config from a Python file.
+
+This function behaves as if the file was imported as module with the :meth:`from_object` function.
+
+Parameters:
+    filename (str | os.PathLike[str]): The filename of the config. This can either be an absolute filename or a filename relative to the root path.
+    silent (bool): Set to True if you want silent failure for missing files. Defaults to False.
+
+Returns:
+    bool: True if the file was loaded successfully.
+
+.. versionadded:: 0.7
+   silent parameter.
+"""
+
         filename = os.path.join(self.root_path, filename)
         d = types.ModuleType("config")
         d.__file__ = filename
@@ -265,33 +329,34 @@ class Config(dict):  # type: ignore[type-arg]
         silent: bool = False,
         text: bool = True,
     ) -> bool:
-        """Update the values in the config from a file that is loaded
-        using the ``load`` parameter. The loaded data is passed to the
-        :meth:`from_mapping` method.
-
-        .. code-block:: python
-
-            import json
-            app.config.from_file("config.json", load=json.load)
-
-            import tomllib
-            app.config.from_file("config.toml", load=tomllib.load, text=False)
-
-        :param filename: The path to the data file. This can be an
-            absolute path or relative to the config root path.
-        :param load: A callable that takes a file handle and returns a
-            mapping of loaded data from the file.
-        :type load: ``Callable[[Reader], Mapping]`` where ``Reader``
-            implements a ``read`` method.
-        :param silent: Ignore the file if it doesn't exist.
-        :param text: Open the file in text or binary mode.
-        :return: ``True`` if the file was loaded successfully.
-
-        .. versionchanged:: 2.3
-            The ``text`` parameter was added.
-
-        .. versionadded:: 2.0
         """
+Update the values in the config from a file that is loaded
+using the ``load`` parameter. The loaded data is passed to the
+:meth:`from_mapping` method.
+
+.. code-block:: python
+
+    import json
+    app.config.from_file("config.json", load=json.load)
+
+    import tomllib
+    app.config.from_file("config.toml", load=tomllib.load, text=False)
+
+:param filename: The path to the data file. This can be an
+    absolute path or relative to the config root path.
+:type load: ``Callable[[Reader], Mapping]`` where ``Reader``
+    implements a ``read`` method.
+
+:param silent: Ignore the file if it doesn't exist.
+:param text: Open the file in text or binary mode.
+:return: ``True`` if the file was loaded successfully.
+
+.. versionchanged:: 2.3
+    The ``text`` parameter was added.
+
+.. versionadded:: 2.0
+"""
+
         filename = os.path.join(self.root_path, filename)
 
         try:

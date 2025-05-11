@@ -84,8 +84,16 @@ class JSONTag:
         raise NotImplementedError
 
     def tag(self, value: t.Any) -> dict[str, t.Any]:
-        """Convert the value to a valid JSON type and add the tag structure
-        around it."""
+        """
+Converts the input value to a valid JSON type and wraps it with a tag structure.
+
+Args:
+    value (t.Any): The value to be converted and tagged.
+
+Returns:
+    dict[str, t.Any]: A dictionary containing the converted value wrapped in a tag structure.
+"""
+
         return {self.key: self.to_json(value)}
 
 
@@ -258,19 +266,26 @@ class TaggedJSONSerializer:
         force: bool = False,
         index: int | None = None,
     ) -> None:
-        """Register a new tag with this serializer.
-
-        :param tag_class: tag class to register. Will be instantiated with this
-            serializer instance.
-        :param force: overwrite an existing tag. If false (default), a
-            :exc:`KeyError` is raised.
-        :param index: index to insert the new tag in the tag order. Useful when
-            the new tag is a special case of an existing tag. If ``None``
-            (default), the tag is appended to the end of the order.
-
-        :raise KeyError: if the tag key is already registered and ``force`` is
-            not true.
         """
+Registers a new tag with this serializer.
+
+Parameters
+----------
+tag_class : type[JSONTag]
+    Tag class to register. Will be instantiated with this serializer instance.
+force : bool, optional
+    Overwrite an existing tag. If false (default), a KeyError is raised.
+index : int | None, optional
+    Index to insert the new tag in the tag order. Useful when the new tag is
+    a special case of an existing tag. If None (default), the tag is appended to
+    the end of the order.
+
+Raises
+------
+KeyError
+    If the tag key is already registered and force is not true.
+"""
+
         tag = tag_class(self)
         key = tag.key
 
@@ -286,7 +301,16 @@ class TaggedJSONSerializer:
             self.order.insert(index, tag)
 
     def tag(self, value: t.Any) -> t.Any:
-        """Convert a value to a tagged representation if necessary."""
+        """
+Converts a value to a tagged representation if it matches any of the tags defined in `self.order`.
+
+Args:
+    value (t.Any): The value to be converted.
+
+Returns:
+    t.Any: The tagged representation of the value if found, otherwise the original value.
+"""
+
         for tag in self.order:
             if tag.check(value):
                 return tag.tag(value)
