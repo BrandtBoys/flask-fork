@@ -774,9 +774,24 @@ class CertParamType(click.ParamType):
 
 
 def _validate_key(ctx, param, value):
-    """The ``--key`` option must be specified when ``--cert`` is a file.
-    Modifies the ``cert`` param to be a ``(cert, key)`` pair if needed.
     """
+Validate the key parameter for the --key option.
+
+This function checks if the --key option is required when --cert is a file.
+It also verifies that the --cert option is not used with an SSLContext object or adhoc certificate.
+
+Args:
+    ctx (click.Context): The click context object.
+    param (click.Parameter): The parameter being validated.
+    value: The value of the key parameter.
+
+Raises:
+    click.BadParameter: If the validation fails.
+
+Returns:
+    value: The validated key value if successful, otherwise raises an error.
+"""
+
     cert = ctx.params.get("cert")
     is_adhoc = cert == "adhoc"
 
