@@ -252,6 +252,7 @@ Args:
 Returns:
     None
 """
+
         self.app = app
         self.url_adapter = app.create_url_adapter(None)
         self.g: _AppCtxGlobals = app.app_ctx_globals_class()
@@ -337,14 +338,15 @@ The method initializes the internal state of the class by setting up the request
 After initialization, any functions that should be executed after the request on the response object can be added to the `_after_request_functions` list.
 
 Parameters:
-app (Flask): The Flask application instance.
-environ (WSGIEnvironment): The WSGI environment.
-request (Request | None): An optional request object. Defaults to None.
-session (SessionMixin | None): An optional session mixin object. Defaults to None.
+- `app`: The Flask application instance.
+- `environ`: The WSGI environment.
+- `request`: An optional request object. Defaults to None.
+- `session`: An optional session mixin object. Defaults to None.
 
 Returns:
 None
 """
+
         self.app = app
         if request is None:
             request = app.request_class(environ)

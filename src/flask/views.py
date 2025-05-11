@@ -120,6 +120,7 @@ Returns:
 Raises:
     None
 """
+
                 self = view.view_class(  # type: ignore[attr-defined]
                     *class_args, **class_kwargs
                 )
@@ -130,8 +131,6 @@ Raises:
 
             def view(**kwargs: t.Any) -> ft.ResponseReturnValue:
                 """
-View a request.
-
 Dispatches the given request to the appropriate handler and returns the response.
 
 Args:
@@ -140,6 +139,7 @@ Args:
 Returns:
     ft.ResponseReturnValue: The response returned by the dispatched request.
 """
+
                 return current_app.ensure_sync(self.dispatch_request)(**kwargs)  # type: ignore[no-any-return]
 
         if cls.decorators:

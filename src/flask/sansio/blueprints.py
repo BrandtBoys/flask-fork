@@ -698,7 +698,11 @@ Args:
     code (type[Exception] | int): The exception code or integer to use for error handling.
 Returns:
     T_error_handler: A decorator that can be used to register an error handler function.
+
+Raises:
+    Exception: If an error occurs during error handling.
 """
+
 
         def decorator(f: T_error_handler) -> T_error_handler:
             """

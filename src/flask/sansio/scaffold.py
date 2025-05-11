@@ -311,6 +311,7 @@ Args:
 Returns:
     None
 """
+
         if value is not None:
             value = os.fspath(value).rstrip(r"\/")
 
@@ -385,6 +386,7 @@ Returns:
 Raises:
     TypeError: If the 'methods' argument is provided in the options dictionary.
 """
+
         if "methods" in options:
             raise TypeError("Use the 'route' decorator to use the 'methods' argument.")
 

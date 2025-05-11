@@ -75,6 +75,7 @@ Returns:
 Raises:
     RequestRedirect: A custom exception with information about the redirect.
 """
+
         exc = request.routing_exception
         assert isinstance(exc, RequestRedirect)
         buf = [

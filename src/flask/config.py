@@ -33,6 +33,7 @@ Args:
 Returns:
     None
 """
+
         self.__name__ = name
         self.get_converter = get_converter
 
@@ -42,7 +43,20 @@ Returns:
 
     @t.overload
     def __get__(self, obj: App, owner: type[App]) -> T:
-        ...
+        """
+Gets an attribute from an instance of the class.
+
+This method is used to implement property access in Python. It allows you to define a getter function for a property and use it with the `@property` decorator.
+
+Args:
+    self (object): The instance of the class.
+    obj (App, optional): The object that owns this attribute. Defaults to None.
+    owner (type[App], optional): The type of the App class. Defaults to None.
+
+Returns:
+    T: The value of the attribute.
+"""
+...
         """
 Gets an attribute from an instance of the class.
 
@@ -73,6 +87,7 @@ Args:
 Returns:
     T | te.Self: The configuration value or self if no object was provided.
 """
+
         if obj is None:
             return self
 
@@ -87,7 +102,7 @@ Returns:
         """
 Sets a configuration attribute on an object.
 
-This method is used to set a configuration attribute on an object. The attribute name is determined by the `__name__` attribute of the current instance, and its value is stored in the `config` dictionary of the object's parent class (`App`). 
+This method is used to set a configuration attribute on an object. The attribute name is determined by the `__name__` attribute of the current instance, and its value is stored in the `config` dictionary of the object's parent class (`App`).
 
 Args:
     obj (App): The object that owns this configuration attribute.
@@ -96,6 +111,7 @@ Args:
 Returns:
     None
 """
+
         obj.config[self.__name__] = value
 
 
