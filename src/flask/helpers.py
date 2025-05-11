@@ -155,7 +155,6 @@ Internally, this function checks the number of arguments passed and calls
 
 .. versionadded:: 0.6
 """
-
     if not args:
         return current_app.response_class()
     if len(args) == 1:
