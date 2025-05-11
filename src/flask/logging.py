@@ -16,13 +16,15 @@ if t.TYPE_CHECKING:  # pragma: no cover
 def wsgi_errors_stream() -> t.TextIO:
     """Find the most appropriate error stream for the application. If a request
     is active, log to ``wsgi.errors``, otherwise use ``sys.stderr``.
+    if request:
+        return request.environ["wsgi.errors"]  # type: ignore[no-any-return]
 
+    return sys.stderr
     If you configure your own :class:`logging.StreamHandler`, you may want to
     use this for the stream. If you are using file or dict configuration and
     can't import this directly, you can refer to it as
     ``ext://flask.logging.wsgi_errors_stream``.
     """
-    return request.environ["wsgi.errors"] if request else sys.stderr
 
 
 def has_level_handler(logger: logging.Logger) -> bool:

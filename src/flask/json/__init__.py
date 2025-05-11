@@ -136,6 +136,7 @@ def load(fp: t.IO[t.AnyStr], **kwargs: t.Any) -> t.Any:
 
 
 def jsonify(*args: t.Any, **kwargs: t.Any) -> Response:
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
     """Serialize the given arguments as JSON, and return a
     :class:`~flask.Response` object with the ``application/json``
     mimetype. A dict or list returned from a view will be converted to a
@@ -167,4 +168,3 @@ def jsonify(*args: t.Any, **kwargs: t.Any) -> Response:
 
     .. versionadded:: 0.2
     """
-    return current_app.json.response(*args, **kwargs)
