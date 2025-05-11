@@ -527,20 +527,7 @@ class AppGroup(click.Group):
         wrap_for_ctx = kwargs.pop("with_appcontext", True)
 
         def decorator(f: t.Callable[..., t.Any]) -> click.Command:
-            """
-Decorates a function to create a Click command.
-
-This decorator wraps the provided function in an AppGroup context if `wrap_for_ctx` is True.
-It then calls the `super()` method on the AppGroup class, passing the original function as an argument,
-and returns the result of this call. The `# type: ignore[no-any-return]` comment suppresses a type check warning.
-
-Args:
-    f (t.Callable[..., t.Any]): The function to be decorated.
-
-Returns:
-    click.Command: The decorated Click command.
-"""
-if wrap_for_ctx:
+            if wrap_for_ctx:
             """
 Decorates a function to create a Click command.
 
@@ -1198,7 +1185,6 @@ Args:
 Returns:
     None
 """
-
     try:
         app: WSGIApplication = info.load_app()
     except Exception as e:
@@ -1211,16 +1197,7 @@ Returns:
             def app(
                 environ: WSGIEnvironment, start_response: StartResponse
             ) -> cabc.Iterable[bytes]:
-                """
-WSGI Application Function.
-
-This function serves as the entry point for a web application. It takes in an environment object and a response object,
-and returns an iterable of bytes.
-
-Raises:
-    err: An exception to be raised when the application is unable to handle the request.
-"""
-raise err from None
+                raise err from None
                 """
 WSGI Application Function.
 

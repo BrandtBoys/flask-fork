@@ -439,21 +439,6 @@ Returns:
 
     def _merge_blueprint_funcs(self, app: App, name: str) -> None:
         def extend(
-        """
-Merges blueprint functions into the application's configuration.
-
-This function merges the provided blueprint functions (`bp_dict`) into the
-application's configuration. It updates the `error_handler_spec`, `view_functions`,
-`before_request_funcs`, `after_request_funcs`, `teardown_request_funcs`, `url_default_functions`,
-`url_value_preprocessors`, and `template_context_processors` dictionaries with the merged values.
-
-Args:
-    app (App): The application instance.
-    name (str): The blueprint name to merge functions under.
-
-Returns:
-    None
-"""
             bp_dict: dict[ft.AppOrBlueprintKey, list[t.Any]],
             parent_dict: dict[ft.AppOrBlueprintKey, list[t.Any]],
         ) -> None:
