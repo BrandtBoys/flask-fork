@@ -115,7 +115,7 @@ class _AppCtxGlobals:
 
 
 def after_this_request(
-    f: ft.AfterRequestCallable[t.Any]
+    f: ft.AfterRequestCallable[t.Any],
 ) -> ft.AfterRequestCallable[t.Any]:
     """Executes a function after this request.  This is useful to modify
     response objects.  The function is passed the response object and has
@@ -252,7 +252,7 @@ Args:
 Returns:
     None
 """
-self.app = app
+        self.app = app
         self.url_adapter = app.create_url_adapter(None)
         self.g: _AppCtxGlobals = app.app_ctx_globals_class()
         self._cv_tokens: list[contextvars.Token[AppContext]] = []
@@ -345,7 +345,7 @@ session (SessionMixin | None): An optional session mixin object. Defaults to Non
 Returns:
 None
 """
-self.app = app
+        self.app = app
         if request is None:
             request = app.request_class(environ)
             request.json_module = app.json

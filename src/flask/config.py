@@ -33,7 +33,7 @@ Args:
 Returns:
     None
 """
-self.__name__ = name
+        self.__name__ = name
         self.get_converter = get_converter
 
     @t.overload
@@ -42,6 +42,7 @@ self.__name__ = name
 
     @t.overload
     def __get__(self, obj: App, owner: type[App]) -> T:
+        ...
         """
 Gets an attribute from an instance of the class.
 
@@ -55,7 +56,6 @@ Args:
 Returns:
     T: The value of the attribute.
 """
-...
 
     def __get__(self, obj: App | None, owner: type[App] | None = None) -> T | te.Self:
         """
@@ -73,7 +73,7 @@ Args:
 Returns:
     T | te.Self: The configuration value or self if no object was provided.
 """
-if obj is None:
+        if obj is None:
             return self
 
         rv = obj.config[self.__name__]
@@ -96,7 +96,7 @@ Args:
 Returns:
     None
 """
-obj.config[self.__name__] = value
+        obj.config[self.__name__] = value
 
 
 class Config(dict):  # type: ignore[type-arg]
@@ -160,7 +160,7 @@ Initialize the documentation assistant.
 
 None
 """
-super().__init__(defaults or {})
+        super().__init__(defaults or {})
         self.root_path = root_path
 
     def from_envvar(self, variable_name: str, silent: bool = False) -> bool:
@@ -269,7 +269,6 @@ Returns:
 .. versionadded:: 0.7
    silent parameter.
 """
-
         filename = os.path.join(self.root_path, filename)
         d = types.ModuleType("config")
         d.__file__ = filename
@@ -356,7 +355,6 @@ using the ``load`` parameter. The loaded data is passed to the
 
 .. versionadded:: 2.0
 """
-
         filename = os.path.join(self.root_path, filename)
 
         try:

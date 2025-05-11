@@ -252,7 +252,7 @@ Raises:
     AssertionError: If `static_host` and `host_matching` do not match, or if 
         `static_folder` exists but `static_url_path` is not provided.
 """
-super().__init__(
+        super().__init__(
             import_name=import_name,
             static_url_path=static_url_path,
             static_folder=static_folder,
@@ -470,7 +470,6 @@ It's intended for internal use only.
 :meta private:
 :internal:
 """
-
         if (
             not self.debug
             or not isinstance(request.routing_exception, RequestRedirect)
@@ -500,7 +499,6 @@ Args:
 Returns:
     None
 """
-
         names: t.Iterable[str | None] = (None,)
 
         # A template may be rendered outside a request context.
@@ -883,7 +881,6 @@ Returns:
 Raises:
     None
 """
-
         req = request_ctx.request
         if req.routing_exception is not None:
             self.raise_routing_exception(req)
@@ -970,7 +967,6 @@ Override this method to change how the app runs async views.
 
 .. versionadded:: 2.0
 """
-
         if iscoroutinefunction(func):
             return self.async_to_sync(func)
 
@@ -1002,7 +998,6 @@ Version Added: 2.0
 Raises:
     RuntimeError: If Flask is not installed with the 'async' extra.
 """
-
         try:
             from asgiref.sync import async_to_sync as asgiref_async_to_sync
         except ImportError:
@@ -1290,7 +1285,6 @@ Args:
 Returns:
     ft.ResponseReturnValue | None: The result of the before request handlers, or None if no handler returns a non-None value.
 """
-
         names = (None, *reversed(request.blueprints))
 
         for name in names:
@@ -1431,7 +1425,6 @@ Use :meth:`test_request_context` to create an environment and context instead of
 :param environ: a WSGI environment
 :return: a :class:`~flask.ctx.RequestContext`
 """
-
         return RequestContext(self, environ)
 
     def test_request_context(self, *args: t.Any, **kwargs: t.Any) -> RequestContext:
@@ -1522,7 +1515,6 @@ can continue to call methods on it.
 
 :returns: An iterable of bytes representing the response.
 """
-
         ctx = self.request_context(environ)
         error: BaseException | None = None
         try:
@@ -1564,5 +1556,4 @@ Args:
 Returns:
     cabc.Iterable[bytes]: An iterable of bytes representing the response body.
 """
-
         return self.wsgi_app(environ, start_response)

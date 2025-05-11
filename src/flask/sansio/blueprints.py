@@ -112,7 +112,6 @@ Args:
 Returns:
     None
 """
-
         if self.url_prefix is not None:
             if rule:
                 rule = "/".join((self.url_prefix.rstrip("/"), rule.lstrip("/")))
@@ -230,7 +229,7 @@ Attributes:
     _blueprints (list[tuple[Blueprint, dict[str, t.Any]]]): A list of blueprints and their configurations.
 
 """
-super().__init__(
+        super().__init__(
             import_name=import_name,
             static_folder=static_folder,
             static_url_path=static_url_path,
@@ -281,7 +280,6 @@ Args:
 Returns:
     None
 """
-
         self.deferred_functions.append(func)
 
     @setupmethod
@@ -299,7 +297,6 @@ Args:
 Returns:
     None
 """
-
 
         def wrapper(state: BlueprintSetupState) -> None:
             if state.first_registration:
@@ -441,6 +438,7 @@ Returns:
             blueprint.register(app, bp_options)
 
     def _merge_blueprint_funcs(self, app: App, name: str) -> None:
+        def extend(
         """
 Merges blueprint functions into the application's configuration.
 
@@ -456,7 +454,6 @@ Args:
 Returns:
     None
 """
-def extend(
             bp_dict: dict[ft.AppOrBlueprintKey, list[t.Any]],
             parent_dict: dict[ft.AppOrBlueprintKey, list[t.Any]],
         ) -> None:
@@ -471,7 +468,7 @@ Args:
 Returns:
     None
 """
-for key, values in bp_dict.items():
+            for key, values in bp_dict.items():
                 key = name if key is None else f"{name}.{key}"
                 parent_dict[key].extend(values)
 
@@ -703,7 +700,6 @@ Returns:
     T_error_handler: A decorator that can be used to register an error handler function.
 """
 
-
         def decorator(f: T_error_handler) -> T_error_handler:
             """
 Decorates an error handler function with the ability to be registered once in a Blueprint's setup.
@@ -714,7 +710,7 @@ Args:
 Returns:
     T_error_handler: The decorated error handler function.
 """
-def from_blueprint(state: BlueprintSetupState) -> None:
+            def from_blueprint(state: BlueprintSetupState) -> None:
                 """
 Handles error handling for an application using a blueprint setup state.
 
@@ -725,7 +721,7 @@ Returns:
 Raises:
     Exception: If an error occurs during error handling.
 """
-state.app.errorhandler(code)(f)
+                state.app.errorhandler(code)(f)
 
             self.record_once(from_blueprint)
             return f

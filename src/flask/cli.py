@@ -55,7 +55,6 @@ Flask: The best possible Flask application in the module.
 Raises:
 NoAppException: If no suitable Flask application or factory function is found.
 """
-
     from . import Flask
 
     # Search for the most common names first.
@@ -112,7 +111,6 @@ Checks whether calling a function raised a ``TypeError`` because the call failed
 :param f: The function that was called.
 :return: ``True`` if the call failed, ``False`` otherwise.
 """
-
     tb = sys.exc_info()[2]
 
     try:
@@ -151,7 +149,6 @@ Raises:
         name or function call, or if the retrieved attribute is not a valid
         Flask application.
 """
-
     from . import Flask
 
     # Parse app_name as a single expression to determine if it's a valid
@@ -241,7 +238,6 @@ Args:
 Returns:
     str: The calculated Python module name.
 """
-
     path = os.path.realpath(path)
 
     fname, ext = os.path.splitext(path)
@@ -271,6 +267,7 @@ Returns:
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[True] = True
 ) -> Flask:
+    ...
     """
 Locate an application within a given Flask module.
 
@@ -288,13 +285,13 @@ Returns:
 Raises:
     ValueError: If `app_name` is not provided and `raise_if_not_found` is False.
 """
-...
 
 
 @t.overload
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[False] = ...
 ) -> Flask | None:
+    ...
     """
 Locate an application within a given module.
 
@@ -312,12 +309,12 @@ Returns:
 Raises:
     ValueError: If `raise_if_not_found` is set to `True` and the application is not found.
 """
-...
 
 
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: bool = True
 ) -> Flask | None:
+    try:
     """
 Locate an application within a given module.
 
@@ -334,7 +331,6 @@ Args:
 Returns:
     - The located Flask application, or None if no application was found.
 """
-try:
         __import__(module_name)
     except ImportError:
         # Reraise the ImportError if it occurred within the imported module.
@@ -374,7 +370,7 @@ Args:
 Returns:
     None
 """
-if not value or ctx.resilient_parsing:
+    if not value or ctx.resilient_parsing:
         return
 
     flask_version = importlib.metadata.version("flask")
@@ -440,7 +436,6 @@ Returns:
 Raises:
     NoAppException: If no Flask application can be found
 """
-
         if self._loaded_app is not None:
             return self._loaded_app
 
@@ -498,7 +493,6 @@ decorator is not required in that case.
     ``app.cli`` command and parameter callbacks.
 """
 
-
     @click.pass_context
     def decorator(ctx: click.Context, /, *args: t.Any, **kwargs: t.Any) -> t.Any:
         """
@@ -516,7 +510,7 @@ Args:
 Returns:
     t.Any: The result of the decorated function invocation.
 """
-if not current_app:
+        if not current_app:
             app = ctx.ensure_object(ScriptInfo).load_app()
             ctx.with_resource(app.app_context())
 
@@ -564,10 +558,10 @@ class AppGroup(click.Group):
     method of the same name on a regular :class:`click.Group`, but it provides an 
     additional option to disable this behavior.
 """
-
         wrap_for_ctx = kwargs.pop("with_appcontext", True)
 
         def decorator(f: t.Callable[..., t.Any]) -> click.Command:
+            if wrap_for_ctx:
             """
 Decorates a function to create a Click command.
 
@@ -581,7 +575,6 @@ Args:
 Returns:
     click.Command: The decorated Click command.
 """
-if wrap_for_ctx:
                 f = with_appcontext(f)
             return super(AppGroup, self).command(*args, **kwargs)(f)  # type: ignore[no-any-return]
 
@@ -767,7 +760,7 @@ Args:
 Returns:
     None
 """
-if self._loaded_plugin_commands:
+        if self._loaded_plugin_commands:
             return
 
         if sys.version_info >= (3, 10):
@@ -801,7 +794,7 @@ Args:
 Returns:
     click.Command | None: The specified command or `None` if not found.
 """
-self._load_plugin_commands()
+        self._load_plugin_commands()
         # Look up built-in and plugin commands, which should be
         # available even if the app fails to load.
         rv = super().get_command(ctx, name)
@@ -842,7 +835,7 @@ Args:
 Returns:
     list[str]: A sorted list of all available commands.
 """
-self._load_plugin_commands()
+        self._load_plugin_commands()
         # Start with the built-in and plugin commands.
         rv = set(super().list_commands(ctx))
         info = ctx.ensure_object(ScriptInfo)
@@ -910,7 +903,6 @@ Parameters:
 Returns:
     bool: Whether `path` is an ancestor of `other`.
 """
-
     return os.path.join(path, other[len(path) :].lstrip(os.sep)) == other
 
 
@@ -987,7 +979,6 @@ Args:
 Returns:
     None
 """
-
     if is_running_from_reloader():
         return
 
@@ -1017,11 +1008,12 @@ and will attempt to resolve the path if possible.
 Attributes:
     path_type (click.Path): The path type attribute of this instance.
 """
-self.path_type = click.Path(exists=True, dir_okay=False, resolve_path=True)
+        self.path_type = click.Path(exists=True, dir_okay=False, resolve_path=True)
 
     def convert(
         self, value: t.Any, param: click.Parameter | None, ctx: click.Context | None
     ) -> t.Any:
+        try:
         """
 Converts a given value to its corresponding type.
 
@@ -1040,7 +1032,6 @@ Returns:
 Raises:
     click.BadParameter: If the conversion fails or if a required library is not installed.
 """
-try:
             import ssl
         except ImportError:
             raise click.BadParameter(
@@ -1228,7 +1219,6 @@ Args:
 Returns:
     None
 """
-
     try:
         app: WSGIApplication = info.load_app()
     except Exception as e:
@@ -1241,6 +1231,7 @@ Returns:
             def app(
                 environ: WSGIEnvironment, start_response: StartResponse
             ) -> cabc.Iterable[bytes]:
+                raise err from None
                 """
 WSGI Application Function.
 
@@ -1250,7 +1241,6 @@ and returns an iterable of bytes.
 Raises:
     err: An exception to be raised when the application is unable to handle the request.
 """
-raise err from None
 
         else:
             # When not reloading, raise the error immediately so the
@@ -1305,7 +1295,6 @@ Raises:
 See Also:
     https://flask.palletsprojects.com/en/2.0.x/api/#flask.Flask.make_shell_context
 """
-
     import code
 
     banner = (

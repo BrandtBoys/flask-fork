@@ -75,7 +75,7 @@ Returns:
 Raises:
     RequestRedirect: A custom exception with information about the redirect.
 """
-exc = request.routing_exception
+        exc = request.routing_exception
         assert isinstance(exc, RequestRedirect)
         buf = [
             f"A request was sent to '{request.url}', but routing issued"
@@ -105,12 +105,12 @@ Patch `request.files.__getitem__` to raise a descriptive error about `enctype=mu
 :param request: The request to patch.
 :meta private:
 """
-
     oldcls = request.files.__class__
 
     class newcls(oldcls):  # type: ignore[valid-type, misc]
         def __getitem__(self, key: str) -> t.Any:
             """
+            try:
 Raises a `DebugFilesKeyError` exception when the provided key is not found in the request form.
 If the key is present but raises a KeyError, it will be re-raised with additional context.
 
@@ -124,7 +124,6 @@ Raises:
     DebugFilesKeyError: If the key is not found in the request form.
     KeyError: If the key is present but raises a KeyError.
 """
-try:
                 return super().__getitem__(key)
             except KeyError as e:
                 if key not in request.form:
@@ -156,7 +155,6 @@ def _dump_loader_info(loader: BaseLoader) -> t.Iterator[str]:
         yield f"{key}: {value!r}"
 
 
-    """This should help developers understand what failed"""
 def explain_template_loading_attempts(
     app: App,
     template: str,

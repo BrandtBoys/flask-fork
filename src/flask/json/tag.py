@@ -93,7 +93,6 @@ Args:
 Returns:
     dict[str, t.Any]: A dictionary containing the converted value wrapped in a tag structure.
 """
-
         return {self.key: self.to_json(value)}
 
 
@@ -270,7 +269,6 @@ class TaggedJSONSerializer:
 Registers a new tag with this serializer.
 
 Parameters
-----------
 tag_class : type[JSONTag]
     Tag class to register. Will be instantiated with this serializer instance.
 force : bool, optional
@@ -281,11 +279,9 @@ index : int | None, optional
     the end of the order.
 
 Raises
-------
 KeyError
     If the tag key is already registered and force is not true.
 """
-
         tag = tag_class(self)
         key = tag.key
 
@@ -310,7 +306,6 @@ Args:
 Returns:
     t.Any: The tagged representation of the value if found, otherwise the original value.
 """
-
         for tag in self.order:
             if tag.check(value):
                 return tag.tag(value)

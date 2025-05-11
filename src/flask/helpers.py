@@ -48,7 +48,7 @@ def get_load_dotenv(default: bool = True) -> bool:
 
 
 def stream_with_context(
-    generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]]
+    generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]],
 ) -> t.Iterator[t.AnyStr]:
     """Request contexts disappear when the response is started on the server.
     This is done for efficiency reasons and to make it less likely to encounter
@@ -101,7 +101,7 @@ Returns:
 Note:
     This decorator is used to convert a function or generator into an iterator that can be used with the `stream_with_context` function.
 """
-gen = generator_or_function(*args, **kwargs)  # type: ignore[operator]
+            gen = generator_or_function(*args, **kwargs)  # type: ignore[operator]
             return stream_with_context(gen)
 
         return update_wrapper(decorator, generator_or_function)  # type: ignore[arg-type]
@@ -546,7 +546,6 @@ Version History:
     0.5: Moved implementation to Werkzeug, now a wrapper to pass
         some Flask-specific arguments.
 """
-
     return werkzeug.utils.send_from_directory(  # type: ignore[return-value]
         directory, path, **_prepare_send_file_kwargs(**kwargs)
     )
@@ -571,7 +570,6 @@ Raises:
     ValueError: If the module cannot be found.
     RuntimeError: If the module is a namespace package and no file path can be found.
 """
-
     # Module already imported and has a file attribute. Use that first.
     mod = sys.modules.get(import_name)
 

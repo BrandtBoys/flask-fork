@@ -49,7 +49,7 @@ Args:
 Returns:
     F: The decorated method.
 """
-f_name = f.__name__
+    f_name = f.__name__
 
     def wrapper_func(self: Scaffold, *args: t.Any, **kwargs: t.Any) -> t.Any:
         """
@@ -74,7 +74,7 @@ Note:
 This function is a wrapper and does not modify the behavior of the underlying `f` method.
 It is intended to provide additional functionality or error checking before calling the original method.
 """
-self._check_setup_finished(f_name)
+        self._check_setup_finished(f_name)
         return f(self, *args, **kwargs)
 
     return t.cast(F, update_wrapper(wrapper_func, f))
@@ -144,7 +144,7 @@ Attributes:
 Raises:
     TypeError: If any parameter is not of the correct type.
 """
-self.import_name = import_name
+        self.import_name = import_name
 
         self.static_folder = static_folder  # type: ignore
         self.static_url_path = static_url_path
@@ -311,7 +311,7 @@ Args:
 Returns:
     None
 """
-if value is not None:
+        if value is not None:
             value = os.fspath(value).rstrip(r"\/")
 
         self._static_folder = value
@@ -385,7 +385,7 @@ Returns:
 Raises:
     TypeError: If the 'methods' argument is provided in the options dictionary.
 """
-if "methods" in options:
+        if "methods" in options:
             raise TypeError("Use the 'route' decorator to use the 'methods' argument.")
 
         return self.route(rule, methods=[method], **options)
@@ -831,7 +831,6 @@ Returns:
 Raises:
     ValueError: If the module is not found.
 """
-
     root_mod_name, _, _ = import_name.partition(".")
 
     try:

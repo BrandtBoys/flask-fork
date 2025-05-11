@@ -16,7 +16,10 @@ if t.TYPE_CHECKING:  # pragma: no cover
 def wsgi_errors_stream() -> t.TextIO:
     """
 Find the most appropriate error stream for the application.
+    if request:
+        return request.environ["wsgi.errors"]  # type: ignore[no-any-return]
 
+    return sys.stderr
 If a request is active, log to `wsgi.errors`, otherwise use `sys.stderr`.
 
 Returns:
@@ -29,7 +32,6 @@ See Also:
     :class:`logging.StreamHandler`
     ext://flask.logging.wsgi_errors_stream
 """
-
 
 
 def has_level_handler(logger: logging.Logger) -> bool:

@@ -120,7 +120,7 @@ Returns:
 Raises:
     None
 """
-self = view.view_class(  # type: ignore[attr-defined]
+                self = view.view_class(  # type: ignore[attr-defined]
                     *class_args, **class_kwargs
                 )
                 return current_app.ensure_sync(self.dispatch_request)(**kwargs)  # type: ignore[no-any-return]
@@ -140,7 +140,7 @@ Args:
 Returns:
     ft.ResponseReturnValue: The response returned by the dispatched request.
 """
-return current_app.ensure_sync(self.dispatch_request)(**kwargs)  # type: ignore[no-any-return]
+                return current_app.ensure_sync(self.dispatch_request)(**kwargs)  # type: ignore[no-any-return]
 
         if cls.decorators:
             view.__name__ = name

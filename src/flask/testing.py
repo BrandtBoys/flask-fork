@@ -161,7 +161,6 @@ Raises:
     TypeError: If cookies are disabled and not created with 'use_cookies=True'.
     RuntimeError: If the session backend did not open a session.
 """
-
         if self._cookies is None:
             raise TypeError(
                 "Cookies are disabled. Create a client with 'use_cookies=True'."
@@ -204,7 +203,7 @@ Args:
 Returns:
     WSGIEnvironment: A new WSGIEnvironment instance with the copied environment.
 """
-out = {**self.environ_base, **other}
+        out = {**self.environ_base, **other}
 
         if self.preserve_context:
             out["werkzeug.debug.preserve_context"] = self._new_contexts.append
@@ -230,7 +229,7 @@ Raises:
 Note:
     This function creates an EnvironBuilder instance and uses it to get a request. It ensures the builder is properly closed after use.
 """
-kwargs["environ_base"] = self._copy_environ(kwargs.get("environ_base", {}))
+        kwargs["environ_base"] = self._copy_environ(kwargs.get("environ_base", {}))
         builder = EnvironBuilder(self.application, *args, **kwargs)
 
         try:
@@ -262,7 +261,7 @@ Returns:
 Raises:
     ValueError: If the provided arguments are invalid.
 """
-if args and isinstance(
+        if args and isinstance(
             args[0], (werkzeug.test.EnvironBuilder, dict, BaseRequest)
         ):
             if isinstance(args[0], werkzeug.test.EnvironBuilder):
@@ -348,7 +347,6 @@ Parameters:
 Returns:
     a :class:`~click.testing.Result` object.
 """
-
         if cli is None:
             cli = self.app.cli
 

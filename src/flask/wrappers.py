@@ -66,7 +66,6 @@ Args:
 Returns:
     int | None: The maximum allowed content length or `None` if not configured.
 """
-
         if current_app:
             return current_app.config["MAX_CONTENT_LENGTH"]  # type: ignore[no-any-return]
         else:
@@ -181,7 +180,6 @@ Werkzeug's default value, depending on whether a current application context is 
 Returns:
     int: The maximum allowed cookie size.
 """
-
         if current_app:
             return current_app.config["MAX_COOKIE_SIZE"]  # type: ignore[no-any-return]
 
