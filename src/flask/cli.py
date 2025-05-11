@@ -791,7 +791,6 @@ Raises:
 Returns:
     value: The validated key value if successful, otherwise raises an error.
 """
-
     cert = ctx.params.get("cert")
     is_adhoc = cert == "adhoc"
 
