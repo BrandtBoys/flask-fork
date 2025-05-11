@@ -42,7 +42,20 @@ Returns:
 
     @t.overload
     def __get__(self, obj: App, owner: type[App]) -> T:
-        ...
+        """
+Gets an attribute from an instance of the class.
+
+This method is used to implement property access in Python. It allows you to define a getter function for a property and use it with the `@property` decorator.
+
+Args:
+    self (object): The instance of the class.
+    obj (App, optional): The object that owns this attribute. Defaults to None.
+    owner (type[App], optional): The type of the App class. Defaults to None.
+
+Returns:
+    T: The value of the attribute.
+"""
+...
         """
 Gets an attribute from an instance of the class.
 
