@@ -14,7 +14,10 @@ if t.TYPE_CHECKING:  # pragma: no cover
 
 @LocalProxy
 def wsgi_errors_stream() -> t.TextIO:
-    return request.environ["wsgi.errors"] if request else sys.stderr
+    if request:
+        return request.environ["wsgi.errors"]  # type: ignore[no-any-return]
+
+    return sys.stderr
 
 
 def has_level_handler(logger: logging.Logger) -> bool:
@@ -51,4 +54,3 @@ def create_logger(app: App) -> logging.Logger:
         logger.addHandler(default_handler)
 
     return logger
-

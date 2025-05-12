@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing as t
 
 from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import Request as RequestBase
 from werkzeug.wrappers import Response as ResponseBase
 
@@ -49,12 +50,12 @@ class Request(RequestBase):
     #: raised / was raised as part of the request handling.  This is
     #: usually a :exc:`~werkzeug.exceptions.NotFound` exception or
     #: something similar.
-    routing_exception: Exception | None = None
+    routing_exception: HTTPException | None = None
 
     @property
-    def max_content_length(self) -> int | None:  # type: ignore
+    def max_content_length(self) -> int | None:  # type: ignore[override]
         if current_app:
-            return current_app.config["MAX_CONTENT_LENGTH"]
+            return current_app.config["MAX_CONTENT_LENGTH"]  # type: ignore[no-any-return]
         else:
             return None
 
@@ -135,8 +136,7 @@ class Response(ResponseBase):
     @property
     def max_cookie_size(self) -> int:  # type: ignore
         if current_app:
-            return current_app.config["MAX_COOKIE_SIZE"]
+            return current_app.config["MAX_COOKIE_SIZE"]  # type: ignore[no-any-return]
 
         # return Werkzeug's default when not in an app context
         return super().max_cookie_size
-

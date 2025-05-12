@@ -17,6 +17,7 @@ from .cli import ScriptInfo
 from .sessions import SessionMixin
 
 if t.TYPE_CHECKING:  # pragma: no cover
+    from _typeshed.wsgi import WSGIEnvironment
     from werkzeug.test import TestResponse
 
     from .app import Flask
@@ -129,7 +130,7 @@ class FlaskClient(Client):
     @contextmanager
     def session_transaction(
         self, *args: t.Any, **kwargs: t.Any
-    ) -> t.Generator[SessionMixin, None, None]:
+    ) -> t.Iterator[SessionMixin]:
         if self._cookies is None:
             raise TypeError(
                 "Cookies are disabled. Create a client with 'use_cookies=True'."
@@ -160,7 +161,7 @@ class FlaskClient(Client):
             resp.headers.getlist("Set-Cookie"),
         )
 
-    def _copy_environ(self, other):
+    def _copy_environ(self, other: WSGIEnvironment) -> WSGIEnvironment:
         out = {**self.environ_base, **other}
 
         if self.preserve_context:
@@ -168,7 +169,9 @@ class FlaskClient(Client):
 
         return out
 
-    def _request_from_builder_args(self, args, kwargs):
+    def _request_from_builder_args(
+        self, args: tuple[t.Any, ...], kwargs: dict[str, t.Any]
+    ) -> BaseRequest:
         kwargs["environ_base"] = self._copy_environ(kwargs.get("environ_base", {}))
         builder = EnvironBuilder(self.application, *args, **kwargs)
 
@@ -189,7 +192,7 @@ class FlaskClient(Client):
         ):
             if isinstance(args[0], werkzeug.test.EnvironBuilder):
                 builder = copy(args[0])
-                builder.environ_base = self._copy_environ(builder.environ_base or {})
+                builder.environ_base = self._copy_environ(builder.environ_base or {})  # type: ignore[arg-type]
                 request = builder.get_request()
             elif isinstance(args[0], dict):
                 request = EnvironBuilder.from_environ(
@@ -252,10 +255,9 @@ class FlaskCliRunner(CliRunner):
         self, cli: t.Any = None, args: t.Any = None, **kwargs: t.Any
     ) -> t.Any:
         if cli is None:
-            cli = self.app.cli  # type: ignore
+            cli = self.app.cli
 
         if "obj" not in kwargs:
             kwargs["obj"] = ScriptInfo(create_app=lambda: self.app)
 
         return super().invoke(cli, args, **kwargs)
-

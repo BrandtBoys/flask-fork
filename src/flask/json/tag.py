@@ -61,9 +61,9 @@ class JSONTag:
 
     __slots__ = ("serializer",)
 
-    #: The tag to mark the serialized object with. If ``None``, this tag is
+    #: The tag to mark the serialized object with. If empty, this tag is
     #: only used as an intermediate step during tagging.
-    key: str | None = None
+    key: str = ""
 
     def __init__(self, serializer: TaggedJSONSerializer) -> None:
         self.serializer = serializer
@@ -77,7 +77,7 @@ class JSONTag:
     def to_python(self, value: t.Any) -> t.Any:
         raise NotImplementedError
 
-    def tag(self, value: t.Any) -> t.Any:
+    def tag(self, value: t.Any) -> dict[str, t.Any]:
         return {self.key: self.to_json(value)}
 
 
@@ -253,7 +253,7 @@ class TaggedJSONSerializer:
         tag = tag_class(self)
         key = tag.key
 
-        if key is not None:
+        if key:
             if not force and key in self.tags:
                 raise KeyError(f"Tag '{key}' is already registered.")
 
@@ -264,7 +264,7 @@ class TaggedJSONSerializer:
         else:
             self.order.insert(index, tag)
 
-    def tag(self, value: t.Any) -> dict[str, t.Any]:
+    def tag(self, value: t.Any) -> t.Any:
         for tag in self.order:
             if tag.check(value):
                 return tag.tag(value)

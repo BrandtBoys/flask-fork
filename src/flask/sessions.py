@@ -13,12 +13,15 @@ from werkzeug.datastructures import CallbackDict
 from .json.tag import TaggedJSONSerializer
 
 if t.TYPE_CHECKING:  # pragma: no cover
+    import typing_extensions as te
+
     from .app import Flask
     from .wrappers import Request
     from .wrappers import Response
 
 
-class SessionMixin(MutableMapping):
+# TODO generic when Python > 3.8
+class SessionMixin(MutableMapping):  # type: ignore[type-arg]
     """Expands a basic dictionary with session attributes."""
 
     @property
@@ -45,7 +48,8 @@ class SessionMixin(MutableMapping):
     accessed = True
 
 
-class SecureCookieSession(CallbackDict, SessionMixin):
+# TODO generic when Python > 3.8
+class SecureCookieSession(CallbackDict, SessionMixin):  # type: ignore[type-arg]
     """Base class for sessions based on signed cookies.
 
     This session backend will set the :attr:`modified` and
@@ -68,7 +72,7 @@ class SecureCookieSession(CallbackDict, SessionMixin):
     accessed = False
 
     def __init__(self, initial: t.Any = None) -> None:
-        def on_update(self) -> None:
+        def on_update(self: te.Self) -> None:
             self.modified = True
             self.accessed = True
 
@@ -161,23 +165,22 @@ class SessionInterface:
         return isinstance(obj, self.null_session_class)
 
     def get_cookie_name(self, app: Flask) -> str:
-        return app.config["SESSION_COOKIE_NAME"]
+        return app.config["SESSION_COOKIE_NAME"]  # type: ignore[no-any-return]
 
     def get_cookie_domain(self, app: Flask) -> str | None:
-        rv = app.config["SESSION_COOKIE_DOMAIN"]
-        return rv if rv else None
+        return app.config["SESSION_COOKIE_DOMAIN"]  # type: ignore[no-any-return]
 
     def get_cookie_path(self, app: Flask) -> str:
-        return app.config["SESSION_COOKIE_PATH"] or app.config["APPLICATION_ROOT"]
+        return app.config["SESSION_COOKIE_PATH"] or app.config["APPLICATION_ROOT"]  # type: ignore[no-any-return]
 
     def get_cookie_httponly(self, app: Flask) -> bool:
-        return app.config["SESSION_COOKIE_HTTPONLY"]
+        return app.config["SESSION_COOKIE_HTTPONLY"]  # type: ignore[no-any-return]
 
     def get_cookie_secure(self, app: Flask) -> bool:
-        return app.config["SESSION_COOKIE_SECURE"]
+        return app.config["SESSION_COOKIE_SECURE"]  # type: ignore[no-any-return]
 
-    def get_cookie_samesite(self, app: Flask) -> str:
-        return app.config["SESSION_COOKIE_SAMESITE"]
+    def get_cookie_samesite(self, app: Flask) -> str | None:
+        return app.config["SESSION_COOKIE_SAMESITE"]  # type: ignore[no-any-return]
 
     def get_expiration_time(self, app: Flask, session: SessionMixin) -> datetime | None:
         if session.permanent:
@@ -294,4 +297,3 @@ class SecureCookieSessionInterface(SessionInterface):
             samesite=samesite,
         )
         response.vary.add("Cookie")
-

@@ -23,7 +23,7 @@ class Blueprint(SansioBlueprint):
         if isinstance(value, timedelta):
             return int(value.total_seconds())
 
-        return value
+        return value  # type: ignore[no-any-return]
 
     def send_static_file(self, filename: str) -> Response:
         if not self.has_static_folder:
@@ -41,4 +41,3 @@ class Blueprint(SansioBlueprint):
             raise ValueError("Resources can only be opened for reading.")
 
         return open(os.path.join(self.root_path, resource), mode)
-
