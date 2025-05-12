@@ -18,3 +18,4 @@ def index():
 @admin.route("/index2")
 def index2():
     return render_template("./admin/index.html")
+
