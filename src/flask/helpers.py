@@ -118,7 +118,6 @@ Returns:
 Raises:
     None
 """
-    
     if not args:
         return current_app.response_class()
     if len(args) == 1:
