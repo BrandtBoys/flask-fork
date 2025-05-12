@@ -173,7 +173,19 @@ def test_jsonify_aware_datetimes(tz):
 
 def test_jsonify_uuid_types(app, client):
 
-    test_uuid = uuid.UUID(bytes=b"\xde\xad\xbe\xef" * 4)
+   """
+Tests the JSONification of UUID types.
+
+This function tests that a UUID object can be successfully serialized to JSON and deserialized back into a UUID object.
+
+Parameters:
+app (Flask application): The Flask application instance.
+client (Flask client): The Flask client instance.
+
+Returns:
+None
+"""
+     test_uuid = uuid.UUID(bytes=b"\xde\xad\xbe\xef" * 4)
     url = "/uuid_test"
     app.add_url_rule(url, url, lambda: flask.jsonify(x=test_uuid))
 

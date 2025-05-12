@@ -39,8 +39,31 @@ Returns:
     @t.overload
     def __get__(self, obj: None, owner: None) -> te.Self: ...
 
-    @t.overload
+    @t."""
+Gets the instance of this descriptor.
+
+Args:
+    obj (None): The object that owns this descriptor. If not provided, returns self.
+    owner (None): The class or type that defines this descriptor. If not provided, returns self.
+
+Returns:
+    te.Self: The instance of this descriptor.
+"""
+        overload
     def __get__(self, obj: App, owner: type[App]) -> T: ...
+        """
+Gets an attribute from an object.
+
+This method is used to implement property access in Python. It allows you to define a getter function for a property of a class.
+
+Args:
+    self (object): The instance of the class.
+    obj (App, optional): The object that owns this property. Defaults to None.
+    owner (type[App], optional): The type of the App class. Defaults to None.
+
+Returns:
+    T: The value of the attribute.
+"""
         """
 Gets an attribute from an instance of the class.
 
