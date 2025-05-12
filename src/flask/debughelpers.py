@@ -73,10 +73,6 @@ class FormDataRoutingRedirect(AssertionError):
 
 
 def attach_enctype_error_multidict(request):
-    """Since Flask 0.8 we're monkeypatching the files object in case a
-    request is detected that does not use multipart form data but the files
-    object is accessed.
-    """
     oldcls = request.files.__class__
 
     class newcls(oldcls):
@@ -111,7 +107,6 @@ def _dump_loader_info(loader) -> t.Generator:
 
 
 def explain_template_loading_attempts(app: Flask, template, attempts) -> None:
-    """This should help developers understand what failed"""
     info = [f"Locating template {template!r}:"]
     total_found = 0
     blueprint = None
@@ -169,3 +164,4 @@ def explain_ignored_app_run() -> None:
             ),
             stacklevel=3,
         )
+

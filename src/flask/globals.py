@@ -57,3 +57,4 @@ session: "SessionMixin" = LocalProxy(  # type: ignore
     partial(_lookup_req_object, "session")
 )
 g: "_AppCtxGlobals" = LocalProxy(partial(_lookup_app_object, "g"))  # type: ignore
+

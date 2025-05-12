@@ -41,7 +41,6 @@ def runner():
 
 
 def test_cli_name(test_apps):
-    """Make sure the CLI object's name is the app's name and not the app itself"""
     from cliapp.app import testapp
 
     assert testapp.cli.name == testapp.name
@@ -185,13 +184,6 @@ def test_find_best_app(test_apps):
     ),
 )
 def test_prepare_import(request, value, path, result):
-    """Expect the correct path to be set and the correct import and app names
-    to be returned.
-
-    :func:`prepare_exec_for_file` has a side effect where the parent directory
-    of the given import is added to :data:`sys.path`. This is reset after the
-    test runs.
-    """
     original_path = sys.path[:]
 
     def reset_path():
@@ -321,9 +313,6 @@ def test_scriptinfo(test_apps, monkeypatch):
 
 
 def test_lazy_load_error(monkeypatch):
-    """When using lazy loading, the correct exception should be
-    re-raised.
-    """
 
     class BadExc(Exception):
         pass
@@ -629,7 +618,6 @@ def test_run_cert_no_ssl(monkeypatch):
 
 
 def test_cli_blueprints(app):
-    """Test blueprint commands register correctly to the application"""
     custom = Blueprint("custom", __name__, cli_group="customized")
     nested = Blueprint("nested", __name__)
     merged = Blueprint("merged", __name__, cli_group=None)
@@ -672,7 +660,6 @@ def test_cli_blueprints(app):
 
 
 def test_cli_empty(app):
-    """If a Blueprint's CLI group is empty, do not register it."""
     bp = Blueprint("blue", __name__, cli_group="blue")
     app.register_blueprint(bp)
 
@@ -686,3 +673,4 @@ def test_click_7_deprecated():
             pytest.deprecated_call(cli_main, match=".* Click 7 is deprecated")
         else:
             cli_main()
+

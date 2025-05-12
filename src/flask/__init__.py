@@ -44,3 +44,4 @@ from .templating import render_template as render_template
 from .templating import render_template_string as render_template_string
 
 __version__ = "2.0.2.dev0"
+

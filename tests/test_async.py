@@ -161,3 +161,4 @@ def test_async_runtime_error():
     app = Flask(__name__)
     with pytest.raises(RuntimeError):
         app.async_to_sync(None)
+

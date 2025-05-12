@@ -60,24 +60,12 @@ class View:
     decorators: t.List[t.Callable] = []
 
     def dispatch_request(self) -> ResponseReturnValue:
-        """Subclasses have to override this method to implement the
-        actual view function code.  This method is called with all
-        the arguments from the URL rule.
-        """
         raise NotImplementedError()
 
     @classmethod
     def as_view(
         cls, name: str, *class_args: t.Any, **class_kwargs: t.Any
     ) -> t.Callable:
-        """Converts the class into an actual view function that can be used
-        with the routing system.  Internally this generates a function on the
-        fly which will instantiate the :class:`View` on each request and call
-        the :meth:`dispatch_request` method on it.
-
-        The arguments passed to :meth:`as_view` are forwarded to the
-        constructor of the class.
-        """
 
         def view(*args: t.Any, **kwargs: t.Any) -> ResponseReturnValue:
             self = view.view_class(*class_args, **class_kwargs)  # type: ignore
@@ -156,3 +144,4 @@ class MethodView(View, metaclass=MethodViewType):
 
         assert meth is not None, f"Unimplemented method {request.method!r}"
         return current_app.ensure_sync(meth)(*args, **kwargs)
+

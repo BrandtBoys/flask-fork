@@ -119,3 +119,4 @@ def test_egg_installed_paths(install_egg, modules_tmpdir, modules_tmpdir_prefix)
     finally:
         if "site_egg" in sys.modules:
             del sys.modules["site_egg"]
+

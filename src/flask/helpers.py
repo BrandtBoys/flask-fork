@@ -27,19 +27,10 @@ if t.TYPE_CHECKING:
 
 
 def get_env() -> str:
-    """Get the environment the app is running in, indicated by the
-    :envvar:`FLASK_ENV` environment variable. The default is
-    ``'production'``.
-    """
     return os.environ.get("FLASK_ENV") or "production"
 
 
 def get_debug_flag() -> bool:
-    """Get whether debug mode should be enabled for the app, indicated
-    by the :envvar:`FLASK_DEBUG` environment variable. The default is
-    ``True`` if :func:`.get_env` returns ``'development'``, or ``False``
-    otherwise.
-    """
     val = os.environ.get("FLASK_DEBUG")
 
     if not val:
@@ -49,12 +40,6 @@ def get_debug_flag() -> bool:
 
 
 def get_load_dotenv(default: bool = True) -> bool:
-    """Get whether the user has disabled loading dotenv files by setting
-    :envvar:`FLASK_SKIP_DOTENV`. The default is ``True``, load the
-    files.
-
-    :param default: What to return if the env var isn't set.
-    """
     val = os.environ.get("FLASK_SKIP_DOTENV")
 
     if not val:
@@ -68,39 +53,6 @@ def stream_with_context(
         t.Iterator[t.AnyStr], t.Callable[..., t.Iterator[t.AnyStr]]
     ]
 ) -> t.Iterator[t.AnyStr]:
-    """Request contexts disappear when the response is started on the server.
-    This is done for efficiency reasons and to make it less likely to encounter
-    memory leaks with badly written WSGI middlewares.  The downside is that if
-    you are using streamed responses, the generator cannot access request bound
-    information any more.
-
-    This function however can help you keep the context around for longer::
-
-        from flask import stream_with_context, request, Response
-
-        @app.route('/stream')
-        def streamed_response():
-            @stream_with_context
-            def generate():
-                yield 'Hello '
-                yield request.args['name']
-                yield '!'
-            return Response(generate())
-
-    Alternatively it can also be used around a specific generator::
-
-        from flask import stream_with_context, request, Response
-
-        @app.route('/stream')
-        def streamed_response():
-            def generate():
-                yield 'Hello '
-                yield request.args['name']
-                yield '!'
-            return Response(stream_with_context(generate()))
-
-    .. versionadded:: 0.9
-    """
     try:
         gen = iter(generator_or_function)  # type: ignore
     except TypeError:
@@ -143,47 +95,6 @@ def stream_with_context(
 
 
 def make_response(*args: t.Any) -> "Response":
-    """Sometimes it is necessary to set additional headers in a view.  Because
-    views do not have to return response objects but can return a value that
-    is converted into a response object by Flask itself, it becomes tricky to
-    add headers to it.  This function can be called instead of using a return
-    and you will get a response object which you can use to attach headers.
-
-    If view looked like this and you want to add a new header::
-
-        def index():
-            return render_template('index.html', foo=42)
-
-    You can now do something like this::
-
-        def index():
-            response = make_response(render_template('index.html', foo=42))
-            response.headers['X-Parachutes'] = 'parachutes are cool'
-            return response
-
-    This function accepts the very same arguments you can return from a
-    view function.  This for example creates a response with a 404 error
-    code::
-
-        response = make_response(render_template('not_found.html'), 404)
-
-    The other use case of this function is to force the return value of a
-    view function into a response which is helpful with view
-    decorators::
-
-        response = make_response(view_function())
-        response.headers['X-Parachutes'] = 'parachutes are cool'
-
-    Internally this function does the following things:
-
-    -   if no arguments are passed, it creates a new response argument
-    -   if one argument is passed, :meth:`flask.Flask.make_response`
-        is invoked with it.
-    -   if more than one argument is passed, the arguments are passed
-        to the :meth:`flask.Flask.make_response` function as tuple.
-
-    .. versionadded:: 0.6
-    """
     if not args:
         return current_app.response_class()
     if len(args) == 1:
@@ -192,81 +103,6 @@ def make_response(*args: t.Any) -> "Response":
 
 
 def url_for(endpoint: str, **values: t.Any) -> str:
-    """Generates a URL to the given endpoint with the method provided.
-
-    Variable arguments that are unknown to the target endpoint are appended
-    to the generated URL as query arguments.  If the value of a query argument
-    is ``None``, the whole pair is skipped.  In case blueprints are active
-    you can shortcut references to the same blueprint by prefixing the
-    local endpoint with a dot (``.``).
-
-    This will reference the index function local to the current blueprint::
-
-        url_for('.index')
-
-    See :ref:`url-building`.
-
-    Configuration values ``APPLICATION_ROOT`` and ``SERVER_NAME`` are only used when
-    generating URLs outside of a request context.
-
-    To integrate applications, :class:`Flask` has a hook to intercept URL build
-    errors through :attr:`Flask.url_build_error_handlers`.  The `url_for`
-    function results in a :exc:`~werkzeug.routing.BuildError` when the current
-    app does not have a URL for the given endpoint and values.  When it does, the
-    :data:`~flask.current_app` calls its :attr:`~Flask.url_build_error_handlers` if
-    it is not ``None``, which can return a string to use as the result of
-    `url_for` (instead of `url_for`'s default to raise the
-    :exc:`~werkzeug.routing.BuildError` exception) or re-raise the exception.
-    An example::
-
-        def external_url_handler(error, endpoint, values):
-            "Looks up an external URL when `url_for` cannot build a URL."
-            # This is an example of hooking the build_error_handler.
-            # Here, lookup_url is some utility function you've built
-            # which looks up the endpoint in some external URL registry.
-            url = lookup_url(endpoint, **values)
-            if url is None:
-                # External lookup did not have a URL.
-                # Re-raise the BuildError, in context of original traceback.
-                exc_type, exc_value, tb = sys.exc_info()
-                if exc_value is error:
-                    raise exc_type(exc_value).with_traceback(tb)
-                else:
-                    raise error
-            # url_for will use this result, instead of raising BuildError.
-            return url
-
-        app.url_build_error_handlers.append(external_url_handler)
-
-    Here, `error` is the instance of :exc:`~werkzeug.routing.BuildError`, and
-    `endpoint` and `values` are the arguments passed into `url_for`.  Note
-    that this is for building URLs outside the current application, and not for
-    handling 404 NotFound errors.
-
-    .. versionadded:: 0.10
-       The `_scheme` parameter was added.
-
-    .. versionadded:: 0.9
-       The `_anchor` and `_method` parameters were added.
-
-    .. versionadded:: 0.9
-       Calls :meth:`Flask.handle_build_error` on
-       :exc:`~werkzeug.routing.BuildError`.
-
-    :param endpoint: the endpoint of the URL (name of the function)
-    :param values: the variable arguments of the URL rule
-    :param _external: if set to ``True``, an absolute URL is generated. Server
-      address can be changed via ``SERVER_NAME`` configuration variable which
-      falls back to the `Host` header, then to the IP and port of the request.
-    :param _scheme: a string specifying the desired URL scheme. The `_external`
-      parameter must be set to ``True`` or a :exc:`ValueError` is raised. The default
-      behavior uses the same scheme as the current request, or
-      :data:`PREFERRED_URL_SCHEME` if no request context is available.
-      This also can be set to an empty string to build protocol-relative
-      URLs.
-    :param _anchor: if provided this is added as anchor to the URL.
-    :param _method: if provided this explicitly specifies an HTTP method.
-    """
     appctx = _app_ctx_stack.top
     reqctx = _request_ctx_stack.top
 
@@ -343,42 +179,10 @@ def url_for(endpoint: str, **values: t.Any) -> str:
 
 
 def get_template_attribute(template_name: str, attribute: str) -> t.Any:
-    """Loads a macro (or variable) a template exports.  This can be used to
-    invoke a macro from within Python code.  If you for example have a
-    template named :file:`_cider.html` with the following contents:
-
-    .. sourcecode:: html+jinja
-
-       {% macro hello(name) %}Hello {{ name }}!{% endmacro %}
-
-    You can access this from Python code like this::
-
-        hello = get_template_attribute('_cider.html', 'hello')
-        return hello('World')
-
-    .. versionadded:: 0.2
-
-    :param template_name: the name of the template
-    :param attribute: the name of the variable of macro to access
-    """
     return getattr(current_app.jinja_env.get_template(template_name).module, attribute)
 
 
 def flash(message: str, category: str = "message") -> None:
-    """Flashes a message to the next request.  In order to remove the
-    flashed message from the session and to display it to the user,
-    the template has to call :func:`get_flashed_messages`.
-
-    .. versionchanged:: 0.3
-       `category` parameter added.
-
-    :param message: the message to be flashed.
-    :param category: the category for the message.  The following values
-                     are recommended: ``'message'`` for any kind of message,
-                     ``'error'`` for errors, ``'info'`` for information
-                     messages and ``'warning'`` for warnings.  However any
-                     kind of string can be used as category.
-    """
     # Original implementation:
     #
     #     session.setdefault('_flashes', []).append((category, message))
@@ -399,34 +203,6 @@ def flash(message: str, category: str = "message") -> None:
 def get_flashed_messages(
     with_categories: bool = False, category_filter: t.Iterable[str] = ()
 ) -> t.Union[t.List[str], t.List[t.Tuple[str, str]]]:
-    """Pulls all flashed messages from the session and returns them.
-    Further calls in the same request to the function will return
-    the same messages.  By default just the messages are returned,
-    but when `with_categories` is set to ``True``, the return value will
-    be a list of tuples in the form ``(category, message)`` instead.
-
-    Filter the flashed messages to one or more categories by providing those
-    categories in `category_filter`.  This allows rendering categories in
-    separate html blocks.  The `with_categories` and `category_filter`
-    arguments are distinct:
-
-    * `with_categories` controls whether categories are returned with message
-      text (``True`` gives a tuple, where ``False`` gives just the message text).
-    * `category_filter` filters the messages down to only those matching the
-      provided categories.
-
-    See :doc:`/patterns/flashing` for examples.
-
-    .. versionchanged:: 0.3
-       `with_categories` parameter added.
-
-    .. versionchanged:: 0.9
-        `category_filter` parameter added.
-
-    :param with_categories: set to ``True`` to also receive categories.
-    :param category_filter: filter of categories to limit return values.  Only
-                            categories in the list will be returned.
-    """
     flashes = _request_ctx_stack.top.flashes
     if flashes is None:
         _request_ctx_stack.top.flashes = flashes = (
@@ -508,107 +284,6 @@ def send_file(
     ] = None,
     cache_timeout: t.Optional[int] = None,
 ):
-    """Send the contents of a file to the client.
-
-    The first argument can be a file path or a file-like object. Paths
-    are preferred in most cases because Werkzeug can manage the file and
-    get extra information from the path. Passing a file-like object
-    requires that the file is opened in binary mode, and is mostly
-    useful when building a file in memory with :class:`io.BytesIO`.
-
-    Never pass file paths provided by a user. The path is assumed to be
-    trusted, so a user could craft a path to access a file you didn't
-    intend. Use :func:`send_from_directory` to safely serve
-    user-requested paths from within a directory.
-
-    If the WSGI server sets a ``file_wrapper`` in ``environ``, it is
-    used, otherwise Werkzeug's built-in wrapper is used. Alternatively,
-    if the HTTP server supports ``X-Sendfile``, configuring Flask with
-    ``USE_X_SENDFILE = True`` will tell the server to send the given
-    path, which is much more efficient than reading it in Python.
-
-    :param path_or_file: The path to the file to send, relative to the
-        current working directory if a relative path is given.
-        Alternatively, a file-like object opened in binary mode. Make
-        sure the file pointer is seeked to the start of the data.
-    :param mimetype: The MIME type to send for the file. If not
-        provided, it will try to detect it from the file name.
-    :param as_attachment: Indicate to a browser that it should offer to
-        save the file instead of displaying it.
-    :param download_name: The default name browsers will use when saving
-        the file. Defaults to the passed file name.
-    :param conditional: Enable conditional and range responses based on
-        request headers. Requires passing a file path and ``environ``.
-    :param etag: Calculate an ETag for the file, which requires passing
-        a file path. Can also be a string to use instead.
-    :param last_modified: The last modified time to send for the file,
-        in seconds. If not provided, it will try to detect it from the
-        file path.
-    :param max_age: How long the client should cache the file, in
-        seconds. If set, ``Cache-Control`` will be ``public``, otherwise
-        it will be ``no-cache`` to prefer conditional caching.
-
-    .. versionchanged:: 2.0
-        ``download_name`` replaces the ``attachment_filename``
-        parameter. If ``as_attachment=False``, it is passed with
-        ``Content-Disposition: inline`` instead.
-
-    .. versionchanged:: 2.0
-        ``max_age`` replaces the ``cache_timeout`` parameter.
-        ``conditional`` is enabled and ``max_age`` is not set by
-        default.
-
-    .. versionchanged:: 2.0
-        ``etag`` replaces the ``add_etags`` parameter. It can be a
-        string to use instead of generating one.
-
-    .. versionchanged:: 2.0
-        Passing a file-like object that inherits from
-        :class:`~io.TextIOBase` will raise a :exc:`ValueError` rather
-        than sending an empty file.
-
-    .. versionadded:: 2.0
-        Moved the implementation to Werkzeug. This is now a wrapper to
-        pass some Flask-specific arguments.
-
-    .. versionchanged:: 1.1
-        ``filename`` may be a :class:`~os.PathLike` object.
-
-    .. versionchanged:: 1.1
-        Passing a :class:`~io.BytesIO` object supports range requests.
-
-    .. versionchanged:: 1.0.3
-        Filenames are encoded with ASCII instead of Latin-1 for broader
-        compatibility with WSGI servers.
-
-    .. versionchanged:: 1.0
-        UTF-8 filenames as specified in :rfc:`2231` are supported.
-
-    .. versionchanged:: 0.12
-        The filename is no longer automatically inferred from file
-        objects. If you want to use automatic MIME and etag support,
-        pass a filename via ``filename_or_fp`` or
-        ``attachment_filename``.
-
-    .. versionchanged:: 0.12
-        ``attachment_filename`` is preferred over ``filename`` for MIME
-        detection.
-
-    .. versionchanged:: 0.9
-        ``cache_timeout`` defaults to
-        :meth:`Flask.get_send_file_max_age`.
-
-    .. versionchanged:: 0.7
-        MIME guessing and etag support for file-like objects was
-        deprecated because it was unreliable. Pass a filename if you are
-        able to, otherwise attach an etag yourself.
-
-    .. versionchanged:: 0.5
-        The ``add_etags``, ``cache_timeout`` and ``conditional``
-        parameters were added. The default behavior is to add etags.
-
-    .. versionadded:: 0.2
-    """
     return werkzeug.utils.send_file(
         **_prepare_send_file_kwargs(
             path_or_file=path_or_file,
@@ -628,14 +303,6 @@ def send_file(
 
 
 def safe_join(directory: str, *pathnames: str) -> str:
-    """Safely join zero or more untrusted path components to a base
-    directory to avoid escaping the base directory.
-
-    :param directory: The trusted base directory.
-    :param pathnames: The untrusted path components relative to the
-        base directory.
-    :return: A safe path, otherwise ``None``.
-    """
     warnings.warn(
         "'flask.helpers.safe_join' is deprecated and will be removed in"
         " Flask 2.1. Use 'werkzeug.utils.safe_join' instead.",
@@ -656,38 +323,6 @@ def send_from_directory(
     filename: t.Optional[str] = None,
     **kwargs: t.Any,
 ) -> "Response":
-    """Send a file from within a directory using :func:`send_file`.
-
-    .. code-block:: python
-
-        @app.route("/uploads/<path:name>")
-        def download_file(name):
-            return send_from_directory(
-                app.config['UPLOAD_FOLDER'], name, as_attachment=True
-            )
-
-    This is a secure way to serve files from a folder, such as static
-    files or uploads. Uses :func:`~werkzeug.security.safe_join` to
-    ensure the path coming from the client is not maliciously crafted to
-    point outside the specified directory.
-
-    If the final path does not point to an existing regular file,
-    raises a 404 :exc:`~werkzeug.exceptions.NotFound` error.
-
-    :param directory: The directory that ``path`` must be located under.
-    :param path: The path to the file to send, relative to
-        ``directory``.
-    :param kwargs: Arguments to pass to :func:`send_file`.
-
-    .. versionchanged:: 2.0
-        ``path`` replaces the ``filename`` parameter.
-
-    .. versionadded:: 2.0
-        Moved the implementation to Werkzeug. This is now a wrapper to
-        pass some Flask-specific arguments.
-
-    .. versionadded:: 0.5
-    """
     if filename is not None:
         warnings.warn(
             "The 'filename' parameter has been renamed to 'path'. The"
@@ -703,14 +338,6 @@ def send_from_directory(
 
 
 def get_root_path(import_name: str) -> str:
-    """Find the root path of a package, or the path that contains a
-    module. If it cannot be found, returns the current working
-    directory.
-
-    Not to be confused with the value returned by :func:`find_package`.
-
-    :meta private:
-    """
     # Module already imported and has a file attribute. Use that first.
     mod = sys.modules.get(import_name)
 
@@ -786,17 +413,6 @@ class locked_cached_property(werkzeug.utils.cached_property):
 
 
 def total_seconds(td: timedelta) -> int:
-    """Returns the total seconds from a timedelta object.
-
-    :param timedelta td: the timedelta to be converted in seconds
-
-    :returns: number of seconds
-    :rtype: int
-
-    .. deprecated:: 2.0
-        Will be removed in Flask 2.1. Use
-        :meth:`timedelta.total_seconds` instead.
-    """
     warnings.warn(
         "'total_seconds' is deprecated and will be removed in Flask"
         " 2.1. Use 'timedelta.total_seconds' instead.",
@@ -807,14 +423,6 @@ def total_seconds(td: timedelta) -> int:
 
 
 def is_ip(value: str) -> bool:
-    """Determine if the given string is an IP address.
-
-    :param value: value to check
-    :type value: str
-
-    :return: True if string is an IP address
-    :rtype: bool
-    """
     for family in (socket.AF_INET, socket.AF_INET6):
         try:
             socket.inet_pton(family, value)
@@ -834,3 +442,4 @@ def _split_blueprint_path(name: str) -> t.List[str]:
         out.extend(_split_blueprint_path(name.rpartition(".")[0]))
 
     return out
+

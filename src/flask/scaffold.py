@@ -38,9 +38,6 @@ F = t.TypeVar("F", bound=t.Callable[..., t.Any])
 
 
 def setupmethod(f: F) -> F:
-    """Wraps a method so that it performs a check in debug mode if the
-    first request was already handled.
-    """
 
     def wrapper_func(self, *args: t.Any, **kwargs: t.Any) -> t.Any:
         if self._is_setup_finished():
@@ -248,9 +245,6 @@ class Scaffold:
 
     @property
     def static_folder(self) -> t.Optional[str]:
-        """The absolute path to the configured static folder. ``None``
-        if no static folder is set.
-        """
         if self._static_folder is not None:
             return os.path.join(self.root_path, self._static_folder)
         else:
@@ -265,19 +259,10 @@ class Scaffold:
 
     @property
     def has_static_folder(self) -> bool:
-        """``True`` if :attr:`static_folder` is set.
-
-        .. versionadded:: 0.5
-        """
         return self.static_folder is not None
 
     @property
     def static_url_path(self) -> t.Optional[str]:
-        """The URL prefix that the static route will be accessible from.
-
-        If it was not configured during init, it is derived from
-        :attr:`static_folder`.
-        """
         if self._static_url_path is not None:
             return self._static_url_path
 
@@ -295,19 +280,6 @@ class Scaffold:
         self._static_url_path = value
 
     def get_send_file_max_age(self, filename: t.Optional[str]) -> t.Optional[int]:
-        """Used by :func:`send_file` to determine the ``max_age`` cache
-        value for a given file path if it wasn't passed.
-
-        By default, this returns :data:`SEND_FILE_MAX_AGE_DEFAULT` from
-        the configuration of :data:`~flask.current_app`. This defaults
-        to ``None``, which tells the browser to use conditional requests
-        instead of a timed cache, which is usually preferable.
-
-        .. versionchanged:: 2.0
-            The default configuration is ``None`` instead of 12 hours.
-
-        .. versionadded:: 0.9
-        """
         value = current_app.send_file_max_age_default
 
         if value is None:
@@ -316,13 +288,6 @@ class Scaffold:
         return int(value.total_seconds())
 
     def send_static_file(self, filename: str) -> "Response":
-        """The view function used to serve files from
-        :attr:`static_folder`. A route is automatically registered for
-        this view at :attr:`static_url_path` if :attr:`static_folder` is
-        set.
-
-        .. versionadded:: 0.5
-        """
         if not self.has_static_folder:
             raise RuntimeError("'static_folder' must be set to serve static_files.")
 
@@ -335,35 +300,12 @@ class Scaffold:
 
     @locked_cached_property
     def jinja_loader(self) -> t.Optional[FileSystemLoader]:
-        """The Jinja loader for this object's templates. By default this
-        is a class :class:`jinja2.loaders.FileSystemLoader` to
-        :attr:`template_folder` if it is set.
-
-        .. versionadded:: 0.5
-        """
         if self.template_folder is not None:
             return FileSystemLoader(os.path.join(self.root_path, self.template_folder))
         else:
             return None
 
     def open_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
-        """Open a resource file relative to :attr:`root_path` for
-        reading.
-
-        For example, if the file ``schema.sql`` is next to the file
-        ``app.py`` where the ``Flask`` app is defined, it can be opened
-        with:
-
-        .. code-block:: python
-
-            with app.open_resource("schema.sql") as f:
-                conn.executescript(f.read())
-
-        :param resource: Path to the resource relative to
-            :attr:`root_path`.
-        :param mode: Open the file in this mode. Only reading is
-            supported, valid values are "r" (or "rt") and "rb".
-        """
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
@@ -376,63 +318,21 @@ class Scaffold:
         return self.route(rule, methods=[method], **options)
 
     def get(self, rule: str, **options: t.Any) -> t.Callable:
-        """Shortcut for :meth:`route` with ``methods=["GET"]``.
-
-        .. versionadded:: 2.0
-        """
         return self._method_route("GET", rule, options)
 
     def post(self, rule: str, **options: t.Any) -> t.Callable:
-        """Shortcut for :meth:`route` with ``methods=["POST"]``.
-
-        .. versionadded:: 2.0
-        """
         return self._method_route("POST", rule, options)
 
     def put(self, rule: str, **options: t.Any) -> t.Callable:
-        """Shortcut for :meth:`route` with ``methods=["PUT"]``.
-
-        .. versionadded:: 2.0
-        """
         return self._method_route("PUT", rule, options)
 
     def delete(self, rule: str, **options: t.Any) -> t.Callable:
-        """Shortcut for :meth:`route` with ``methods=["DELETE"]``.
-
-        .. versionadded:: 2.0
-        """
         return self._method_route("DELETE", rule, options)
 
     def patch(self, rule: str, **options: t.Any) -> t.Callable:
-        """Shortcut for :meth:`route` with ``methods=["PATCH"]``.
-
-        .. versionadded:: 2.0
-        """
         return self._method_route("PATCH", rule, options)
 
     def route(self, rule: str, **options: t.Any) -> t.Callable:
-        """Decorate a view function to register it with the given URL
-        rule and options. Calls :meth:`add_url_rule`, which has more
-        details about the implementation.
-
-        .. code-block:: python
-
-            @app.route("/")
-            def index():
-                return "Hello, World!"
-
-        See :ref:`url-route-registrations`.
-
-        The endpoint name for the route defaults to the name of the view
-        function if the ``endpoint`` parameter isn't passed.
-
-        The ``methods`` parameter defaults to ``["GET"]``. ``HEAD`` and
-        ``OPTIONS`` are added automatically.
-
-        :param rule: The URL rule string.
-        :param options: Extra options passed to the
-            :class:`~werkzeug.routing.Rule` object.
-        """
 
         def decorator(f: t.Callable) -> t.Callable:
             endpoint = options.pop("endpoint", None)
@@ -450,81 +350,9 @@ class Scaffold:
         provide_automatic_options: t.Optional[bool] = None,
         **options: t.Any,
     ) -> None:
-        """Register a rule for routing incoming requests and building
-        URLs. The :meth:`route` decorator is a shortcut to call this
-        with the ``view_func`` argument. These are equivalent:
-
-        .. code-block:: python
-
-            @app.route("/")
-            def index():
-                ...
-
-        .. code-block:: python
-
-            def index():
-                ...
-
-            app.add_url_rule("/", view_func=index)
-
-        See :ref:`url-route-registrations`.
-
-        The endpoint name for the route defaults to the name of the view
-        function if the ``endpoint`` parameter isn't passed. An error
-        will be raised if a function has already been registered for the
-        endpoint.
-
-        The ``methods`` parameter defaults to ``["GET"]``. ``HEAD`` is
-        always added automatically, and ``OPTIONS`` is added
-        automatically by default.
-
-        ``view_func`` does not necessarily need to be passed, but if the
-        rule should participate in routing an endpoint name must be
-        associated with a view function at some point with the
-        :meth:`endpoint` decorator.
-
-        .. code-block:: python
-
-            app.add_url_rule("/", endpoint="index")
-
-            @app.endpoint("index")
-            def index():
-                ...
-
-        If ``view_func`` has a ``required_methods`` attribute, those
-        methods are added to the passed and automatic methods. If it
-        has a ``provide_automatic_methods`` attribute, it is used as the
-        default if the parameter is not passed.
-
-        :param rule: The URL rule string.
-        :param endpoint: The endpoint name to associate with the rule
-            and view function. Used when routing and building URLs.
-            Defaults to ``view_func.__name__``.
-        :param view_func: The view function to associate with the
-            endpoint name.
-        :param provide_automatic_options: Add the ``OPTIONS`` method and
-            respond to ``OPTIONS`` requests automatically.
-        :param options: Extra options passed to the
-            :class:`~werkzeug.routing.Rule` object.
-        """
         raise NotImplementedError
 
     def endpoint(self, endpoint: str) -> t.Callable:
-        """Decorate a view function to register it for the given
-        endpoint. Used if a rule is added without a ``view_func`` with
-        :meth:`add_url_rule`.
-
-        .. code-block:: python
-
-            app.add_url_rule("/ex", endpoint="example")
-
-            @app.endpoint("example")
-            def example():
-                ...
-
-        :param endpoint: The endpoint name to associate with the view
-            function.
-        """
 
         def decorator(f):
             self.view_functions[endpoint] = f
@@ -534,78 +362,16 @@ class Scaffold:
 
     @setupmethod
     def before_request(self, f: BeforeRequestCallable) -> BeforeRequestCallable:
-        """Register a function to run before each request.
-
-        For example, this can be used to open a database connection, or
-        to load the logged in user from the session.
-
-        .. code-block:: python
-
-            @app.before_request
-            def load_user():
-                if "user_id" in session:
-                    g.user = db.session.get(session["user_id"])
-
-        The function will be called without any arguments. If it returns
-        a non-``None`` value, the value is handled as if it was the
-        return value from the view, and further request handling is
-        stopped.
-        """
         self.before_request_funcs.setdefault(None, []).append(f)
         return f
 
     @setupmethod
     def after_request(self, f: AfterRequestCallable) -> AfterRequestCallable:
-        """Register a function to run after each request to this object.
-
-        The function is called with the response object, and must return
-        a response object. This allows the functions to modify or
-        replace the response before it is sent.
-
-        If a function raises an exception, any remaining
-        ``after_request`` functions will not be called. Therefore, this
-        should not be used for actions that must execute, such as to
-        close resources. Use :meth:`teardown_request` for that.
-        """
         self.after_request_funcs.setdefault(None, []).append(f)
         return f
 
     @setupmethod
     def teardown_request(self, f: TeardownCallable) -> TeardownCallable:
-        """Register a function to be run at the end of each request,
-        regardless of whether there was an exception or not.  These functions
-        are executed when the request context is popped, even if not an
-        actual request was performed.
-
-        Example::
-
-            ctx = app.test_request_context()
-            ctx.push()
-            ...
-            ctx.pop()
-
-        When ``ctx.pop()`` is executed in the above example, the teardown
-        functions are called just before the request context moves from the
-        stack of active contexts.  This becomes relevant if you are using
-        such constructs in tests.
-
-        Teardown functions must avoid raising exceptions, since they . If they
-        execute code that might fail they
-        will have to surround the execution of these code by try/except
-        statements and log occurring errors.
-
-        When a teardown function was called because of an exception it will
-        be passed an error object.
-
-        The return values of teardown functions are ignored.
-
-        .. admonition:: Debug Note
-
-           In debug mode Flask will not tear down a request on an exception
-           immediately.  Instead it will keep it alive so that the interactive
-           debugger can still access it.  This behavior can be controlled
-           by the ``PRESERVE_CONTEXT_ON_EXCEPTION`` configuration variable.
-        """
         self.teardown_request_funcs.setdefault(None, []).append(f)
         return f
 
@@ -613,7 +379,6 @@ class Scaffold:
     def context_processor(
         self, f: TemplateContextProcessorCallable
     ) -> TemplateContextProcessorCallable:
-        """Registers a template context processor function."""
         self.template_context_processors[None].append(f)
         return f
 
@@ -621,27 +386,11 @@ class Scaffold:
     def url_value_preprocessor(
         self, f: URLValuePreprocessorCallable
     ) -> URLValuePreprocessorCallable:
-        """Register a URL value preprocessor function for all view
-        functions in the application. These functions will be called before the
-        :meth:`before_request` functions.
-
-        The function can modify the values captured from the matched url before
-        they are passed to the view. For example, this can be used to pop a
-        common language code value and place it in ``g`` rather than pass it to
-        every view.
-
-        The function is passed the endpoint name and values dict. The return
-        value is ignored.
-        """
         self.url_value_preprocessors[None].append(f)
         return f
 
     @setupmethod
     def url_defaults(self, f: URLDefaultCallable) -> URLDefaultCallable:
-        """Callback function for URL defaults for all view functions of the
-        application.  It's called with the endpoint and values and should
-        update the values passed in place.
-        """
         self.url_default_functions[None].append(f)
         return f
 
@@ -652,34 +401,6 @@ class Scaffold:
         ["ErrorHandlerCallable[GenericException]"],
         "ErrorHandlerCallable[GenericException]",
     ]:
-        """Register a function to handle errors by code or exception class.
-
-        A decorator that is used to register a function given an
-        error code.  Example::
-
-            @app.errorhandler(404)
-            def page_not_found(error):
-                return 'This page does not exist', 404
-
-        You can also register handlers for arbitrary exceptions::
-
-            @app.errorhandler(DatabaseError)
-            def special_exception_handler(error):
-                return 'Database connection failed', 500
-
-        .. versionadded:: 0.7
-            Use :meth:`register_error_handler` instead of modifying
-            :attr:`error_handler_spec` directly, for application wide error
-            handlers.
-
-        .. versionadded:: 0.7
-           One can now additionally also register custom exception types
-           that do not necessarily have to be a subclass of the
-           :class:`~werkzeug.exceptions.HTTPException` class.
-
-        :param code_or_exception: the code as integer for the handler, or
-                                  an arbitrary exception
-        """
 
         def decorator(
             f: "ErrorHandlerCallable[GenericException]",
@@ -695,12 +416,6 @@ class Scaffold:
         code_or_exception: t.Union[t.Type[GenericException], int],
         f: "ErrorHandlerCallable[GenericException]",
     ) -> None:
-        """Alternative error attach function to the :meth:`errorhandler`
-        decorator that is more straightforward to use for non decorator
-        usage.
-
-        .. versionadded:: 0.7
-        """
         if isinstance(code_or_exception, HTTPException):  # old broken behavior
             raise ValueError(
                 "Tried to register a handler for an exception instance"
@@ -725,13 +440,6 @@ class Scaffold:
     def _get_exc_class_and_code(
         exc_class_or_code: t.Union[t.Type[Exception], int]
     ) -> t.Tuple[t.Type[Exception], t.Optional[int]]:
-        """Get the exception class being handled. For HTTP status codes
-        or ``HTTPException`` subclasses, return both the exception and
-        status code.
-
-        :param exc_class_or_code: Any exception class, or an HTTP status
-            code as an integer.
-        """
         exc_class: t.Type[Exception]
         if isinstance(exc_class_or_code, int):
             exc_class = default_exceptions[exc_class_or_code]
@@ -749,19 +457,11 @@ class Scaffold:
 
 
 def _endpoint_from_view_func(view_func: t.Callable) -> str:
-    """Internal helper that returns the default endpoint for a given
-    function.  This always is the function name.
-    """
     assert view_func is not None, "expected view func if endpoint is not provided."
     return view_func.__name__
 
 
 def _matching_loader_thinks_module_is_package(loader, mod_name):
-    """Attempt to figure out if the given name is a package or a module.
-
-    :param: loader: The loader that handled the name.
-    :param mod_name: The name of the package or module.
-    """
     # Use loader.is_package if it's available.
     if hasattr(loader, "is_package"):
         return loader.is_package(mod_name)
@@ -782,7 +482,6 @@ def _matching_loader_thinks_module_is_package(loader, mod_name):
 
 
 def _find_package_path(root_mod_name):
-    """Find the path that contains the package or module."""
     try:
         spec = importlib.util.find_spec(root_mod_name)
 
@@ -834,18 +533,6 @@ def _find_package_path(root_mod_name):
 
 
 def find_package(import_name: str):
-    """Find the prefix that a package is installed under, and the path
-    that it would be imported from.
-
-    The prefix is the directory containing the standard directory
-    hierarchy (lib, bin, etc.). If the package is not installed to the
-    system (:attr:`sys.prefix`) or a virtualenv (``site-packages``),
-    ``None`` is returned.
-
-    The path is the entry in :attr:`sys.path` that contains the package
-    for import. If the package is not installed, it's assumed that the
-    package was imported from the current working directory.
-    """
     root_mod_name, _, _ = import_name.partition(".")
     package_path = _find_package_path(root_mod_name)
     py_prefix = os.path.abspath(sys.prefix)
@@ -873,3 +560,4 @@ def find_package(import_name: str):
 
     # not installed
     return None, package_path
+
