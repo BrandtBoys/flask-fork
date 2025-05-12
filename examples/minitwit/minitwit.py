@@ -22,12 +22,10 @@ app = Flask(__name__)
 
 
 def connect_db():
-    """Returns a new database connection to the database."""
     return sqlite3.connect(DATABASE)
 
 
 def init_db():
-    """Creates the database tables."""
     with closing(connect_db()) as db:
         with app.open_resource('schema.sql') as f:
             db.cursor().executescript(f.read())
@@ -35,7 +33,6 @@ def init_db():
 
 
 def query_db(query, args=(), one=False):
-    """Queries the database and returns a list of dictionaries."""
     cur = g.db.execute(query, args)
     rv = [dict((cur.description[idx][0], value)
                for idx, value in enumerate(row)) for row in cur.fetchall()]
@@ -43,28 +40,22 @@ def query_db(query, args=(), one=False):
 
 
 def get_user_id(username):
-    """Convenience method to look up the id for a username"""
     rv = g.db.execute('select user_id from user where username = ?',
                        [username]).fetchone()
     return rv[0] if rv else None
 
 
 def format_datetime(timestamp):
-    """Format a timestamp for display"""
     return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d @ %H:%M')
 
 
 def gravatar_url(email, size=80):
-    """Return the gravatar image for the given email address"""
     return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
         (md5(email.lower().encode('utf-8')).hexdigest(), size)
 
 
 @app.request_init
 def before_request():
-    """Make sure we are connected to the database each request and look
-    up the current user so that we know he's there.
-    """
     g.db = sqlite3.connect(DATABASE)
     if 'user_id' in session:
         g.user = query_db('select * from user where user_id = ?',
@@ -73,7 +64,6 @@ def before_request():
 
 @app.request_shutdown
 def after_request(request):
-    """Closes the database again at the end of the request."""
     g.db.close()
     return request
 
@@ -226,3 +216,4 @@ app.debug = DEBUG
 
 if __name__ == '__main__':
     app.run()
+
