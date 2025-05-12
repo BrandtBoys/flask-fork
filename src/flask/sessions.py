@@ -365,6 +365,7 @@ response (Response): The response object.
 Returns:
 None
 """
+        
         name = self.get_cookie_name(app)
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)

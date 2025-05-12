@@ -73,6 +73,15 @@ Returns:
 
     @property
     def endpoint(self) -> str | None:
+        """
+Returns the URL rule's endpoint if available, otherwise returns None.
+
+Args:
+    None
+
+Returns:
+    str | None: The URL rule's endpoint or None if not set.
+"""
         if self.url_rule is not None:
             return self.url_rule.endpoint  # type: ignore[no-any-return]
 
