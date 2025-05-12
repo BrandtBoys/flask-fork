@@ -112,3 +112,4 @@ app.add_url_rule(
     "/about",
     view_func=RenderTemplateView.as_view("about_page", template_name="about.html"),
 )
+
