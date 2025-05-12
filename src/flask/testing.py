@@ -79,8 +79,7 @@ class EnvironBuilder(werkzeug.test.EnvironBuilder):
             path = url.path
 
             if url.query:
-                sep = b"?" if isinstance(url.query, bytes) else "?"
-                path += sep + url.query
+                path = f"{path}?{url.query}"
 
         self.app = app
         super().__init__(path, base_url, *args, **kwargs)
@@ -261,4 +260,3 @@ class FlaskCliRunner(CliRunner):
             kwargs["obj"] = ScriptInfo(create_app=lambda: self.app)
 
         return super().invoke(cli, args, **kwargs)
-

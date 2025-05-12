@@ -512,7 +512,7 @@ class App(Scaffold):
         methods = {item.upper() for item in methods}
 
         # Methods that should always be added
-        required_methods = set(getattr(view_func, "required_methods", ()))
+        required_methods: set[str] = set(getattr(view_func, "required_methods", ()))
 
         # starting with Flask 0.8 the view_func object can disable and
         # force-enable the automatic options handling.
@@ -522,7 +522,7 @@ class App(Scaffold):
             )
 
         if provide_automatic_options is None:
-            if "OPTIONS" not in methods:
+            if "OPTIONS" not in methods and self.config["PROVIDE_AUTOMATIC_OPTIONS"]:
                 provide_automatic_options = True
                 required_methods.add("OPTIONS")
             else:
@@ -690,4 +690,3 @@ class App(Scaffold):
             raise
 
         raise error
-
