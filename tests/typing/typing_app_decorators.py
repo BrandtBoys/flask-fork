@@ -34,3 +34,4 @@ def teardown_sync(exc: BaseException | None) -> None:
 @app.teardown_appcontext
 async def teardown_async(exc: BaseException | None) -> None:
     ...
+
