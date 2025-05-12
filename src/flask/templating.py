@@ -16,9 +16,6 @@ if t.TYPE_CHECKING:
 
 
 def _default_template_ctx_processor() -> t.Dict[str, t.Any]:
-    """Default template context processor.  Injects `request`,
-    `session` and `g`.
-    """
     reqctx = _request_ctx_stack.top
     appctx = _app_ctx_stack.top
     rv = {}
@@ -122,7 +119,6 @@ class DispatchingJinjaLoader(BaseLoader):
 
 
 def _render(template: Template, context: dict, app: "Flask") -> str:
-    """Renders the template and fires the signal"""
 
     before_render_template.send(app, template=template, context=context)
     rv = template.render(context)
@@ -133,15 +129,6 @@ def _render(template: Template, context: dict, app: "Flask") -> str:
 def render_template(
     template_name_or_list: t.Union[str, t.List[str]], **context: t.Any
 ) -> str:
-    """Renders a template from the template folder with the given
-    context.
-
-    :param template_name_or_list: the name of the template to be
-                                  rendered, or an iterable with template names
-                                  the first one existing will be rendered
-    :param context: the variables that should be available in the
-                    context of the template.
-    """
     ctx = _app_ctx_stack.top
     ctx.app.update_template_context(context)
     return _render(
@@ -152,14 +139,7 @@ def render_template(
 
 
 def render_template_string(source: str, **context: t.Any) -> str:
-    """Renders a template from the given template source string
-    with the given context. Template variables will be autoescaped.
-
-    :param source: the source code of the template to be
-                   rendered
-    :param context: the variables that should be available in the
-                    context of the template.
-    """
     ctx = _app_ctx_stack.top
     ctx.app.update_template_context(context)
     return _render(ctx.app.jinja_env.from_string(source), context, ctx.app)
+

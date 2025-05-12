@@ -245,10 +245,6 @@ class TestGenericHandlers:
 
     @pytest.mark.parametrize("to_handle", (InternalServerError, 500))
     def test_handle_class_or_code(self, app, client, to_handle):
-        """``InternalServerError`` and ``500`` are aliases, they should
-        have the same behavior. Both should only receive
-        ``InternalServerError``, which might wrap another error.
-        """
 
         @app.errorhandler(to_handle)
         def handle_500(e):
@@ -261,9 +257,6 @@ class TestGenericHandlers:
         assert client.get("/raise").data == b"direct InternalServerError"
 
     def test_handle_generic_http(self, app, client):
-        """``HTTPException`` should only receive ``HTTPException``
-        subclasses. It will receive ``404`` routing exceptions.
-        """
 
         @app.errorhandler(HTTPException)
         def handle_http(e):
@@ -275,9 +268,6 @@ class TestGenericHandlers:
         assert client.get("/not-found").data == b"404"
 
     def test_handle_generic(self, app, client):
-        """Generic ``Exception`` will handle all exceptions directly,
-        including ``HTTPExceptions``.
-        """
 
         @app.errorhandler(Exception)
         def handle_exception(e):
@@ -287,3 +277,4 @@ class TestGenericHandlers:
         assert client.get("/error").data == b"direct KeyError"
         assert client.get("/abort").data == b"direct InternalServerError"
         assert client.get("/not-found").data == b"direct NotFound"
+

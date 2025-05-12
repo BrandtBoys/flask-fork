@@ -22,3 +22,4 @@ def test_aborting(app):
         assert rv.headers["Location"] == "http://localhost/test"
         rv = c.get("/test")
         assert rv.data == b"42"
+

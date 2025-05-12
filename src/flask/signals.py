@@ -54,3 +54,4 @@ appcontext_tearing_down = _signals.signal("appcontext-tearing-down")
 appcontext_pushed = _signals.signal("appcontext-pushed")
 appcontext_popped = _signals.signal("appcontext-popped")
 message_flashed = _signals.signal("message-flashed")
+

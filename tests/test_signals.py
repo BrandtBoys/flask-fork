@@ -194,3 +194,4 @@ def test_appcontext_tearing_down_signal():
         assert recorded == [("tear_down", {"exc": None})]
     finally:
         flask.appcontext_tearing_down.disconnect(record_teardown, app)
+

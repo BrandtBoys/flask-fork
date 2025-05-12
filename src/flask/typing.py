@@ -54,3 +54,4 @@ if t.TYPE_CHECKING:
     class ErrorHandlerCallable(te.Protocol[GenericException]):
         def __call__(self, error: GenericException) -> ResponseReturnValue:
             ...
+

@@ -22,7 +22,6 @@ class SessionMixin(MutableMapping):
 
     @property
     def permanent(self) -> bool:
-        """This reflects the ``'_permanent'`` key in the dict."""
         return self.get("_permanent", False)
 
     @permanent.setter
@@ -148,42 +147,15 @@ class SessionInterface:
     pickle_based = False
 
     def make_null_session(self, app: "Flask") -> NullSession:
-        """Creates a null session which acts as a replacement object if the
-        real session support could not be loaded due to a configuration
-        error.  This mainly aids the user experience because the job of the
-        null session is to still support lookup without complaining but
-        modifications are answered with a helpful error message of what
-        failed.
-
-        This creates an instance of :attr:`null_session_class` by default.
-        """
         return self.null_session_class()
 
     def is_null_session(self, obj: object) -> bool:
-        """Checks if a given object is a null session.  Null sessions are
-        not asked to be saved.
-
-        This checks if the object is an instance of :attr:`null_session_class`
-        by default.
-        """
         return isinstance(obj, self.null_session_class)
 
     def get_cookie_name(self, app: "Flask") -> str:
-        """Returns the name of the session cookie.
-
-        Uses ``app.session_cookie_name`` which is set to ``SESSION_COOKIE_NAME``
-        """
         return app.session_cookie_name
 
     def get_cookie_domain(self, app: "Flask") -> t.Optional[str]:
-        """Returns the domain that should be set for the session cookie.
-
-        Uses ``SESSION_COOKIE_DOMAIN`` if it is configured, otherwise
-        falls back to detecting the domain based on ``SERVER_NAME``.
-
-        Once detected (or if not set at all), ``SESSION_COOKIE_DOMAIN`` is
-        updated to avoid re-running the logic.
-        """
 
         rv = app.config["SESSION_COOKIE_DOMAIN"]
 
@@ -234,56 +206,25 @@ class SessionInterface:
         return rv
 
     def get_cookie_path(self, app: "Flask") -> str:
-        """Returns the path for which the cookie should be valid.  The
-        default implementation uses the value from the ``SESSION_COOKIE_PATH``
-        config var if it's set, and falls back to ``APPLICATION_ROOT`` or
-        uses ``/`` if it's ``None``.
-        """
         return app.config["SESSION_COOKIE_PATH"] or app.config["APPLICATION_ROOT"]
 
     def get_cookie_httponly(self, app: "Flask") -> bool:
-        """Returns True if the session cookie should be httponly.  This
-        currently just returns the value of the ``SESSION_COOKIE_HTTPONLY``
-        config var.
-        """
         return app.config["SESSION_COOKIE_HTTPONLY"]
 
     def get_cookie_secure(self, app: "Flask") -> bool:
-        """Returns True if the cookie should be secure.  This currently
-        just returns the value of the ``SESSION_COOKIE_SECURE`` setting.
-        """
         return app.config["SESSION_COOKIE_SECURE"]
 
     def get_cookie_samesite(self, app: "Flask") -> str:
-        """Return ``'Strict'`` or ``'Lax'`` if the cookie should use the
-        ``SameSite`` attribute. This currently just returns the value of
-        the :data:`SESSION_COOKIE_SAMESITE` setting.
-        """
         return app.config["SESSION_COOKIE_SAMESITE"]
 
     def get_expiration_time(
         self, app: "Flask", session: SessionMixin
     ) -> t.Optional[datetime]:
-        """A helper method that returns an expiration date for the session
-        or ``None`` if the session is linked to the browser session.  The
-        default implementation returns now + the permanent session
-        lifetime configured on the application.
-        """
         if session.permanent:
             return datetime.utcnow() + app.permanent_session_lifetime
         return None
 
     def should_set_cookie(self, app: "Flask", session: SessionMixin) -> bool:
-        """Used by session backends to determine if a ``Set-Cookie`` header
-        should be set for this session cookie for this response. If the session
-        has been modified, the cookie is set. If the session is permanent and
-        the ``SESSION_REFRESH_EACH_REQUEST`` config is true, the cookie is
-        always set.
-
-        This check is usually skipped if the session was deleted.
-
-        .. versionadded:: 0.11
-        """
 
         return session.modified or (
             session.permanent and app.config["SESSION_REFRESH_EACH_REQUEST"]
@@ -292,21 +233,11 @@ class SessionInterface:
     def open_session(
         self, app: "Flask", request: "Request"
     ) -> t.Optional[SessionMixin]:
-        """This method has to be implemented and must either return ``None``
-        in case the loading failed because of a configuration error or an
-        instance of a session object which implements a dictionary like
-        interface + the methods and attributes on :class:`SessionMixin`.
-        """
         raise NotImplementedError()
 
     def save_session(
         self, app: "Flask", session: SessionMixin, response: "Response"
     ) -> None:
-        """This is called for actual sessions returned by :meth:`open_session`
-        at the end of the request.  This is still called during a request
-        context so if you absolutely need access to the request you can do
-        that.
-        """
         raise NotImplementedError()
 
 
@@ -402,3 +333,4 @@ class SecureCookieSessionInterface(SessionInterface):
             secure=secure,
             samesite=samesite,
         )
+

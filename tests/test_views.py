@@ -240,3 +240,4 @@ def test_remove_method_from_parent(app, client):
     assert client.get("/").data == b"GET"
     assert client.post("/").status_code == 405
     assert sorted(View.methods) == ["GET"]
+

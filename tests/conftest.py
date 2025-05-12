@@ -12,10 +12,6 @@ from flask import Flask as _Flask
 
 @pytest.fixture(scope="session", autouse=True)
 def _standard_os_environ():
-    """Set up ``os.environ`` at the start of the test session to have
-    standard values. Returns a list of operations that is used by
-    :func:`._reset_os_environ` after each test.
-    """
     mp = monkeypatch.MonkeyPatch()
     out = (
         (os.environ, "FLASK_APP", monkeypatch.notset),
@@ -37,9 +33,6 @@ def _standard_os_environ():
 
 @pytest.fixture(autouse=True)
 def _reset_os_environ(monkeypatch, _standard_os_environ):
-    """Reset ``os.environ`` to the standard environ after each test,
-    in case a test changed something without cleaning up.
-    """
     monkeypatch._setitem.extend(_standard_os_environ)
 
 
@@ -98,15 +91,6 @@ def leak_detector():
 
 @pytest.fixture(params=(True, False))
 def limit_loader(request, monkeypatch):
-    """Patch pkgutil.get_loader to give loader without get_filename or archive.
-
-    This provides for tests where a system has custom loaders, e.g. Google App
-    Engine's HardenedModulesHook, which have neither the `get_filename` method
-    nor the `archive` attribute.
-
-    This fixture will run the testcase twice, once with and once without the
-    limitation/mock.
-    """
     if not request.param:
         return
 
@@ -129,7 +113,6 @@ def limit_loader(request, monkeypatch):
 
 @pytest.fixture
 def modules_tmpdir(tmpdir, monkeypatch):
-    """A tmpdir added to sys.path."""
     rv = tmpdir.mkdir("modules_tmpdir")
     monkeypatch.syspath_prepend(str(rv))
     return rv
@@ -143,7 +126,6 @@ def modules_tmpdir_prefix(modules_tmpdir, monkeypatch):
 
 @pytest.fixture
 def site_packages(modules_tmpdir, monkeypatch):
-    """Create a fake site-packages."""
     rv = (
         modules_tmpdir.mkdir("lib")
         .mkdir(f"python{sys.version_info.major}.{sys.version_info.minor}")
@@ -155,8 +137,6 @@ def site_packages(modules_tmpdir, monkeypatch):
 
 @pytest.fixture
 def install_egg(modules_tmpdir, monkeypatch):
-    """Generate egg from package name inside base and put the egg into
-    sys.path."""
 
     def inner(name, base=modules_tmpdir):
         base.join(name).ensure_dir()
@@ -195,3 +175,4 @@ def purge_module(request):
         request.addfinalizer(lambda: sys.modules.pop(name, None))
 
     return inner
+

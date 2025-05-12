@@ -2026,3 +2026,4 @@ def test_app_freed_on_zero_refcount():
         assert weak() is None
     finally:
         gc.enable()
+

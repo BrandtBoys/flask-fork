@@ -3,10 +3,6 @@ from flask.sessions import SessionInterface
 
 
 def test_open_session_with_endpoint():
-    """If request.endpoint (or other URL matching behavior) is needed
-    while loading the session, RequestContext.match_request() can be
-    called manually.
-    """
 
     class MySessionInterface(SessionInterface):
         def save_session(self, app, session, response):
@@ -25,3 +21,4 @@ def test_open_session_with_endpoint():
 
     response = app.test_client().get("/")
     assert response.status_code == 200
+

@@ -110,7 +110,6 @@ def test_path_is_url(app):
 
 
 def test_environbuilder_json_dumps(app):
-    """EnvironBuilder.json_dumps() takes settings from the app."""
     app.config["JSON_AS_ASCII"] = False
     eb = EnvironBuilder(app, json="\u20ac")
     assert eb.input_stream.read().decode("utf8") == '"\u20ac"'
@@ -422,3 +421,4 @@ def test_client_pop_all_preserved(app, req_ctx, client):
 
     # only req_ctx fixture should still be pushed
     assert flask._request_ctx_stack.top is req_ctx
+
