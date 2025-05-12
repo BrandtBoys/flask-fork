@@ -6,23 +6,22 @@ from celery import Task
 
 @shared_task(ignore_result=False)
 def add(a: int, b: int) -> int:
-    """
-Adds two integers together.
+    # Adds two integers together.
+#
+# Args:
+#     a (int): The first integer to be added.
+#     b (int): The second integer to be added.
+#
+# Returns:
+#     int: The sum of the two input integers.
+#
+# Raises:
+#     TypeError: If either 'a' or 'b' is not an integer.
+#
+# Example:
+#     >>> add(3, 5)
+#     8
 
-Args:
-    a (int): The first integer to be added.
-    b (int): The second integer to be added.
-
-Returns:
-    int: The sum of the two input integers.
-
-Raises:
-    TypeError: If either 'a' or 'b' is not an integer.
-
-Example:
-    >>> add(3, 5)
-    8
-"""
     return a + b
 
 
@@ -39,6 +38,7 @@ Args:
 Returns:
     None
 """
+
     time.sleep(5)
 
 

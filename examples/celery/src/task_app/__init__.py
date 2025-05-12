@@ -10,7 +10,11 @@ Creates a new Flask application instance with Celery configuration and blueprint
 
 Returns:
     A fully configured Flask application instance.
+
+Note: This function initializes the Flask application, sets up Celery configuration, 
+registers blueprints, and returns the fully configured application instance.
 """
+
     app = Flask(__name__)
     app.config.from_mapping(
         CELERY=dict(
