@@ -236,78 +236,12 @@ Returns:
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[True] = True
 ) -> Flask: ...
-    """
-Locate an application within a given Flask module.
-
-This function takes in the name of the module and the name of the application to locate.
-It also accepts an optional parameter `raise_if_not_found` which defaults to `True`.
-If `raise_if_not_found` is `False`, the function will return `None` instead of raising an exception if the application cannot be found.
-
-Args:
-    module_name (str): The name of the Flask module to search in.
-    app_name (str | None): The name of the application to locate. If `None`, all applications in the module are returned.
-    raise_if_not_found (bool, optional): Whether to raise an exception if the application cannot be found. Defaults to `True`.
-
-Returns:
-    Flask: The located Flask application object.
-
-Raises:
-    ValueError: If `raise_if_not_found` is `False`.
-"""
-    """
-Locate an application within a given Flask module.
-
-This function takes in the name of the module and the application to locate,
-as well as an optional parameter to raise an exception if the application is not found.
-
-Args:
-    - `module_name` (str): The name of the module to search for.
-    - `app_name` (str | None): The name of the application to locate. If None, all applications will be returned.
-    - `raise_if_not_found` (bool, optional): Whether to raise an exception if the application is not found. Defaults to True.
-
-Returns:
-    Flask: The located Flask application object.
-
-Raises:
-    ValueError: If `app_name` is not provided and `raise_if_not_found` is False.
-"""
 
 
 @t.overload
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[False] = ...
 ) -> Flask | None: ...
-    """
-Locate an application within a given module.
-
-This function searches for an application with the specified name within a given module.
-It returns the found application or `None` if not found. If `raise_if_not_found` is set to `True`, it raises a `ValueError` if the application is not found.
-
-Args:
-    - **module_name** (str): The name of the module to search in.
-    - **app_name** (str | None): The name of the application to locate. If `None`, all applications will be returned.
-    - **raise_if_not_found** (t.Literal[False] = ...): Whether to raise an error if the application is not found.
-
-Returns:
-    - Flask | None: The located application or `None` if not found.
-"""
-    """
-Locate an application within a given module.
-
-This function searches for an application with the specified name within a given module.
-It returns the found application or `None` if not found. If `raise_if_not_found` is set to `True`, it raises a `ValueError` if the application is not found.
-
-Args:
-    - **module_name** (str): The name of the module to search in.
-    - **app_name** (str | None): The name of the application to locate. If `None`, all applications will be returned.
-    - **raise_if_not_found** (bool, optional): Whether to raise an error if the application is not found. Defaults to `False`.
-
-Returns:
-    - Flask | None: The located application or `None` if not found.
-
-Raises:
-    ValueError: If `raise_if_not_found` is set to `True` and the application is not found.
-"""
 
 
 def locate_app(
