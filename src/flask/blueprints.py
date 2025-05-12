@@ -29,6 +29,26 @@ class Blueprint(SansioBlueprint):
         root_path: str | None = None,
         cli_group: str | None = _sentinel,  # type: ignore
     ) -> None:
+        """
+Initialize a Flask application.
+
+This function initializes a new instance of the Flask class, setting up various configuration options and command groups for the application.
+
+Parameters:
+    name (str): The name of the application.
+    import_name (str): The import name of the application.
+    static_folder (str | os.PathLike[str] | None): The path to the static folder. Defaults to None.
+    static_url_path (str | None): The URL path for static files. Defaults to None.
+    template_folder (str | os.PathLike[str] | None): The path to the template folder. Defaults to None.
+    url_prefix (str | None): The prefix for URLs. Defaults to None.
+    subdomain (str | None): The subdomain for the application. Defaults to None.
+    url_defaults (dict[str, t.Any] | None): A dictionary of URL defaults. Defaults to None.
+    root_path (str | None): The root path for the application. Defaults to None.
+    cli_group (str | None): The Click command group for registering CLI commands. Defaults to _sentinel.
+
+Returns:
+    None
+"""
         super().__init__(
             name,
             import_name,

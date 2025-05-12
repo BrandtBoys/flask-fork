@@ -252,6 +252,7 @@ Raises:
     AssertionError: If `static_host` and `host_matching` do not match, or if 
         `static_folder` exists but `static_url_path` is not provided.
 """
+        
         super().__init__(
             import_name=import_name,
             static_url_path=static_url_path,
