@@ -300,7 +300,7 @@ Example:
 Note:
     This function is typically used in a web framework to map URL patterns to view functions.
 """
-def decorator(f):
+        def decorator(f):
             self.add_url_rule(rule, f.__name__, **options)
             self.view_functions[f.__name__] = f
             return f
