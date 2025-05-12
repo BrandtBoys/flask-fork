@@ -282,6 +282,10 @@ Returns:
 session_json_serializer = TaggedJSONSerializer()
 
 
+def _lazy_sha1(string: bytes = b"") -> t.Any:
+    return hashlib.sha1(string)
+
+
 class SecureCookieSessionInterface(SessionInterface):
     """The default session interface that stores sessions in signed cookies
     through the :mod:`itsdangerous` module.
@@ -291,7 +295,7 @@ class SecureCookieSessionInterface(SessionInterface):
     #: signing of cookie based sessions.
     salt = "cookie-session"
     #: the hash function to use for the signature.  The default is sha1
-    digest_method = staticmethod(hashlib.sha1)
+    digest_method = staticmethod(_lazy_sha1)
     #: the name of the itsdangerous supported key derivation.  The default
     #: is hmac.
     key_derivation = "hmac"
