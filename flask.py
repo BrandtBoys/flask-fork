@@ -256,7 +256,19 @@ Raises:
         return run_simple(host, port, self, **options)
 
     def test_client(self):
-        from werkzeug import Client
+        """
+Returns a Werkzeug HTTP client instance for testing purposes.
+
+The client is configured to use cookies and is tied to the provided `self` object and response class. This allows for seamless integration with the test framework's request and response objects.
+
+Args:
+    self (object): The object being tested.
+    self.response_class (class): The response class used by the test framework.
+
+Returns:
+    Client: A Werkzeug HTTP client instance.
+"""
+from werkzeug import Client
         return Client(self, self.response_class, use_cookies=True)
 
     def open_resource(self, resource):

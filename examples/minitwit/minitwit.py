@@ -124,9 +124,11 @@ Fetches the timeline of messages for the current user, including messages they h
 
 Args:
     - offset (int): The number of rows to skip before displaying messages. Defaults to 0.
+
 Returns:
     A rendered HTML template containing the timeline of messages.
 """
+
     if not g.user:
         return redirect(url_for('public_timeline'))
     offset = request.args.get('offset', type=int)
