@@ -703,6 +703,23 @@ class CertParamType(click.ParamType):
 
 
 def _validate_key(ctx, param, value):
+    """
+Validate the key for a given certificate.
+
+This function checks if the provided key is valid based on the type of certificate used.
+It raises an error if the key is not required or if it's used with an invalid certificate type.
+
+Args:
+    ctx (click.Context): The context object containing the command-line arguments.
+    param (click.Parameter): The parameter being validated.
+    value: The value to be validated.
+
+Returns:
+    value: The validated key value.
+
+Raises:
+    click.BadParameter: If the key is not required or if it's used with an invalid certificate type.
+"""
     cert = ctx.params.get("cert")
     is_adhoc = cert == "adhoc"
 
