@@ -24,7 +24,6 @@ Returns:
 Raises:
     TypeError: If the input ID is not a string.
 """
-
     result = AsyncResult(id)
     ready = result.ready()
     return {
