@@ -7,3 +7,4 @@ from blueprintapp.apps.frontend import frontend
 
 app.register_blueprint(admin)
 app.register_blueprint(frontend)
+

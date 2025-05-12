@@ -69,12 +69,6 @@ class FormDataRoutingRedirect(AssertionError):
 
 
 def attach_enctype_error_multidict(request):
-    """Patch ``request.files.__getitem__`` to raise a descriptive error
-    about ``enctype=multipart/form-data``.
-
-    :param request: The request to patch.
-    :meta private:
-    """
     oldcls = request.files.__class__
 
     class newcls(oldcls):
@@ -112,7 +106,6 @@ def _dump_loader_info(loader) -> t.Generator:
 
 
 def explain_template_loading_attempts(app: Flask, template, attempts) -> None:
-    """This should help developers understand what failed"""
     info = [f"Locating template {template!r}:"]
     total_found = 0
     blueprint = None
@@ -156,3 +149,4 @@ def explain_template_loading_attempts(app: Flask, template, attempts) -> None:
         info.append("  See https://flask.palletsprojects.com/blueprints/#templates")
 
     app.logger.info("\n".join(info))
+

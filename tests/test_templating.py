@@ -448,3 +448,4 @@ def test_custom_jinja_env():
 
     app = CustomFlask(__name__)
     assert isinstance(app.jinja_env, CustomEnvironment)
+
