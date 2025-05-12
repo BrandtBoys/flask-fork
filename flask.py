@@ -255,8 +255,7 @@ Raises:
         options.setdefault('use_debugger', self.debug)
         return run_simple(host, port, self, **options)
 
-    @cached_property
-    def test(self):
+    def test_client(self):
         from werkzeug import Client
         return Client(self, self.response_class, use_cookies=True)
 

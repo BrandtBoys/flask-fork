@@ -113,7 +113,7 @@ Args:
 Returns:
     object: The modified HTTP response object with the database connection closed.
 """
-g.db.close()
+    g.db.close()
     return response
 
 
@@ -127,7 +127,7 @@ Args:
 Returns:
     A rendered HTML template containing the timeline of messages.
 """
-if not g.user:
+    if not g.user:
         return redirect(url_for('public_timeline'))
     offset = request.args.get('offset', type=int)
     return render_template('timeline.html', messages=query_db('''
@@ -160,7 +160,7 @@ Parameters:
 Returns:
 - A rendered HTML template containing the user's timeline data.
 """
-profile_user = query_db('select * from user where username = ?',
+    profile_user = query_db('select * from user where username = ?',
                             [username], one=True)
     if profile_user is None:
         abort(404)
@@ -254,7 +254,7 @@ Returns:
     redirect: Redirects to the timeline page if the user is already logged in.
     render_template: Renders the registration template with any error messages.
 """
-if g.user:
+    if g.user:
         return redirect(url_for('timeline'))
     error = None
     if request.method == 'POST':
@@ -266,7 +266,7 @@ if g.user:
         elif not request.form['password']:
             error = 'You have to enter a password'
         elif request.form['password'] != request.form['password2']:
-            error = 'The two passwords to not match'
+            error = 'The two passwords do not match'
         elif get_user_id(request.form['username']) is not None:
             error = 'The username is already taken'
         else:
