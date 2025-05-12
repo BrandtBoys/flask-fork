@@ -23,7 +23,7 @@ Example:
     >>> add(3, 5)
     8
 """
-return a + b
+    return a + b
 
 
 @shared_task()
@@ -39,7 +39,7 @@ Args:
 Returns:
     None
 """
-time.sleep(5)
+    time.sleep(5)
 
 
 @shared_task(bind=True, ignore_result=False)
@@ -57,7 +57,7 @@ Args:
 Returns:
     dict: A dictionary containing the final state of the task, including 'current' and 'total' values.
 """
-for i in range(total):
+    for i in range(total):
         self.update_state(state="PROGRESS", meta={"current": i + 1, "total": total})
         time.sleep(1)
 

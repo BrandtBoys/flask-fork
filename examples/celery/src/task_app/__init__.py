@@ -11,7 +11,7 @@ Creates a new Flask application instance with Celery configuration and blueprint
 Returns:
     A fully configured Flask application instance.
 """
-app = Flask(__name__)
+    app = Flask(__name__)
     app.config.from_mapping(
         CELERY=dict(
             broker_url="redis://localhost",
@@ -33,7 +33,7 @@ Args:
 Returns:
     str: The rendered HTML content of the 'index.html' template.
 """
-return render_template("index.html")
+        return render_template("index.html")
 
     from . import views
 
@@ -55,7 +55,7 @@ Args:
 Returns:
     Celery: The initialized Celery application.
 """
-class FlaskTask(Task):
+    class FlaskTask(Task):
         def __call__(self, *args: object, **kwargs: object) -> object:
             """
 Call the run method of the current instance within an application context.
@@ -71,7 +71,7 @@ Args:
 Returns:
     object: The result of calling the run method on the instance with the provided arguments and keyword arguments.
 """
-with app.app_context():
+            with app.app_context():
                 return self.run(*args, **kwargs)
 
     celery_app = Celery(app.name, task_cls=FlaskTask)

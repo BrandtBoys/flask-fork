@@ -24,7 +24,7 @@ Returns:
 Raises:
     TypeError: If the input ID is not a string.
 """
-result = AsyncResult(id)
+    result = AsyncResult(id)
     ready = result.ready()
     return {
         "ready": ready,
@@ -58,7 +58,7 @@ Returns:
 Raises:
     None
 """
-result = tasks.block.delay()
+    result = tasks.block.delay()
     return {"result_id": result.id}
 
 
@@ -66,6 +66,8 @@ result = tasks.block.delay()
 def process() -> dict[str, object]:
     """
 Processes a task and returns the ID of the delayed job.
+    result = tasks.process.delay(total=request.form.get("total", type=int))
+    return {"result_id": result.id}
 
 This function takes no arguments and returns a dictionary containing the ID of the delayed job.
 The delay is set to the total value provided in the request form, defaulting to 0 if not specified.
@@ -73,5 +75,3 @@ The delay is set to the total value provided in the request form, defaulting to 
 Returns:
     dict[str, object]: A dictionary containing the result_id of the delayed job.
 """
-result = tasks.process.delay(total=request.form.get("total", type=int))
-    return {"result_id": result.id}
