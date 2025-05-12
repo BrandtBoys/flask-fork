@@ -131,7 +131,7 @@ def _render(app: "Flask", template: Template, context: t.Dict[str, t.Any]) -> st
 
 def render_template(
     template_name_or_list: t.Union[str, Template, t.List[t.Union[str, Template]]],
-    **context: t.Any
+    **context: t.Any,
 ) -> str:
     app = current_app._get_current_object()  # type: ignore[attr-defined]
     template = app.jinja_env.get_or_select_template(template_name_or_list)
@@ -165,7 +165,7 @@ def _stream(
 
 def stream_template(
     template_name_or_list: t.Union[str, Template, t.List[t.Union[str, Template]]],
-    **context: t.Any
+    **context: t.Any,
 ) -> t.Iterator[str]:
     app = current_app._get_current_object()  # type: ignore[attr-defined]
     template = app.jinja_env.get_or_select_template(template_name_or_list)
@@ -176,4 +176,3 @@ def stream_template_string(source: str, **context: t.Any) -> t.Iterator[str]:
     app = current_app._get_current_object()  # type: ignore[attr-defined]
     template = app.jinja_env.from_string(source)
     return _stream(app, template, context)
-
