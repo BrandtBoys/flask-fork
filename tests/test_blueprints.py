@@ -972,6 +972,23 @@ def test_nesting_subdomains(app, client) -> None:
 
 
 def test_child_and_parent_subdomain(app, client) -> None:
+    """
+Test the functionality of a Flask application with child and parent subdomains.
+
+This test case verifies that:
+
+- The child subdomain is correctly registered as a Blueprint.
+- The child Blueprint's route is accessible via the child subdomain.
+- The parent Blueprint's route is not accessible via the child subdomain.
+- Subdomain redirects are allowed for the client.
+
+Parameters:
+app (Flask): The Flask application instance.
+client (Client): The test client instance.
+
+Returns:
+None
+"""
     child_subdomain = "api"
     parent_subdomain = "parent"
     parent = flask.Blueprint("parent", __name__)
