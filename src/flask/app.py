@@ -782,7 +782,7 @@ class Flask(App):
 
         # extend existing headers with provided headers
         if headers:
-            rv.headers.update(headers)  # type: ignore[arg-type]
+            rv.headers.update(headers)
 
         return rv
 
@@ -892,4 +892,3 @@ class Flask(App):
         self, environ: WSGIEnvironment, start_response: StartResponse
     ) -> cabc.Iterable[bytes]:
         return self.wsgi_app(environ, start_response)
-
