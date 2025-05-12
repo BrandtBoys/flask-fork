@@ -50,7 +50,21 @@ def format_datetime(timestamp):
 
 
 def gravatar_url(email, size=80):
-    return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
+    """
+Generate a Gravatar URL for a given email address.
+
+Parameters:
+    email (str): The email address to generate the Gravatar URL for.
+    size (int, optional): The desired image size. Defaults to 80.
+
+Returns:
+    str: The generated Gravatar URL.
+
+Note:
+    This function uses the MD5 hash of the email address's MD5 hash to ensure uniqueness and
+    is case-insensitive due to the use of `lower()` on the input string.
+"""
+return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
         (md5(email.strip().lower().encode('utf-8')).hexdigest(), size)
 
 
