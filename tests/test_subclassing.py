@@ -19,3 +19,4 @@ def test_suppressed_exception_logging():
     assert rv.status_code == 500
     assert b"Internal Server Error" in rv.data
     assert not out.getvalue()
+
