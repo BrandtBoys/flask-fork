@@ -187,7 +187,27 @@ def send_file(
     last_modified: datetime | int | float | None = None,
     max_age: None | (int | t.Callable[[str | None], int | None]) = None,
 ) -> Response:
-    return werkzeug.utils.send_file(  # type: ignore[return-value]
+    """
+Sends a file to the client.
+
+This function is used to send files from the server to the client. It takes various parameters
+to customize the behavior of the file sending process, such as the MIME type, whether to send
+the file as an attachment, and the last modified date of the file.
+
+Parameters:
+- path_or_file (os.PathLike[t.AnyStr] | str | t.BinaryIO): The path or file-like object containing the data to be sent.
+- mimetype (str | None): The MIME type of the file. Defaults to None.
+- as_attachment (bool): Whether to send the file as an attachment. Defaults to False.
+- download_name (str | None): The name of the downloaded file. Defaults to None.
+- conditional (bool): Whether to check for a conditional GET request. Defaults to True.
+- etag (bool | str): Whether to include the ETag in the response headers or its value as a string. Defaults to True.
+- last_modified (datetime | int | float | None): The last modified date of the file. Defaults to None.
+- max_age (None | (int | t.Callable[[str | None], int | None])): The maximum age of the cached response in seconds. Defaults to None.
+
+Returns:
+- Response: The HTTP response object containing the sent file data.
+"""
+return werkzeug.utils.send_file(  # type: ignore[return-value]
         **_prepare_send_file_kwargs(
             path_or_file=path_or_file,
             environ=request.environ,
