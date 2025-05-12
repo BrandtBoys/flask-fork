@@ -276,7 +276,7 @@ Args:
 Returns:
     None
 """
-         def wrapper(state: BlueprintSetupState) -> None:
+        def wrapper(state: BlueprintSetupState) -> None:
             if state.first_registration:
                 func(state)
 

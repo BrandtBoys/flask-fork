@@ -90,7 +90,7 @@ class _AppCtxGlobals:
 
 
 def after_this_request(
-    f: ft.AfterRequestCallable[t.Any]
+    f: ft.AfterRequestCallable[t.Any],
 ) -> ft.AfterRequestCallable[t.Any]:
     """
 Returns a decorator that appends the provided callable to the list of functions 

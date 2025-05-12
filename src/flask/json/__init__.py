@@ -41,6 +41,7 @@ def load(fp: t.IO[t.AnyStr], **kwargs: t.Any) -> t.Any:
 
 
 def jsonify(*args: t.Any, **kwargs: t.Any) -> Response:
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
     """
 Returns a JSON response.
 
@@ -55,4 +56,3 @@ Args:
 Returns:
     Response: A JSON response object.
 """
-    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
