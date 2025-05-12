@@ -11,3 +11,4 @@ def create_app2(foo, bar):
 
 def no_app():
     pass
+
