@@ -38,7 +38,7 @@ Example:
     >>> app.index()
     'Hello World!'
 """
-return 'Hello %s!' % flask.request.args['name']
+            return 'Hello %s!' % flask.request.args['name']
         @app.route('/meh')
         def meh():
             """
@@ -52,7 +52,7 @@ Args:
 Returns:
     str: The URL of the current request.
 """
-return flask.request.url
+            return flask.request.url
 
         with app.test_request_context('/?name=World'):
             assert index() == 'Hello World!'
@@ -73,7 +73,7 @@ It checks for correct status codes, allowed methods, and response data.
 - `c.get('/more')` should return a response with method 'GET'.
 - `c.delete('/more')` should return a response with status code 405 (Method Not Allowed) and allowed methods ['GET', 'HEAD', 'POST'].
 """
-app = flask.Flask(__name__)
+        app = flask.Flask(__name__)
         @app.route('/')
         def index():
             """
@@ -92,7 +92,7 @@ Example:
     >>> app.index()
     'GET'
 """
-return flask.request.method
+            return flask.request.method
         @app.route('/more', methods=['GET', 'POST'])
         def more():
             """
@@ -111,7 +111,7 @@ Example:
     >>> from your_module import more
     >>> print(more())  # prints the HTTP method of the current request
 """
-return flask.request.method
+            return flask.request.method
 
         c = app.test_client()
         assert c.get('/').data == 'GET'
@@ -141,7 +141,7 @@ This test case verifies that the `test_session` method correctly sets and retrie
 
 Note: This test case assumes that the Flask session is properly configured and initialized before running this test.
 """
-app = flask.Flask(__name__)
+        app = flask.Flask(__name__)
         app.secret_key = 'testkey'
         @app.route('/set', methods=['POST'])
         def set():
@@ -158,7 +158,7 @@ Args:
 Returns:
     str: A success message
 """
-flask.session['value'] = flask.request.form['value']
+            flask.session['value'] = flask.request.form['value']
             return 'value set'
         @app.route('/get')
         def get():
@@ -174,11 +174,19 @@ Returns the value from the Flask session dictionary.
     Raises:
         KeyError: If the 'value' key is not found in the session dictionary.
 """
-return flask.session['value']
+            return flask.session['value']
 
         c = app.test_client()
         assert c.post('/set', data={'value': '42'}).data == 'value set'
         assert c.get('/get').data == '42'
+
+    def test_url_generation(self):
+        app = flask.Flask(__name__)
+        @app.route('/hello/<name>', methods=['POST'])
+        def hello():
+            pass
+        with app.test_request_context():
+            assert flask.url_for('hello', name='test x') == '/hello/test%20x'
 
 
 if __name__ == '__main__':
