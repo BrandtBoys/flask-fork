@@ -96,6 +96,7 @@ Returns:
 Raises:
     None
 """
+
     current_app.update_template_context(context)
     return current_app.jinja_env.get_template(template_name).render(context)
 
@@ -118,6 +119,7 @@ Returns:
 Raises:
     None
 """
+
     current_app.update_template_context(context)
     return current_app.jinja_env.from_string(source).render(context)
 
@@ -238,6 +240,7 @@ Returns:
 Raises:
     AttributeError: If _request_ctx_stack is not available or top is not a Request object.
 """
+
         reqctx = _request_ctx_stack.top
         context['request'] = reqctx.request
         context['session'] = reqctx.session
@@ -275,7 +278,21 @@ Raises:
 
     def route(self, rule, **options):
         def decorator(f):
-            if 'endpoint' not in options:
+            """
+Decorates a function to register it with the URL map.
+
+This decorator is used to associate a view function with a specific endpoint in the application.
+It checks if an 'endpoint' key exists in the options dictionary, and if not, assigns the current function's name as the default endpoint.
+The methods for the endpoint are set to ('GET',) by default, but can be overridden using the `options` dictionary.
+The decorated function is then added to the URL map and stored in the view functions dictionary.
+
+Args:
+    f (function): The view function to be registered with the URL map.
+
+Returns:
+    function: The original view function, now decorated and registered with the URL map.
+"""
+if 'endpoint' not in options:
                 options['endpoint'] = f.__name__
             options.setdefault('methods', ('GET',))
             self.url_map.add(Rule(rule, **options))
@@ -386,6 +403,7 @@ Args:
 Returns:
     The result of calling `self.request_context` with the created mock environment.
 """
+
         return self.request_context(create_environ(*args, **kwargs))
 
     def __call__(self, environ, start_response):
