@@ -346,3 +346,4 @@ class TestHelpers:
 
         with pytest.raises(ValueError):
             app.open_resource("static/index.html", mode)
+
