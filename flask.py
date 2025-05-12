@@ -105,9 +105,22 @@ def render_template_string(source, **context):
 
 class Flask(object):
     """The flask object implements a WSGI application and acts as the central
-    object.  It is passed the name of the module or package of the application
-    and optionally a configuration.  When it's created it sets up the
-    template engine and provides ways to register view functions.
+    object.  It is passed the name of the module or package of the
+    application.  Once it is created it will act as a central registry for
+    the view functions, the URL rules, template configuration and much more.
+
+    The name of the package is used to resolve resources from inside the
+    package or the folder the module is contained in depending on if the
+    package parameter resolves to an actual python package (a folder with
+    an `__init__.py` file inside) or a standard module (just a `.py` file).
+
+    For more information about resource loading, see :func:`open_resource`.
+
+    Usually you create a :class:`Flask` instance in your main module or
+    in the `__init__.py` file of your package like this::
+
+        from flask import Flask
+        app = Flask(__name__)
     """
 
     #: the class that is used for request objects
@@ -136,11 +149,43 @@ class Flask(object):
     )
 
     def __init__(self, package_name):
+        #: the debug flag.  Set this to `True` to enable debugging of
+        #: the application.  In debug mode the debugger will kick in
+        #: when an unhandled exception ocurrs and the integrated server
+        #: will automatically reload the application if changes in the
+        #: code are detected.
         self.debug = False
+
+        #: the name of the package or module.  Do not change this once
+        #: it was set by the constructor.
         self.package_name = package_name
+
+        #: a dictionary of all view functions registered.  The keys will
+        #: be function names which are also used to generate URLs and
+        #: the values are the function objects themselves.
+        #: to register a view function, use the :meth:`route` decorator.
         self.view_functions = {}
+
+        #: a dictionary of all registered error handlers.  The key is
+        #: be the error code as integer, the value the function that
+        #: should handle that error.
+        #: To register a error handler, use the :meth:`errorhandler`
+        #: decorator.
         self.error_handlers = {}
+
+        #: a list of functions that should be called at the beginning
+        #: of the request before request dispatching kicks in.  This
+        #: can for example be used to open database connections or
+        #: getting hold of the currently logged in user.
+        #: To register a function here, use the :meth:`request_init`
+        #: decorator.
         self.request_init_funcs = []
+
+        #: a list of functions that are called at the end of the
+        #: request.  Tha function is passed the current response
+        #: object and modify it in place or replace it.
+        #: To register a function here use the :meth:`request_shtdown`
+        #: decorator.
         self.request_shutdown_funcs = []
         self.url_map = Map()
 
@@ -148,6 +193,9 @@ class Flask(object):
             self.url_map.add(Rule(self.static_path + '/<filename>',
                                   build_only=True, endpoint='static'))
 
+        #: the Jinja2 environment.  It is created from the
+        #: :attr:`jinja_options` and the loader that is returned
+        #: by the :meth:`create_jinja_loader` function.
         self.jinja_env = Environment(loader=self.create_jinja_loader(),
                                      **self.jinja_options)
         self.jinja_env.globals.update(
@@ -279,4 +327,3 @@ current_app = LocalProxy(lambda: _request_ctx_stack.top.app)
 request = LocalProxy(lambda: _request_ctx_stack.top.request)
 session = LocalProxy(lambda: _request_ctx_stack.top.session)
 g = LocalProxy(lambda: _request_ctx_stack.top.g)
-
