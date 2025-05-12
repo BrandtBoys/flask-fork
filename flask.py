@@ -96,7 +96,6 @@ Returns:
 Raises:
     None
 """
-
     current_app.update_template_context(context)
     return current_app.jinja_env.get_template(template_name).render(context)
 
@@ -119,7 +118,6 @@ Returns:
 Raises:
     None
 """
-
     current_app.update_template_context(context)
     return current_app.jinja_env.from_string(source).render(context)
 
@@ -240,7 +238,6 @@ Returns:
 Raises:
     AttributeError: If _request_ctx_stack is not available or top is not a Request object.
 """
-
         reqctx = _request_ctx_stack.top
         context['request'] = reqctx.request
         context['session'] = reqctx.session
@@ -292,7 +289,7 @@ Args:
 Returns:
     function: The original view function, now decorated and registered with the URL map.
 """
-if 'endpoint' not in options:
+            if 'endpoint' not in options:
                 options['endpoint'] = f.__name__
             options.setdefault('methods', ('GET',))
             self.url_map.add(Rule(rule, **options))
@@ -403,7 +400,6 @@ Args:
 Returns:
     The result of calling `self.request_context` with the created mock environment.
 """
-
         return self.request_context(create_environ(*args, **kwargs))
 
     def __call__(self, environ, start_response):
