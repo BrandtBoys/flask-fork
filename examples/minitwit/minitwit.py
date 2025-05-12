@@ -128,7 +128,6 @@ Args:
 Returns:
     A rendered HTML template containing the timeline of messages.
 """
-
     if not g.user:
         return redirect(url_for('public_timeline'))
     offset = request.args.get('offset', type=int)

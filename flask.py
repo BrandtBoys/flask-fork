@@ -268,7 +268,7 @@ Args:
 Returns:
     Client: A Werkzeug HTTP client instance.
 """
-from werkzeug import Client
+        from werkzeug import Client
         return Client(self, self.response_class, use_cookies=True)
 
     def open_resource(self, resource):
