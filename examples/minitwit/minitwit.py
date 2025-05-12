@@ -76,7 +76,17 @@ Returns a database connection and retrieves the current user's information.
 - Connects to the database using `connect_db()`.
 - Checks if a 'user_id' is present in the session. If it exists, retrieves the corresponding user data from the database.
 - Stores the retrieved user data in the `g.user` variable for later use.
+
+Args:
+    None
+
+Returns:
+    A dictionary containing the database connection and the current user's information.
+
+Raises:
+    Exception: If an error occurs while connecting to the database or retrieving user data.
 """
+
     g.db = connect_db()
     if 'user_id' in session:
         g.user = query_db('select * from user where user_id = ?',
