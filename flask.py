@@ -96,7 +96,7 @@ Returns:
 Raises:
     None
 """
-current_app.update_template_context(context)
+    current_app.update_template_context(context)
     return current_app.jinja_env.get_template(template_name).render(context)
 
 
@@ -118,7 +118,7 @@ Returns:
 Raises:
     None
 """
-current_app.update_template_context(context)
+    current_app.update_template_context(context)
     return current_app.jinja_env.from_string(source).render(context)
 
 
@@ -238,7 +238,7 @@ Returns:
 Raises:
     AttributeError: If _request_ctx_stack is not available or top is not a Request object.
 """
-reqctx = _request_ctx_stack.top
+        reqctx = _request_ctx_stack.top
         context['request'] = reqctx.request
         context['session'] = reqctx.session
         context['g'] = reqctx.g
@@ -277,6 +277,7 @@ reqctx = _request_ctx_stack.top
         def decorator(f):
             if 'endpoint' not in options:
                 options['endpoint'] = f.__name__
+            options.setdefault('methods', ('GET',))
             self.url_map.add(Rule(rule, **options))
             self.view_functions[options['endpoint']] = f
             return f
@@ -358,7 +359,7 @@ Notes:
     It preprocesses the request, dispatches it if necessary, makes a response, processes it,
     and finally returns the response to the WSGI server.
 """
-with self.request_context(environ):
+        with self.request_context(environ):
             rv = self.preprocess_request()
             if rv is None:
                 rv = self.dispatch_request()
@@ -385,7 +386,7 @@ Args:
 Returns:
     The result of calling `self.request_context` with the created mock environment.
 """
-return self.request_context(create_environ(*args, **kwargs))
+        return self.request_context(create_environ(*args, **kwargs))
 
     def __call__(self, environ, start_response):
         return self.wsgi_app(environ, start_response)
