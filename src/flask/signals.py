@@ -29,7 +29,7 @@ except ImportError:
             raise RuntimeError(
                 "Signalling support is unavailable because the blinker"
                 " library is not installed."
-            )
+            ) from None
 
         connect = connect_via = connected_to = temporarily_connected_to = _fail
         disconnect = _fail
@@ -54,4 +54,3 @@ appcontext_tearing_down = _signals.signal("appcontext-tearing-down")
 appcontext_pushed = _signals.signal("appcontext-pushed")
 appcontext_popped = _signals.signal("appcontext-popped")
 message_flashed = _signals.signal("message-flashed")
-
