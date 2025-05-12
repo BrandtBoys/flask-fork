@@ -78,6 +78,15 @@ class JSONTag:
         raise NotImplementedError
 
     def tag(self, value: t.Any) -> dict[str, t.Any]:
+        """
+Converts a given value to JSON format and returns it as a dictionary.
+
+Args:
+    value (t.Any): The value to be converted to JSON format.
+
+Returns:
+    dict[str, t.Any]: A dictionary containing the key-value pair where the key is 'tag' and the value is the JSON representation of the input value.
+"""
         return {self.key: self.to_json(value)}
 
 
@@ -250,6 +259,20 @@ class TaggedJSONSerializer:
         force: bool = False,
         index: int | None = None,
     ) -> None:
+        """
+Registers a new JSON tag or inserts an existing one at the specified position in the order list.
+
+Args:
+    - `tag_class`: The class of the JSON tag to be registered.
+    - `force` (optional): If True, forces registration even if the key already exists. Defaults to False.
+    - `index` (optional): The index at which to insert the tag. If None, appends to the end of the order list.
+
+Raises:
+    KeyError: If the key is already registered and force is False.
+
+Returns:
+    None
+"""
         tag = tag_class(self)
         key = tag.key
 
@@ -265,6 +288,17 @@ class TaggedJSONSerializer:
             self.order.insert(index, tag)
 
     def tag(self, value: t.Any) -> t.Any:
+        """
+Returns the first matching tag from the order list.
+
+If a match is found, it returns the corresponding tag's value. Otherwise, it returns the original input value.
+
+Args:
+    value (t.Any): The input value to be checked against the tags.
+
+Returns:
+    t.Any: The matched tag's value or the original input value.
+"""
         for tag in self.order:
             if tag.check(value):
                 return tag.tag(value)

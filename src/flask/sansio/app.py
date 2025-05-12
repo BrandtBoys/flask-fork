@@ -428,6 +428,18 @@ class App(Scaffold):
 
     @cached_property
     def name(self) -> str:  # type: ignore
+        """
+Returns the name of the current module or 'main' if running directly.
+
+If running directly, attempts to retrieve the filename from sys.modules['__main__'].
+If not found, returns '__main__'. Otherwise, returns the base filename without extension.
+
+Args:
+    None
+
+Returns:
+    str: The name of the current module or 'main'.
+"""
         if self.import_name == "__main__":
             fn: str | None = getattr(sys.modules["__main__"], "__file__", None)
             if fn is None:
@@ -473,6 +485,15 @@ class App(Scaffold):
 
     @property
     def debug(self) -> bool:
+        """
+Returns whether the debug mode is enabled based on the configuration.
+
+Args:
+    None
+
+Returns:
+    bool: True if debug mode is enabled, False otherwise
+"""
         return self.config["DEBUG"]  # type: ignore[no-any-return]
 
     @debug.setter
@@ -661,6 +682,24 @@ class App(Scaffold):
         )
 
     def inject_url_defaults(self, endpoint: str, values: dict[str, t.Any]) -> None:
+        """
+Injects URL defaults into the provided endpoint.
+
+This function is used to inject default values from a dictionary into an endpoint.
+It can be called outside of a request context and will parse the passed endpoint
+to determine which blueprint it belongs to. It then calls the specified functions
+for each name in the parsed path, passing the endpoint and values as arguments.
+
+Args:
+    endpoint (str): The URL endpoint to inject defaults into.
+    values (dict[str, t.Any]): A dictionary of default values to inject.
+
+Returns:
+    None
+
+Raises:
+    ValueError: If the endpoint is not a valid URL.
+"""
         names: t.Iterable[str | None] = (None,)
 
         # url_for may be called outside a request context, parse the

@@ -15,6 +15,18 @@ if t.TYPE_CHECKING:  # pragma: no cover
 
 class Blueprint(SansioBlueprint):
     def get_send_file_max_age(self, filename: str | None) -> int | None:
+        """
+Returns the maximum age in seconds for sending files.
+
+If `filename` is provided, it will be used to retrieve the default send file max age from the application configuration.
+Otherwise, the default value will be returned.
+
+Args:
+    filename (str | None): The name of the file to retrieve the default send file max age for. If None, the default value will be returned.
+
+Returns:
+    int | None: The maximum age in seconds for sending files, or None if no default value is set.
+"""
         value = current_app.config["SEND_FILE_MAX_AGE_DEFAULT"]
 
         if value is None:

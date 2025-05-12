@@ -55,6 +55,26 @@ class FormDataRoutingRedirect(AssertionError):
     """
 
     def __init__(self, request: Request) -> None:
+        """
+Raises a custom exception when a request is redirected by the router.
+
+This exception is raised when a request is sent to a URL that is
+redirected by the router, but the redirect was not properly configured.
+The exception provides information about the original and canonical URLs,
+as well as guidance on how to configure routing redirects correctly.
+
+In debug mode only. In production mode, this exception will be caught
+and handled by Flask's default error handling mechanism.
+
+Parameters:
+    request (Request): The original request that caused the redirect.
+
+Returns:
+    None
+
+Raises:
+    RequestRedirect: A custom exception with information about the redirect.
+"""
         exc = request.routing_exception
         assert isinstance(exc, RequestRedirect)
         buf = [
@@ -79,10 +99,37 @@ class FormDataRoutingRedirect(AssertionError):
 
 
 def attach_enctype_error_multidict(request: Request) -> None:
+    """
+Replaces the default behavior of Django's `request.files` with a multidict-based implementation.
+
+When an error occurs while accessing a file, it will be raised as a `DebugFilesKeyError` instead of raising a `KeyError`. This allows for additional debugging information to be provided.
+
+This function is intended to be used in conjunction with the `django.http.HttpRequest` class. It should not be called directly by external code.
+
+Args:
+    request (HttpRequest): The HTTP request object.
+
+Returns:
+    None
+"""
     oldcls = request.files.__class__
 
     class newcls(oldcls):  # type: ignore[valid-type, misc]
         def __getitem__(self, key: str) -> t.Any:
+            """
+Raises a `DebugFilesKeyError` exception when the provided key is not found in the request form.
+If the key is present but raises a KeyError, it will be re-raised with additional context.
+
+Args:
+    key (str): The key to look up in the request form.
+
+Returns:
+    t.Any: The value associated with the key if found, otherwise raises an exception.
+
+Raises:
+    DebugFilesKeyError: If the key is not found in the request form.
+    KeyError: If the key is present but raises a KeyError.
+"""
             try:
                 return super().__getitem__(key)
             except KeyError as e:
@@ -99,6 +146,23 @@ def attach_enctype_error_multidict(request: Request) -> None:
 
 
 def _dump_loader_info(loader: BaseLoader) -> t.Iterator[str]:
+    """
+Yields a formatted string representation of the loader's class and attributes.
+
+This function takes a `BaseLoader` object as input and returns an iterator over strings.
+Each string represents either a class or attribute of the loader, with indentation used to denote nested values.
+
+The yielded strings are formatted according to the following rules:
+- Class information is represented as "class: <module>.<class_name>".
+- Attribute values that are tuples or lists are indented and separated by hyphens (e.g. "key: value1 - value2").
+- Attribute values that are not strings, integers, floats, or booleans are skipped.
+
+Args:
+    loader (BaseLoader): The loader object to generate documentation for.
+
+Yields:
+    str: A formatted string representation of the loader's class and attributes.
+"""
     yield f"class: {type(loader).__module__}.{type(loader).__name__}"
     for key, value in sorted(loader.__dict__.items()):
         if key.startswith("_"):

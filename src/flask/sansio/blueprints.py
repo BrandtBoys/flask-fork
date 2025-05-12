@@ -91,6 +91,18 @@ class BlueprintSetupState:
         view_func: ft.RouteCallable | None = None,
         **options: t.Any,
     ) -> None:
+        """
+Adds a URL rule to the application.
+
+Parameters:
+    rule (str): The URL pattern.
+    endpoint (str | None, optional): The endpoint name. Defaults to None.
+    view_func (ft.RouteCallable | None, optional): The view function. Defaults to None.
+    **options (t.Any): Additional options for the URL rule.
+
+Returns:
+    None
+"""
         if self.url_prefix is not None:
             if rule:
                 rule = "/".join((self.url_prefix.rstrip("/"), rule.lstrip("/")))
@@ -180,6 +192,34 @@ class Blueprint(Scaffold):
         root_path: str | None = None,
         cli_group: str | None = _sentinel,  # type: ignore[assignment]
     ):
+        """
+Initialize a new instance of the class.
+
+Parameters:
+    name (str): The name of the application or module.
+    import_name (str): The import name of the application or module.
+    static_folder (str | os.PathLike[str] | None, optional): The path to the static folder. Defaults to None.
+    static_url_path (str | None, optional): The URL path for static files. Defaults to None.
+    template_folder (str | os.PathLike[str] | None, optional): The path to the template folder. Defaults to None.
+    url_prefix (str | None, optional): The prefix for URLs. Defaults to None.
+    subdomain (str | None, optional): The subdomain for URLs. Defaults to None.
+    url_defaults (dict[str, t.Any] | None, optional): Default values for URL parameters. Defaults to None.
+    root_path (str | None, optional): The path of the application or module. Defaults to None.
+    cli_group (str | None, optional): The CLI group name. Defaults to _sentinel.
+
+Raises:
+    ValueError: If 'name' is empty or contains a dot '.' character.
+
+Attributes:
+    name (str): The name of the application or module.
+    url_prefix (str): The prefix for URLs.
+    subdomain (str): The subdomain for URLs.
+    deferred_functions (list[DeferredSetupFunction]): A list of deferred functions.
+    url_values_defaults (dict[str, t.Any]): Default values for URL parameters.
+    cli_group (str): The CLI group name.
+    _blueprints (list[tuple[Blueprint, dict[str, t.Any]]]): A list of blueprints and their configurations.
+
+"""
         super().__init__(
             import_name=import_name,
             static_folder=static_folder,
@@ -223,7 +263,20 @@ class Blueprint(Scaffold):
     @setupmethod
     def record_once(self, func: DeferredSetupFunction) -> None:
 
-        def wrapper(state: BlueprintSetupState) -> None:
+       """
+Records a function to be executed once during the setup process.
+
+This method is used to register a function that should only be executed once,
+during the initial setup of the application. The function is wrapped in a
+decorator to ensure it's only called once, even if the blueprint is reloaded.
+
+Args:
+    func (DeferredSetupFunction): The function to be recorded and executed.
+    
+Returns:
+    None
+"""
+         def wrapper(state: BlueprintSetupState) -> None:
             if state.first_registration:
                 func(state)
 
@@ -319,10 +372,36 @@ class Blueprint(Scaffold):
             blueprint.register(app, bp_options)
 
     def _merge_blueprint_funcs(self, app: App, name: str) -> None:
+        """
+Merges blueprint functions into the application's configuration.
+
+This function merges the provided blueprint functions (`bp_dict`) into the
+application's configuration. It updates the `error_handler_spec`, `view_functions`,
+`before_request_funcs`, `after_request_funcs`, `teardown_request_funcs`, `url_default_functions`,
+`url_value_preprocessors`, and `template_context_processors` dictionaries with the merged values.
+
+Args:
+    app (App): The application instance.
+    name (str): The blueprint name to merge functions under.
+
+Returns:
+    None
+"""
         def extend(
             bp_dict: dict[ft.AppOrBlueprintKey, list[t.Any]],
             parent_dict: dict[ft.AppOrBlueprintKey, list[t.Any]],
         ) -> None:
+            """
+Extends the `parent_dict` with the items from `bp_dict`, 
+overwriting any existing keys.
+
+Args:
+    - **bp_dict**: A dictionary mapping blueprint or app keys to lists of values.
+    - **parent_dict**: The dictionary to extend, also mapping blueprint or app keys to lists of values.
+
+Returns:
+    None
+"""
             for key, values in bp_dict.items():
                 key = name if key is None else f"{name}.{key}"
                 parent_dict[key].extend(values)
@@ -475,7 +554,26 @@ class Blueprint(Scaffold):
     ) -> t.Callable[[T_error_handler], T_error_handler]:
 
         def decorator(f: T_error_handler) -> T_error_handler:
+            """
+Decorates an error handler function with the ability to be registered once in a Blueprint's setup.
+
+Args:
+    f (T_error_handler): The error handler function to decorate.
+
+Returns:
+    T_error_handler: The decorated error handler function.
+"""
             def from_blueprint(state: BlueprintSetupState) -> None:
+                """
+Handles error handling for an application using a blueprint setup state.
+
+Args:
+    state (BlueprintSetupState): The current state of the blueprint setup.
+Returns:
+    None
+Raises:
+    Exception: If an error occurs during error handling.
+"""
                 state.app.errorhandler(code)(f)
 
             self.record_once(from_blueprint)

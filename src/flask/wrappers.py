@@ -54,6 +54,18 @@ class Request(RequestBase):
 
     @property
     def max_content_length(self) -> int | None:  # type: ignore[override]
+        """
+Returns the maximum allowed content length for the application.
+
+If `current_app` is available, it returns the value from `current_app.config["MAX_CONTENT_LENGTH"]`.
+Otherwise, it returns `None`.
+
+Args:
+    None
+
+Returns:
+    int | None: The maximum allowed content length or None if not configured.
+"""
         if current_app:
             return current_app.config["MAX_CONTENT_LENGTH"]  # type: ignore[no-any-return]
         else:

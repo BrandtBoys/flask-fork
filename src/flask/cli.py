@@ -89,6 +89,15 @@ def find_best_app(module: ModuleType) -> Flask:
 
 
 def _called_with_wrong_args(f: t.Callable[..., Flask]) -> bool:
+    """
+Checks if a given Flask function was called with incorrect arguments.
+
+Args:
+    f (callable): The Flask function to check.
+
+Returns:
+    bool: True if the function was not called with correct arguments, False otherwise.
+"""
     tb = sys.exc_info()[2]
 
     try:
@@ -185,6 +194,19 @@ def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
 
 
 def prepare_import(path: str) -> str:
+    """
+Prepares the import path for a Python module.
+
+This function takes a file path as input and returns the relative import path
+for the corresponding module. It handles cases where the input path is within
+a package structure, and adjusts the sys.path accordingly.
+
+Args:
+    path (str): The absolute or relative path to the Python module.
+
+Returns:
+    str: The relative import path for the module.
+"""
     path = os.path.realpath(path)
 
     fname, ext = os.path.splitext(path)
@@ -214,6 +236,23 @@ def prepare_import(path: str) -> str:
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[True] = True
 ) -> Flask:
+    """
+Locate an application within a given Flask module.
+
+This function takes in the name of the module and the application to locate,
+as well as an optional parameter to raise an exception if the application is not found.
+
+Args:
+    - `module_name` (str): The name of the module to search for.
+    - `app_name` (str | None): The name of the application to locate. If None, all applications will be returned.
+    - `raise_if_not_found` (bool, optional): Whether to raise an exception if the application is not found. Defaults to True.
+
+Returns:
+    Flask: The located Flask application object.
+
+Raises:
+    ValueError: If `app_name` is not provided and `raise_if_not_found` is False.
+"""
     ...
 
 
@@ -221,12 +260,45 @@ def locate_app(
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[False] = ...
 ) -> Flask | None:
+    """
+Locate an application within a given module.
+
+This function searches for an application with the specified name within a given module.
+It returns the found application or `None` if not found. If `raise_if_not_found` is set to `True`, it raises a `ValueError` if the application is not found.
+
+Args:
+    - **module_name** (str): The name of the module to search in.
+    - **app_name** (str | None): The name of the application to locate. If `None`, all applications will be returned.
+    - **raise_if_not_found** (bool, optional): Whether to raise an error if the application is not found. Defaults to `False`.
+
+Returns:
+    - Flask | None: The located application or `None` if not found.
+
+Raises:
+    ValueError: If `raise_if_not_found` is set to `True` and the application is not found.
+"""
     ...
 
 
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: bool = True
 ) -> Flask | None:
+    """
+Locate an application within a given module.
+
+This function attempts to import the specified module and then searches for
+the requested application. If the application is not found, it will raise a
+`NoAppException`.
+
+Args:
+    - `module_name`: The name of the module to search in.
+    - `app_name`: The name of the application to locate (optional).
+    - `raise_if_not_found`: Whether to raise an exception if the application
+        is not found. Defaults to True.
+
+Returns:
+    - The located Flask application, or None if no application was found.
+"""
     try:
         __import__(module_name)
     except ImportError:
@@ -251,6 +323,22 @@ def locate_app(
 
 
 def get_version(ctx: click.Context, param: click.Parameter, value: t.Any) -> None:
+    """
+Returns the version information of Python, Flask, and Werkzeug.
+
+This function is used to display the versions of these dependencies when running a Click command.
+It checks if the value provided is valid (i.e., not empty) or if resilient parsing is enabled,
+in which case it returns without displaying any output. Otherwise, it prints the version information
+to the console using `click.echo` and then exits the application with `ctx.exit()`.
+
+Args:
+    ctx (click.Context): The Click context object.
+    param (click.Parameter): The parameter being processed.
+    value (t.Any): The value provided by the user.
+
+Returns:
+    None
+"""
     if not value or ctx.resilient_parsing:
         return
 
@@ -303,6 +391,18 @@ class ScriptInfo:
         self._loaded_app: Flask | None = None
 
     def load_app(self) -> Flask:
+        """
+Loads a Flask application instance.
+
+This method attempts to load an existing Flask application from the `self._loaded_app` attribute,
+or creates a new one if none exists. It also sets the debug flag of the loaded application
+if `self.set_debug_flag` is True.
+
+If no application can be found, it raises a `NoAppException`.
+
+Returns:
+    Flask: The loaded or created Flask application instance.
+"""
         if self._loaded_app is not None:
             return self._loaded_app
 
@@ -347,8 +447,40 @@ F = t.TypeVar("F", bound=t.Callable[..., t.Any])
 
 def with_appcontext(f: F) -> F:
 
-    @click.pass_context
+   """
+Decorates a function to run with the application context.
+
+This decorator is used to ensure that functions decorated with it are executed within
+the application's context. This can be useful for tasks such as database operations,
+file I/O, or any other operation that requires access to the current application state.
+
+The `with_appcontext` function takes a function `f` as an argument and returns the result of
+invoking `f` with the application context. If the application context is not already set,
+it will load the application from the `ScriptInfo` object associated with the click context.
+
+Args:
+    f (function): The function to be decorated.
+
+Returns:
+    function: The original function, wrapped in a decorator that runs it with the application context.
+"""
+     @click.pass_context
     def decorator(ctx: click.Context, /, *args: t.Any, **kwargs: t.Any) -> t.Any:
+        """
+Decorates a function with the necessary context.
+
+This decorator loads the application context and ensures that it is available for the decorated function.
+If the current application context is not set, it loads the script info from the click context and switches to its app context.
+
+Args:
+    ctx (click.Context): The click context object.
+    /: Ignored positional argument.
+    *args (t.Any): Variable number of non-keyword arguments.
+    **kwargs (t.Any): Variable number of keyword arguments.
+
+Returns:
+    t.Any: The result of the decorated function invocation.
+"""
         if not current_app:
             app = ctx.ensure_object(ScriptInfo).load_app()
             ctx.with_resource(app.app_context())
@@ -372,6 +504,19 @@ class AppGroup(click.Group):
         wrap_for_ctx = kwargs.pop("with_appcontext", True)
 
         def decorator(f: t.Callable[..., t.Any]) -> click.Command:
+            """
+Decorates a function to create a Click command.
+
+This decorator wraps the provided function in an AppGroup context if `wrap_for_ctx` is True.
+It then calls the `super()` method on the AppGroup class, passing the original function as an argument,
+and returns the result of this call. The `# type: ignore[no-any-return]` comment suppresses a type check warning.
+
+Args:
+    f (t.Callable[..., t.Any]): The function to be decorated.
+
+Returns:
+    click.Command: The decorated Click command.
+"""
             if wrap_for_ctx:
                 f = with_appcontext(f)
             return super(AppGroup, self).command(*args, **kwargs)(f)  # type: ignore[no-any-return]
@@ -540,6 +685,20 @@ class FlaskGroup(AppGroup):
         self._loaded_plugin_commands = False
 
     def _load_plugin_commands(self) -> None:
+        """
+Loads plugin commands from the `importlib.metadata` module.
+
+This method checks if plugin commands have already been loaded and returns early.
+If the Python version is 3.10 or higher, it uses the `metadata` function from `importlib`.
+Otherwise, it uses a backport of `importlib_metadata` for consistency with earlier versions.
+It then iterates over the entry points in the "flask.commands" group and adds each command to the instance's commands.
+
+Args:
+    None
+
+Returns:
+    None
+"""
         if self._loaded_plugin_commands:
             return
 
@@ -557,6 +716,23 @@ class FlaskGroup(AppGroup):
         self._loaded_plugin_commands = True
 
     def get_command(self, ctx: click.Context, name: str) -> click.Command | None:
+        """
+Returns the specified command from the application's CLI.
+
+If the command is found in the built-in commands or plugin commands,
+it returns that command. Otherwise, it attempts to load the
+application and retrieve the command from its CLI.
+
+If the application fails to load, an error message is displayed
+and `None` is returned.
+
+Args:
+    ctx (click.Context): The context of the current command.
+    name (str): The name of the command to retrieve.
+
+Returns:
+    click.Command | None: The specified command or `None` if not found.
+"""
         self._load_plugin_commands()
         # Look up built-in and plugin commands, which should be
         # available even if the app fails to load.
@@ -584,6 +760,20 @@ class FlaskGroup(AppGroup):
         return app.cli.get_command(ctx, name)
 
     def list_commands(self, ctx: click.Context) -> list[str]:
+        """
+Lists all available commands for a given context.
+
+This function extends the base command listing functionality by also including
+commands provided by plugins and apps. If an app couldn't be loaded, it will
+display an error message without the traceback. Any other errors during loading
+will display the full traceback.
+
+Args:
+    ctx (click.Context): The context in which to list commands.
+
+Returns:
+    list[str]: A sorted list of all available commands.
+"""
         self._load_plugin_commands()
         # Start with the built-in and plugin commands.
         rv = set(super().list_commands(ctx))
@@ -644,6 +834,20 @@ def _path_is_ancestor(path: str, other: str) -> bool:
 
 
 def load_dotenv(path: str | os.PathLike[str] | None = None) -> bool:
+    """
+Loads environment variables from a .env or .flaskenv file.
+
+If no specific path is provided, it will attempt to load the default files
+in the current working directory. If neither a specific path nor default
+files are found, it will print a tip message suggesting installing python-dotenv.
+
+Args:
+    path (str | os.PathLike[str] | None): The path to the .env or .flaskenv file.
+        If None, it will attempt to load the default files in the current working directory.
+
+Returns:
+    bool: True if at least one file was located and loaded, False otherwise.
+"""
     try:
         import dotenv
     except ImportError:
@@ -680,6 +884,19 @@ def load_dotenv(path: str | os.PathLike[str] | None = None) -> bool:
 
 
 def show_server_banner(debug: bool, app_import_path: str | None) -> None:
+    """
+Show server banner based on debug mode and application import path.
+
+This function displays a banner indicating whether the application is being served
+and, if so, its import path. It also indicates whether debug mode is enabled.
+
+Args:
+    - debug (bool): Whether to display debug mode information.
+    - app_import_path (str | None): The path to the imported Flask application.
+
+Returns:
+    None
+"""
     if is_running_from_reloader():
         return
 
@@ -699,11 +916,39 @@ class CertParamType(click.ParamType):
     name = "path"
 
     def __init__(self) -> None:
+        """
+Initialize a new instance of the class.
+
+This method initializes an empty instance with a path type attribute.
+The path type is set to require an existing file path that cannot be a directory,
+and will attempt to resolve the path if possible.
+
+Attributes:
+    path_type (click.Path): The path type attribute of this instance.
+"""
         self.path_type = click.Path(exists=True, dir_okay=False, resolve_path=True)
 
     def convert(
         self, value: t.Any, param: click.Parameter | None, ctx: click.Context | None
     ) -> t.Any:
+        """
+Converts a given value to its corresponding type.
+
+This function attempts to convert the provided `value` into its respective type.
+If the conversion fails, it tries to parse the `value` as a string and then checks if it's an ad-hoc certificate or an SSL context.
+
+Args:
+    self: The instance of the class that this method belongs to.
+    value (t.Any): The value to be converted.
+    param (click.Parameter | None): The parameter associated with the conversion.
+    ctx (click.Context | None): The context in which the conversion is taking place.
+
+Returns:
+    t.Any: The converted value.
+
+Raises:
+    click.BadParameter: If the conversion fails or if a required library is not installed.
+"""
         try:
             import ssl
         except ImportError:
@@ -756,6 +1001,7 @@ Returns:
 Raises:
     click.BadParameter: If the key is not required or if it's used with an invalid certificate type.
 """
+    
     cert = ctx.params.get("cert")
     is_adhoc = cert == "adhoc"
 
@@ -880,6 +1126,15 @@ def run_command(
             def app(
                 environ: WSGIEnvironment, start_response: StartResponse
             ) -> cabc.Iterable[bytes]:
+                """
+WSGI Application Function.
+
+This function serves as the entry point for a web application. It takes in an environment object and a response object,
+and returns an iterable of bytes.
+
+Raises:
+    err: An exception to be raised when the application is unable to handle the request.
+"""
                 raise err from None
 
         else:
@@ -916,6 +1171,20 @@ run_command.params.insert(0, _debug_option)
 @click.command("shell", short_help="Run a shell in the app context.")
 @with_appcontext
 def shell_command() -> None:
+    """
+Run a Python shell with customized banner and interactive hook.
+
+This function sets up a Python shell with a custom banner displaying the
+Python version, platform, application name, and instance path. It also
+supports setting an interactive hook to customize the readline experience,
+such as tab completion.
+
+Args:
+    None
+
+Returns:
+    None
+"""
     import code
 
     banner = (

@@ -38,9 +38,42 @@ T_route = t.TypeVar("T_route", bound=ft.RouteCallable)
 
 
 def setupmethod(f: F) -> F:
+    """
+Decorates a method with setup functionality.
+
+This function takes a method `f` as input and returns a wrapper function that checks if the setup process is finished before calling the original method. The wrapper function also updates the `__name__` attribute of the original method to include the name of the decorated method.
+
+Args:
+    f (F): The method to be decorated.
+
+Returns:
+    F: The decorated method.
+"""
     f_name = f.__name__
 
     def wrapper_func(self: Scaffold, *args: t.Any, **kwargs: t.Any) -> t.Any:
+        """
+Wrapper function for a scaffold object.
+
+This function acts as a proxy to the underlying `f` method of the scaffold object.
+It checks if the setup is finished before calling the original method and returns
+the result.
+
+Args:
+    self (Scaffold): The scaffold object instance.
+    *args: Variable number of positional arguments passed to the original method.
+    **kwargs: Variable number of keyword arguments passed to the original method.
+
+Returns:
+    Any: The result of the original method call.
+
+Raises:
+    None
+
+Note:
+This function is a wrapper and does not modify the behavior of the underlying `f` method.
+It is intended to provide additional functionality or error checking before calling the original method.
+"""
         self._check_setup_finished(f_name)
         return f(self, *args, **kwargs)
 
@@ -79,6 +112,38 @@ class Scaffold:
     ):
         #: The name of the package or module that this object belongs
         #: to. Do not change this once it is set by the constructor.
+        """
+Initialize a Flask application.
+
+This function initializes a new instance of the Flask class. It takes several
+parameters that define the configuration and behavior of the application.
+
+Parameters:
+    import_name (str): The name of the package or module that this object belongs to.
+    static_folder (str | os.PathLike[str] | None, optional): The path to the static folder.
+    static_url_path (str | None, optional): The URL path for static files.
+    template_folder (str | os.PathLike[str] | None, optional): The path to the templates folder.
+    root_path (str | None, optional): The absolute path to the package on the filesystem.
+
+Attributes:
+    import_name (str): The name of the package or module that this object belongs to.
+    static_folder (str | os.PathLike[str] | None): The path to the static folder.
+    static_url_path (str | None): The URL path for static files.
+    template_folder (str | os.PathLike[str] | None): The path to the templates folder.
+    root_path (str | None): The absolute path to the package on the filesystem.
+    cli (click.Group): The Click command group for registering CLI commands.
+    view_functions (dict[str, ft.RouteCallable]): A dictionary mapping endpoint names to view functions.
+    error_handler_spec (dict[ft.AppOrBlueprintKey, dict[int | None, dict[type[Exception], ft.ErrorHandlerCallable]]]): A data structure of registered error handlers.
+    before_request_funcs (dict[ft.AppOrBlueprintKey, list[ft.BeforeRequestCallable]]): A data structure of functions to call at the beginning of each request.
+    after_request_funcs (dict[ft.AppOrBlueprintKey, list[ft.AfterRequestCallable[t.Any]]]): A data structure of functions to call at the end of each request.
+    teardown_request_funcs (dict[ft.AppOrBlueprintKey, list[ft.TeardownCallable]]): A data structure of functions to call at the end of each request even if an exception is raised.
+    template_context_processors (dict[ft.AppOrBlueprintKey, list[ft.TemplateContextProcessorCallable]]): A data structure of functions to call to pass extra context values when rendering templates.
+    url_value_preprocessors (dict[ft.AppOrBlueprintKey, list[ft.URLValuePreprocessorCallable]]): A data structure of functions to call to modify the keyword arguments passed to the view function.
+    url_default_functions (dict[ft.AppOrBlueprintKey, list[ft.URLDefaultCallable]]): A data structure of functions to call to modify the keyword arguments when generating URLs.
+
+Raises:
+    TypeError: If any parameter is not of the correct type.
+"""
         self.import_name = import_name
 
         self.static_folder = static_folder  # type: ignore
@@ -232,6 +297,17 @@ class Scaffold:
 
     @static_folder.setter
     def static_folder(self, value: str | os.PathLike[str] | None) -> None:
+        """
+Sets the static folder path.
+
+This method sets the path to the static folder. If a path is provided, it will be normalized and stripped of trailing slashes.
+
+Args:
+    value (str | os.PathLike[str] | None): The path to the static folder. Can be an absolute or relative path, or `None` for no static folder.
+
+Returns:
+    None
+"""
         if value is not None:
             value = os.fspath(value).rstrip(r"\/")
 
@@ -272,6 +348,25 @@ class Scaffold:
         rule: str,
         options: dict[str, t.Any],
     ) -> t.Callable[[T_route], T_route]:
+        """
+Returns a method route for the given rule and options.
+
+This function is used to create a method-specific route for a given rule.
+It takes in the method name, rule string, and options dictionary as parameters.
+The returned callable can be used to decorate a class or function with the specified method.
+
+Args:
+    self: The instance of the class that contains this method.
+    method (str): The name of the method to route.
+    rule (str): The rule for which the method will be applied.
+    options (dict[str, t.Any]): Additional keyword arguments to pass to the `route` method.
+
+Returns:
+    t.Callable[[T_route], T_route]: A callable that can be used to decorate a class or function with the specified method.
+
+Raises:
+    TypeError: If the 'methods' argument is provided in the options dictionary.
+"""
         if "methods" in options:
             raise TypeError("Use the 'route' decorator to use the 'methods' argument.")
 

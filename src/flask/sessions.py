@@ -73,6 +73,18 @@ class SecureCookieSession(CallbackDict, SessionMixin):  # type: ignore[type-arg]
 
     def __init__(self, initial: t.Any = None) -> None:
         def on_update(self: te.Self) -> None:
+            """
+Updates the object's state after a modification.
+
+This method is called when an update operation is performed on the object.
+It sets `self.modified` and `self.accessed` to indicate that the object has been modified and accessed, respectively.
+
+Args:
+    None
+
+Returns:
+    None
+"""
             self.modified = True
             self.accessed = True
 
@@ -165,21 +177,86 @@ class SessionInterface:
         return isinstance(obj, self.null_session_class)
 
     def get_cookie_name(self, app: Flask) -> str:
+        """
+Returns the name of the cookie used by the given Flask application for session management.
+
+Args:
+    app (Flask): The Flask application instance.
+
+Returns:
+    str: The name of the session cookie.
+"""
         return app.config["SESSION_COOKIE_NAME"]  # type: ignore[no-any-return]
 
     def get_cookie_domain(self, app: Flask) -> str | None:
+        """
+Returns the domain of the session cookie.
+
+This method retrieves the value of the `SESSION_COOKIE_DOMAIN` configuration
+variable from the provided Flask application instance. If no such variable is set,
+the function returns `None`.
+
+Args:
+    app (Flask): The Flask application instance to retrieve the cookie domain from.
+
+Returns:
+    str | None: The domain of the session cookie, or `None` if not set.
+"""
         return app.config["SESSION_COOKIE_DOMAIN"]  # type: ignore[no-any-return]
 
     def get_cookie_path(self, app: Flask) -> str:
+        """
+Returns the path of the cookie for a given Flask application.
+
+The function checks if `SESSION_COOKIE_PATH` is set in the application's configuration.
+If it is, that value is returned. Otherwise, it falls back to using `APPLICATION_ROOT`.
+
+Args:
+    app (Flask): The Flask application instance.
+
+Returns:
+    str: The path of the cookie for the given application.
+"""
         return app.config["SESSION_COOKIE_PATH"] or app.config["APPLICATION_ROOT"]  # type: ignore[no-any-return]
 
     def get_cookie_httponly(self, app: Flask) -> bool:
+        """
+Returns whether the session cookie is set to be HTTP-only.
+
+Args:
+    app (Flask): The application instance.
+
+Returns:
+    bool: True if the session cookie is HTTP-only, False otherwise.
+"""
         return app.config["SESSION_COOKIE_HTTPONLY"]  # type: ignore[no-any-return]
 
     def get_cookie_secure(self, app: Flask) -> bool:
+        """
+Returns whether the session cookie is secure.
+
+This method checks if the `SESSION_COOKIE_SECURE` configuration variable
+is set to True in the provided Flask application. If it is, the function
+returns True; otherwise, it returns False.
+
+Args:
+    app (Flask): The Flask application instance to check.
+
+Returns:
+    bool: Whether the session cookie is secure.
+"""
         return app.config["SESSION_COOKIE_SECURE"]  # type: ignore[no-any-return]
 
     def get_cookie_samesite(self, app: Flask) -> str | None:
+        """
+Returns the value of the 'SESSION_COOKIE_SAMESITE' configuration option from the provided Flask application.
+
+Args:
+    app (Flask): The Flask application instance to retrieve the configuration from.
+
+Returns:
+    str | None: The value of the 'SESSION_COOKIE_SAMESITE' configuration option, or None if it is not set.
+"""
         return app.config["SESSION_COOKIE_SAMESITE"]  # type: ignore[no-any-return]
 
     def get_expiration_time(self, app: Flask, session: SessionMixin) -> datetime | None:

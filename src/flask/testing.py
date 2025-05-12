@@ -131,6 +131,21 @@ class FlaskClient(Client):
     def session_transaction(
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Iterator[SessionMixin]:
+        """
+Yield a session object for the current test request context.
+
+This function is used to create and manage sessions for testing purposes.
+It checks if cookies are enabled, sets them up, opens a new session,
+and saves it after use. If the session backend fails to open a session,
+it raises a RuntimeError.
+
+Args:
+    *args: Variable arguments passed to the test request context.
+    **kwargs: Keyword arguments passed to the test request context.
+
+Returns:
+    An iterator yielding SessionMixin objects for each session opened.
+"""
         if self._cookies is None:
             raise TypeError(
                 "Cookies are disabled. Create a client with 'use_cookies=True'."
@@ -162,6 +177,17 @@ class FlaskClient(Client):
         )
 
     def _copy_environ(self, other: WSGIEnvironment) -> WSGIEnvironment:
+        """
+Copies the environment of another WSGIEnvironment instance.
+
+This method creates a new dictionary containing all key-value pairs from both `self` and `other`. If `preserve_context` is True, it also adds the `_new_contexts` attribute to the resulting dictionary.
+
+Args:
+    other (WSGIEnvironment): The environment to copy from.
+
+Returns:
+    WSGIEnvironment: A new WSGIEnvironment instance with the copied environment.
+"""
         out = {**self.environ_base, **other}
 
         if self.preserve_context:
@@ -172,6 +198,22 @@ class FlaskClient(Client):
     def _request_from_builder_args(
         self, args: tuple[t.Any, ...], kwargs: dict[str, t.Any]
     ) -> BaseRequest:
+        """
+Returns a BaseRequest object created from the provided arguments and keyword arguments.
+
+Args:
+    - args (tuple[t.Any, ...]): A tuple of positional arguments.
+    - kwargs (dict[str, t.Any]): A dictionary of keyword arguments.
+
+Returns:
+    BaseRequest: The created BaseRequest object.
+
+Raises:
+    None
+
+Note:
+    This function creates an EnvironBuilder instance and uses it to get a request. It ensures the builder is properly closed after use.
+"""
         kwargs["environ_base"] = self._copy_environ(kwargs.get("environ_base", {}))
         builder = EnvironBuilder(self.application, *args, **kwargs)
 
@@ -187,6 +229,23 @@ class FlaskClient(Client):
         follow_redirects: bool = False,
         **kwargs: t.Any,
     ) -> TestResponse:
+        """
+Opens a new test session.
+
+This method is used to create a new test environment. It takes in various arguments and keyword arguments that can be used to customize the behavior of the test session.
+
+Args:
+    *args: A variable number of positional arguments. If provided, they are used to initialize the request object.
+    buffered (bool): Whether to buffer the response. Defaults to False.
+    follow_redirects (bool): Whether to follow redirects. Defaults to False.
+    **kwargs: A dictionary of keyword arguments.
+
+Returns:
+    TestResponse: The test response object.
+
+Raises:
+    ValueError: If the provided arguments are invalid.
+"""
         if args and isinstance(
             args[0], (werkzeug.test.EnvironBuilder, dict, BaseRequest)
         ):
@@ -254,6 +313,20 @@ class FlaskCliRunner(CliRunner):
     def invoke(  # type: ignore
         self, cli: t.Any = None, args: t.Any = None, **kwargs: t.Any
     ) -> t.Any:
+        """
+Invokes the parent class's invoke method with optional CLI and arguments.
+
+This function is used to initialize the script info object and pass it to the parent class's invoke method.
+If no 'obj' key is provided in kwargs, a ScriptInfo object is created with a create_app lambda that returns the app instance.
+
+Args:
+    cli (t.Any): The command line interface. Defaults to self.app.cli if None.
+    args (t.Any): Any additional arguments. Defaults to None.
+    **kwargs (t.Any): Additional keyword arguments. Must include 'obj' key.
+
+Returns:
+    t.Any: The result of the parent class's invoke method.
+"""
         if cli is None:
             cli = self.app.cli
 

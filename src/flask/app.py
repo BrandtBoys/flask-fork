@@ -228,6 +228,30 @@ class Flask(App):
         instance_relative_config: bool = False,
         root_path: str | None = None,
     ):
+        """
+Adds a static route to the application using the provided `static_url_path`, 
+`static_host`, and `static_folder`. This is done without checking if 
+`static_folder` exists, as it might be created while the server is running. 
+
+This method uses a weakref to avoid creating a reference cycle between the app 
+and the view function.
+
+Args:
+    import_name (str): The name of the module being imported.
+    static_url_path (str | None): The URL path for serving static files. Defaults to None.
+    static_folder (str | os.PathLike[str] | None): The folder where static files are stored. Defaults to "static".
+    static_host (str | None): The host on which the static route is served. Defaults to None.
+    host_matching (bool): Whether the host should be matched. Defaults to False.
+    subdomain_matching (bool): Whether the subdomain should be matched. Defaults to False.
+    template_folder (str | os.PathLike[str] | None): The folder where templates are stored. Defaults to "templates".
+    instance_path (str | None): The path of the instance. Defaults to None.
+    instance_relative_config (bool): Whether the configuration is relative to the instance. Defaults to False.
+    root_path (str | None): The root path of the application. Defaults to None.
+
+Raises:
+    AssertionError: If `static_host` and `host_matching` do not match, or if 
+        `static_folder` exists but `static_url_path` is not provided.
+"""
         super().__init__(
             import_name=import_name,
             static_url_path=static_url_path,
@@ -261,6 +285,18 @@ class Flask(App):
             )
 
     def get_send_file_max_age(self, filename: str | None) -> int | None:
+        """
+Returns the maximum age in seconds for sending files.
+
+If `filename` is provided, it will be used to retrieve the default send file max age from the application configuration.
+Otherwise, the default value will be returned.
+
+Args:
+    filename (str | None): The name of the file to retrieve the default send file max age for. If None, the default value will be returned.
+
+Returns:
+    int | None: The maximum age in seconds for sending files, or None if no default value is set.
+"""
         value = current_app.config["SEND_FILE_MAX_AGE_DEFAULT"]
 
         if value is None:
@@ -347,6 +383,17 @@ class Flask(App):
         return None
 
     def raise_routing_exception(self, request: Request) -> t.NoReturn:
+        """
+Raises a routing exception if the current request is not handled by the application.
+
+If `self.debug` is False or the request does not have a valid redirect, and the redirect's code is 307 or 308, or if the request method is GET, HEAD, or OPTIONS, this function raises the original routing exception. Otherwise, it returns a FormDataRoutingRedirect instance for debugging purposes.
+
+Args:
+    request (Request): The current HTTP request.
+
+Returns:
+    t.NoReturn: This function does not return anything.
+"""
         if (
             not self.debug
             or not isinstance(request.routing_exception, RequestRedirect)
@@ -360,6 +407,15 @@ class Flask(App):
         raise FormDataRoutingRedirect(request)
 
     def update_template_context(self, context: dict[str, t.Any]) -> None:
+        """
+Updates the template context with additional information from request blueprints and context processors.
+
+Args:
+    context (dict[str, t.Any]): The initial template context to be updated.
+
+Returns:
+    None
+"""
         names: t.Iterable[str | None] = (None,)
 
         # A template may be rendered outside a request context.
@@ -472,6 +528,19 @@ class Flask(App):
     ) -> HTTPException | ft.ResponseReturnValue:
         # Proxy exceptions don't have error codes.  We want to always return
         # those unchanged as errors
+        """
+Handles HTTP exceptions by checking their code and routing status.
+
+If the exception does not have an error code (i.e., it's a ProxyException),
+it returns the exception unchanged as an error. If the exception is a RoutingException,
+it also returns it unchanged, as these are internal exceptions used to trigger routing actions.
+Otherwise, it finds an error handler for the exception and calls it with the exception.
+
+Args:
+    e (HTTPException): The HTTP exception to handle.
+Returns:
+    HTTPException | ft.ResponseReturnValue: The handled exception or a ResponseReturnValue object.
+"""
         if e.code is None:
             return e
 
@@ -489,6 +558,21 @@ class Flask(App):
     def handle_user_exception(
         self, e: Exception
     ) -> HTTPException | ft.ResponseReturnValue:
+        """
+Handles exceptions raised by the application and returns an HTTPException or ResponseReturnValue.
+
+If a BadRequestKeyError occurs and debug mode or the 'TRAP_BAD_REQUEST_ERRORS' configuration option is enabled,
+the exception's show_exception attribute is set to True. If an HTTPException occurs but it is not trapped,
+it is handled by the handle_http_exception method. Otherwise, the error handler for the given exception
+is found using the _find_error_handler method and its result is returned.
+
+Args:
+    e (Exception): The exception to be handled.
+Returns:
+    HTTPException | ResponseReturnValue: The handled exception or response value.
+Raises:
+    Exception: If no error handler can be found for the exception.
+"""
         if isinstance(e, BadRequestKeyError) and (
             self.debug or self.config["TRAP_BAD_REQUEST_ERRORS"]
         ):
@@ -593,6 +677,17 @@ class Flask(App):
         return rv
 
     def ensure_sync(self, func: t.Callable[..., t.Any]) -> t.Callable[..., t.Any]:
+        """
+Ensures that a provided function is synchronous.
+
+If the function is a coroutine, it is converted to a synchronous function using `async_to_sync`. Otherwise, the original function is returned.
+
+Args:
+    func (Callable[..., Any]): The function to be ensured as synchronous.
+
+Returns:
+    Callable[..., Any]: The synchronous version of the input function or the original function if it's already synchronous.
+"""
         if iscoroutinefunction(func):
             return self.async_to_sync(func)
 
@@ -601,6 +696,20 @@ class Flask(App):
     def async_to_sync(
         self, func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]
     ) -> t.Callable[..., t.Any]:
+        """
+Converts an asynchronous function to a synchronous one.
+
+This function takes an asynchronous function as input and returns a new function that can be called synchronously.
+It uses the `async_to_sync` function from the `asgiref.sync` module, which is part of Flask's async support.
+
+If the required `async` extra for Flask is not installed, a `RuntimeError` is raised with an error message.
+
+Args:
+    func: The asynchronous function to be converted. It should be a coroutine that takes any number of arguments and returns any type of value.
+
+Returns:
+    A new synchronous function that can be called with the same arguments as the original asynchronous function.
+"""
         try:
             from asgiref.sync import async_to_sync as asgiref_async_to_sync
         except ImportError:
@@ -777,6 +886,19 @@ class Flask(App):
         return rv
 
     def preprocess_request(self) -> ft.ResponseReturnValue | None:
+        """
+Preprocesses the request by applying URL value preprocessors and before request functions.
+
+This method iterates over the blueprint names in reverse order, applying any URL value preprocessors to each one.
+It then iterates over the same list again, applying any before request functions to each one. If a function returns
+a non-None value, it is returned immediately. Otherwise, None is returned at the end.
+
+Args:
+    self: The instance of the class this method belongs to.
+
+Returns:
+    ft.ResponseReturnValue | None: The result of the preprocess request, or None if no functions return a value.
+"""
         names = (None, *reversed(request.blueprints))
 
         for name in names:
@@ -840,6 +962,15 @@ class Flask(App):
         return AppContext(self)
 
     def request_context(self, environ: WSGIEnvironment) -> RequestContext:
+        """
+Returns a new instance of RequestContext with the given WSGI environment.
+
+Args:
+    environ (WSGIEnvironment): The WSGI environment to use for the context.
+
+Returns:
+    RequestContext: A new instance of RequestContext initialized with the provided environment.
+"""
         return RequestContext(self, environ)
 
     def test_request_context(self, *args: t.Any, **kwargs: t.Any) -> RequestContext:
@@ -855,6 +986,21 @@ class Flask(App):
     def wsgi_app(
         self, environ: WSGIEnvironment, start_response: StartResponse
     ) -> cabc.Iterable[bytes]:
+        """
+WSGI Application Function.
+
+This function serves as the entry point for the WSGI application, handling incoming requests and responses.
+It takes in an environment dictionary (`environ`) and a start response callback (`start_response`), 
+and returns an iterable of bytes representing the response to the request.
+
+The function first creates a request context using `self.request_context(environ)`, which sets up the necessary
+context for the application. It then attempts to dispatch the request, handling any exceptions that may occur.
+If an exception is caught, it is handled by the `handle_exception` method and the response is generated accordingly.
+Finally, the function returns the response, popping the context if no error occurred.
+
+Note: This function uses a try-except block with a bare `except` clause to catch all exceptions. 
+This is generally discouraged in favor of specific exception handling, but may be necessary for compatibility reasons.
+"""
         ctx = self.request_context(environ)
         error: BaseException | None = None
         try:
@@ -881,4 +1027,14 @@ class Flask(App):
     def __call__(
         self, environ: WSGIEnvironment, start_response: StartResponse
     ) -> cabc.Iterable[bytes]:
+        """
+Call the wsgi_app method to handle the request.
+
+Args:
+    environ (WSGIEnvironment): The environment in which the application is running.
+    start_response (StartResponse): A callable that takes a response status code and headers as arguments.
+
+Returns:
+    cabc.Iterable[bytes]: An iterable of bytes representing the response body.
+"""
         return self.wsgi_app(environ, start_response)
