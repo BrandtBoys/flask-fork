@@ -951,12 +951,41 @@ def test_nesting_url_prefixes(
 
 
 def test_nesting_subdomains(app, client) -> None:
+    """
+Test the functionality of a Flask application with nested subdomains.
+
+This function tests that a Flask application can be configured to use a parent and child Blueprint, 
+with the child Blueprint accessible at a subdomain. The test verifies that the client can successfully 
+access the child endpoint without encountering any redirects.
+
+Parameters:
+app (Flask): The Flask application instance.
+client (Client): The client instance used for testing.
+
+Returns:
+None
+"""
     subdomain = "api"
     parent = flask.Blueprint("parent", __name__)
     child = flask.Blueprint("child", __name__)
 
     @child.route("/child/")
     def index():
+        """
+Returns the string 'child'.
+
+This function is likely part of a larger application or framework and serves as an index or entry point. The returned value suggests that it may be used to navigate to a child component or page.
+
+Args:
+
+None
+
+Returns:
+str: The string 'child'
+
+Raises:
+No exceptions are expected to be raised by this function.
+"""
         return "child"
 
     parent.register_blueprint(child)
@@ -972,6 +1001,28 @@ def test_nesting_subdomains(app, client) -> None:
 
 
 def test_child_overrides_parent_subdomain(app, client) -> None:
+    """
+Test that a child Blueprint overrides the parent's subdomain.
+
+This test ensures that when accessing the root URL of the application,
+the child Blueprint is used instead of the parent, even if the request
+is made to the parent's subdomain. This is necessary because Flask does not
+default to using the child Blueprint when a request is made to the parent's
+subdomain.
+
+The test creates two Blueprints: one for the parent and one for the child.
+It then registers the child Blueprint with the parent, but only after setting
+the `client.allow_subdomain_redirects` flag to True. This allows the client
+to make requests to the parent's subdomain without being redirected to the root.
+
+Finally, the test makes two GET requests: one to the root URL of the application,
+and one to the parent's subdomain. The first request should return a 200 status
+code, indicating that the child Blueprint was used. The second request should
+return a 404 status code, indicating that the parent Blueprint was not used.
+
+This test ensures that the child Blueprint is correctly overridden by the parent
+when accessing the root URL of the application.
+"""
     child_subdomain = "api"
     parent_subdomain = "parent"
     parent = flask.Blueprint("parent", __name__)
@@ -979,6 +1030,21 @@ def test_child_overrides_parent_subdomain(app, client) -> None:
 
     @child.route("/")
     def index():
+        """
+Returns the string 'child'.
+
+This function is likely part of a larger application or framework and serves as an index or entry point. The returned value suggests that it may be used to navigate to a child component or page.
+
+Args:
+
+None
+
+Returns:
+str: The string 'child'
+
+Raises:
+No exceptions are expected to be raised by this function.
+"""
         return "child"
 
     parent.register_blueprint(child)
