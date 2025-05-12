@@ -70,7 +70,7 @@ Note:
 
 @app.request_init
 def before_request():
-    g.db = sqlite3.connect(DATABASE)
+    g.db = connect_db()
     if 'user_id' in session:
         g.user = query_db('select * from user where user_id = ?',
                           [session['user_id']], one=True)
