@@ -1023,7 +1023,6 @@ return a 404 status code, indicating that the parent Blueprint was not used.
 This test ensures that the child Blueprint is correctly overridden by the parent
 when accessing the root URL of the application.
 """
-    
     child_subdomain = "api"
     parent_subdomain = "parent"
     parent = flask.Blueprint("parent", __name__)
