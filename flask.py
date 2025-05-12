@@ -273,8 +273,14 @@ Raises:
         if session is not None:
             session.save_cookie(response, self.session_cookie_name)
 
+    def add_url_rule(self, endpoint, **options):
+        options['endpoint'] = f.__name__
+        options.setdefault('methods', ('GET',))
+        self.url_map.add(Rule(rule, **options))
+
     def route(self, rule, **options):
         def decorator(f):
+            self.add_url_rule(f.__name__, **options)
             """
 Decorates a function to register it with the URL map.
 
@@ -289,11 +295,7 @@ Args:
 Returns:
     function: The original view function, now decorated and registered with the URL map.
 """
-            if 'endpoint' not in options:
-                options['endpoint'] = f.__name__
-            options.setdefault('methods', ('GET',))
-            self.url_map.add(Rule(rule, **options))
-            self.view_functions[options['endpoint']] = f
+            self.view_functions[f.__name__] = f
             return f
         return decorator
 

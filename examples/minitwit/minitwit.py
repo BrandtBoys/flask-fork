@@ -86,7 +86,6 @@ Returns:
 Raises:
     Exception: If an error occurs while connecting to the database or retrieving user data.
 """
-
     g.db = connect_db()
     if 'user_id' in session:
         g.user = query_db('select * from user where user_id = ?',
