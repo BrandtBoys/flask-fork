@@ -399,7 +399,7 @@ None
         val = self.get_signing_serializer(app).dumps(dict(session))  # type: ignore
         response.set_cookie(
             name,
-            val,
+            val,  # type: ignore
             expires=expires,
             httponly=httponly,
             domain=domain,

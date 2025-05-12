@@ -74,7 +74,7 @@ Returns:
     @property
     def endpoint(self) -> str | None:
         if self.url_rule is not None:
-            return self.url_rule.endpoint
+            return self.url_rule.endpoint  # type: ignore[no-any-return]
 
         return None
 
