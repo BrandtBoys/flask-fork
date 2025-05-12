@@ -144,7 +144,15 @@ Raises:
 
 
 def _default_template_ctx_processor():
-    reqctx = _request_ctx_stack.top
+    """
+Processes default template context with request, session and group information.
+
+This function retrieves the topmost request context from the `_request_ctx_stack` and returns a dictionary containing the request, session, and group attributes.
+
+Returns:
+    dict: A dictionary containing the request, session, and group attributes.
+"""
+reqctx = _request_ctx_stack.top
     return dict(
         request=reqctx.request,
         session=reqctx.session,
@@ -271,13 +279,14 @@ Updates the template context with information from the request and session.
 
 Args:
     context (dict): The dictionary to update with the new context values.
-    
+
 Returns:
     None
-    
+
 Raises:
     AttributeError: If _request_ctx_stack is not available or top is not a Request object.
 """
+
         reqctx = _request_ctx_stack.top
         for func in self.template_context_processors:
             context.update(func())
@@ -367,11 +376,32 @@ Note:
         return f
 
     def request_shutdown(self, f):
-        self.request_shutdown_funcs.append(f)
+        """
+Adds a shutdown function to the list of requested shutdown functions.
+
+Args:
+    f (function): The shutdown function to be added.
+
+Returns:
+    function: The original shutdown function passed in, with no changes made.
+"""
+self.request_shutdown_funcs.append(f)
         return f
 
     def context_processor(self, f):
-        self.template_context_processors.append(f)
+        """
+Processors for the template context.
+
+This function adds a processor to the list of template context processors.
+It is used to inject data into the template context.
+
+Args:
+    f (function): The processor function to be added.
+
+Returns:
+    function: The original processor function, which has been appended to the list of template context processors.
+"""
+self.template_context_processors.append(f)
         return f
 
     def match_request(self):
