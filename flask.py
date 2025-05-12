@@ -13,25 +13,17 @@ import os
 import sys
 import pkg_resources
 from threading import local
+from contextlib import contextmanager
 from jinja2 import Environment, PackageLoader
-from werkzeug import Request, Response, LocalStack, LocalProxy
+from werkzeug import Request, Response, LocalStack, LocalProxy, \
+     create_environ, cached_property
 from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException, InternalServerError
 from werkzeug.contrib.securecookie import SecureCookie
 
-# try to import the json helpers
-try:
-    from simplejson import loads as load_json, dumps as dump_json
-except ImportError:
-    try:
-        from json import loads as load_json, dumps as dump_json
-    except ImportError:
-        pass
-
 # utilities we import from Werkzeug and Jinja2 that are unused
 # in the module but are exported as public interface.
-from werkzeug import abort, redirect, secure_filename, cached_property, \
-     html, import_string, generate_password_hash, check_password_hash
+from werkzeug import abort, redirect
 from jinja2 import Markup, escape
 
 
@@ -78,11 +70,6 @@ def url_for(endpoint, **values):
     return _request_ctx_stack.top.url_adapter.build(endpoint, values)
 
 
-def jsonified(**values):
-    return current_app.response_class(dump_json(values),
-                                      mimetype='application/json')
-
-
 def flash(message):
     session['_flashes'] = (session.get('_flashes', [])) + [message]
 
@@ -96,10 +83,12 @@ def get_flashed_messages():
 
 
 def render_template(template_name, **context):
+    current_app.update_template_context(context)
     return current_app.jinja_env.get_template(template_name).render(context)
 
 
 def render_template_string(source, **context):
+    current_app.update_template_context(context)
     return current_app.jinja_env.from_string(source).render(context)
 
 
@@ -200,14 +189,17 @@ class Flask(object):
                                      **self.jinja_options)
         self.jinja_env.globals.update(
             url_for=url_for,
-            request=request,
-            session=session,
-            g=g,
             get_flashed_messages=get_flashed_messages
         )
 
     def create_jinja_loader(self):
         return PackageLoader(self.package_name)
+
+    def update_template_context(self, context):
+        reqctx = _request_ctx_stack.top
+        context['request'] = reqctx.request
+        context['session'] = reqctx.session
+        context['g'] = reqctx.g
 
     def run(self, host='localhost', port=5000, **options):
         from werkzeug import run_simple
@@ -306,16 +298,24 @@ class Flask(object):
         return response
 
     def wsgi_app(self, environ, start_response):
-        _request_ctx_stack.push(_RequestContext(self, environ))
-        try:
+        with self.request_context(environ):
             rv = self.preprocess_request()
             if rv is None:
                 rv = self.dispatch_request()
             response = self.make_response(rv)
             response = self.process_response(response)
             return response(environ, start_response)
+
+    @contextmanager
+    def request_context(self, environ):
+        _request_ctx_stack.push(_RequestContext(self, environ))
+        try:
+            yield
         finally:
             _request_ctx_stack.pop()
+
+    def test_request_context(self, *args, **kwargs):
+        return self.request_context(create_environ(*args, **kwargs))
 
     def __call__(self, environ, start_response):
         return self.wsgi_app(environ, start_response)
