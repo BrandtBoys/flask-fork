@@ -280,4 +280,3 @@ def _split_blueprint_path(name: str) -> list[str]:
         out.extend(_split_blueprint_path(name.rpartition(".")[0]))
 
     return out
-
