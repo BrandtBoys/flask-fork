@@ -143,6 +143,15 @@ Raises:
     return current_app.jinja_env.from_string(source).render(context)
 
 
+def _default_template_ctx_processor():
+    reqctx = _request_ctx_stack.top
+    return dict(
+        request=reqctx.request,
+        session=reqctx.session,
+        g=reqctx.g
+    )
+
+
 class Flask(object):
     """The flask object implements a WSGI application and acts as the central
     object.  It is passed the name of the module or package of the
@@ -229,6 +238,14 @@ class Flask(object):
         #: To register a function here use the :meth:`request_shtdown`
         #: decorator.
         self.request_shutdown_funcs = []
+
+        #: a list of functions that are called without arguments
+        #: to populate the template context.  Each returns a dictionary
+        #: that the template context is updated with.
+        #: To register a function here, use the :meth:`context_processor`
+        #: decorator.
+        self.template_context_processors = [_default_template_ctx_processor]
+
         self.url_map = Map()
 
         if self.static_path is not None:
@@ -262,9 +279,8 @@ Raises:
     AttributeError: If _request_ctx_stack is not available or top is not a Request object.
 """
         reqctx = _request_ctx_stack.top
-        context['request'] = reqctx.request
-        context['session'] = reqctx.session
-        context['g'] = reqctx.g
+        for func in self.template_context_processors:
+            context.update(func())
 
     def run(self, host='localhost', port=5000, **options):
         from werkzeug import run_simple
@@ -352,6 +368,10 @@ Note:
 
     def request_shutdown(self, f):
         self.request_shutdown_funcs.append(f)
+        return f
+
+    def context_processor(self, f):
+        self.template_context_processors.append(f)
         return f
 
     def match_request(self):
