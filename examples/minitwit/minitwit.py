@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+    MiniTwit
+    ~~~~~~~~
+
+    A microblogging application written with Flask and sqlite3.
+
+    :copyright: (c) 2010 by Armin Ronacher.
+    :license: BSD, see LICENSE for more details.
+"""
 from __future__ import with_statement
 import re
 import time
@@ -87,20 +96,21 @@ Raises:
     Exception: If an error occurs while connecting to the database or retrieving user data.
 """
     g.db = connect_db()
+    g.user = None
     if 'user_id' in session:
         g.user = query_db('select * from user where user_id = ?',
                           [session['user_id']], one=True)
 
 
 @app.request_shutdown
-def after_request(request):
+def after_request(response):
     g.db.close()
-    return request
+    return response
 
 
 @app.route('/')
 def timeline():
-    if not 'user_id' in session:
+    if not g.user:
         return redirect(url_for('public_timeline'))
     offset = request.args.get('offset', type=int)
     return render_template('timeline.html', messages=query_db('''
@@ -128,7 +138,7 @@ def user_timeline(username):
     if profile_user is None:
         abort(404)
     followd = False
-    if 'user_id' in session:
+    if g.user:
         followed = query_db('''select 1 from follower where
             follower.who_id = ? and follower.whom_id = ?''',
             [session['user_id'], profile_user['user_id']], one=True) is not None
@@ -142,7 +152,7 @@ def user_timeline(username):
 
 @app.route('/<username>/follow')
 def follow_user(username):
-    if not 'user_id' in session:
+    if not g.user:
         abort(401)
     whom_id = get_user_id(username)
     if whom_id is None:
@@ -156,7 +166,7 @@ def follow_user(username):
 
 @app.route('/<username>/unfollow')
 def unfollow_user(username):
-    if not 'user_id' in session:
+    if not g.user:
         abort(401)
     whom_id = get_user_id(username)
     if whom_id is None:
@@ -183,7 +193,7 @@ def add_message():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if 'user_id' in session:
+    if g.user:
         return redirect(url_for('timeline'))
     error = None
     if request.method == 'POST':
@@ -203,7 +213,7 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if 'user_id' in session:
+    if g.user:
         return redirect(url_for('timeline'))
     error = None
     if request.method == 'POST':
