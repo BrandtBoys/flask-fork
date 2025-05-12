@@ -50,7 +50,6 @@ Attributes:
     endpoint (str): The endpoint URL for this request.
     view_args (dict): A dictionary of view arguments for this request.
 """
-
         RequestBase.__init__(self, environ)
         self.endpoint = None
         self.view_args = None
