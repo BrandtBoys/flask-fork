@@ -279,7 +279,28 @@ Raises:
         self.url_map.add(Rule(rule, **options))
 
     def route(self, rule, **options):
-        def decorator(f):
+        """
+Route a URL pattern to a view function.
+
+This function is used to map a URL rule to a specific view function. It can be used as a decorator to register the view function with the application.
+
+Args:
+    rule (str): The URL rule to match.
+    **options: Additional options for the URL rule, such as the HTTP method.
+
+Returns:
+    A decorator function that registers the view function with the application.
+
+Example:
+    @app.route('/users', methods=['GET'])
+    def get_users():
+        # View function code here
+        pass
+
+Note:
+    This function is typically used in a web framework to map URL patterns to view functions.
+"""
+def decorator(f):
             self.add_url_rule(rule, f.__name__, **options)
             self.view_functions[f.__name__] = f
             return f
