@@ -672,5 +672,17 @@ def test_cli_empty(app):
 
 
 def test_run_exclude_patterns():
+    """
+Returns a context for the `run` command with the current file's path as an exclude pattern.
+
+This function creates a context for the `run` command, passing the current file's path as an exclude pattern.
+The resulting context is then asserted to have the expected exclude patterns.
+
+Args:
+    None
+
+Returns:
+    A context object containing the `run` command parameters
+"""
     ctx = run_command.make_context("run", ["--exclude-patterns", __file__])
     assert ctx.params["exclude_patterns"] == [__file__]
