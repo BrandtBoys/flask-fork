@@ -365,7 +365,6 @@ response (Response): The response object.
 Returns:
 None
 """
-        
         name = self.get_cookie_name(app)
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
@@ -397,10 +396,10 @@ None
             return
 
         expires = self.get_expiration_time(app, session)
-        val = self.get_signing_serializer(app).dumps(dict(session))  # type: ignore
+        val = self.get_signing_serializer(app).dumps(dict(session))  # type: ignore[union-attr]
         response.set_cookie(
             name,
-            val,  # type: ignore
+            val,
             expires=expires,
             httponly=httponly,
             domain=domain,
