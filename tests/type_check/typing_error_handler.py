@@ -31,3 +31,4 @@ def handle_accept_base(e: Exception) -> str:
 @app.errorhandler(404)
 def handle_multiple(e: BadRequest | NotFound) -> str:
     return ""
+
