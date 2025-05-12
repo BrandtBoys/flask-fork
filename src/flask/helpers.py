@@ -101,7 +101,7 @@ Returns:
 Raises:
     None
 """
-if not args:
+    if not args:
         return current_app.response_class()
     if len(args) == 1:
         args = args[0]
