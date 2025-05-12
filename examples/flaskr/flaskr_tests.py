@@ -16,7 +16,6 @@ import tempfile
 class FlaskrTestCase(unittest.TestCase):
 
     def setUp(self):
-        """Before each test, set up a blank database"""
         self.db = tempfile.NamedTemporaryFile()
         self.app = flaskr.app.test_client()
         flaskr.DATABASE = self.db.name
@@ -34,12 +33,10 @@ class FlaskrTestCase(unittest.TestCase):
     # testing functions
 
     def test_empty_db(self):
-        """Start with a blank database."""
         rv = self.app.get('/')
         assert 'No entries here so far' in rv.data
 
     def test_login_logout(self):
-        """Make sure login and logout works"""
         rv = self.login(flaskr.USERNAME, flaskr.PASSWORD)
         assert 'You were logged in' in rv.data
         rv = self.logout()
@@ -50,7 +47,6 @@ class FlaskrTestCase(unittest.TestCase):
         assert 'Invalid password' in rv.data
 
     def test_messages(self):
-        """Test that messages work"""
         self.login(flaskr.USERNAME, flaskr.PASSWORD)
         rv = self.app.post('/add', data=dict(
             title='<Hello>',
@@ -63,3 +59,4 @@ class FlaskrTestCase(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

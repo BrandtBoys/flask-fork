@@ -30,12 +30,10 @@ app = Flask(__name__)
 
 
 def connect_db():
-    """Returns a new connection to the database."""
     return sqlite3.connect(DATABASE)
 
 
 def init_db():
-    """Creates the database tables."""
     with closing(connect_db()) as db:
         with app.open_resource('schema.sql') as f:
             db.cursor().executescript(f.read())
@@ -43,7 +41,6 @@ def init_db():
 
 
 def query_db(query, args=(), one=False):
-    """Queries the database and returns a list of dictionaries."""
     cur = g.db.execute(query, args)
     rv = [dict((cur.description[idx][0], value)
                for idx, value in enumerate(row)) for row in cur.fetchall()]
@@ -51,28 +48,22 @@ def query_db(query, args=(), one=False):
 
 
 def get_user_id(username):
-    """Convenience method to look up the id for a username."""
     rv = g.db.execute('select user_id from user where username = ?',
                        [username]).fetchone()
     return rv[0] if rv else None
 
 
 def format_datetime(timestamp):
-    """Format a timestamp for display."""
     return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d @ %H:%M')
 
 
 def gravatar_url(email, size=80):
-    """Return the gravatar image for the given email address."""
     return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
         (md5(email.strip().lower().encode('utf-8')).hexdigest(), size)
 
 
 @app.before_request
 def before_request():
-    """Make sure we are connected to the database each request and look
-    up the current user so that we know he's there.
-    """
     g.db = connect_db()
     g.user = None
     if 'user_id' in session:
@@ -82,17 +73,12 @@ def before_request():
 
 @app.after_request
 def after_request(response):
-    """Closes the database again at the end of the request."""
     g.db.close()
     return response
 
 
 @app.route('/')
 def timeline():
-    """Shows a users timeline or if no user is logged in it will
-    redirect to the public timeline.  This timeline shows the user's
-    messages as well as all the messages of followed users.
-    """
     if not g.user:
         return redirect(url_for('public_timeline'))
     return render_template('timeline.html', messages=query_db('''
@@ -107,7 +93,6 @@ def timeline():
 
 @app.route('/public')
 def public_timeline():
-    """Displays the latest messages of all users."""
     return render_template('timeline.html', messages=query_db('''
         select message.*, user.* from message, user
         where message.author_id = user.user_id
@@ -116,7 +101,6 @@ def public_timeline():
 
 @app.route('/<username>')
 def user_timeline(username):
-    """Display's a users tweets."""
     profile_user = query_db('select * from user where username = ?',
                             [username], one=True)
     if profile_user is None:
@@ -136,7 +120,6 @@ def user_timeline(username):
 
 @app.route('/<username>/follow')
 def follow_user(username):
-    """Adds the current user as follower of the given user."""
     if not g.user:
         abort(401)
     whom_id = get_user_id(username)
@@ -151,7 +134,6 @@ def follow_user(username):
 
 @app.route('/<username>/unfollow')
 def unfollow_user(username):
-    """Removes the current user as follower of the given user."""
     if not g.user:
         abort(401)
     whom_id = get_user_id(username)
@@ -166,7 +148,6 @@ def unfollow_user(username):
 
 @app.route('/add_message', methods=['POST'])
 def add_message():
-    """Registers a new message for the user."""
     if 'user_id' not in session:
         abort(401)
     if request.form['text']:
@@ -180,7 +161,6 @@ def add_message():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Logs the user in."""
     if g.user:
         return redirect(url_for('timeline'))
     error = None
@@ -201,7 +181,6 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    """Registers the user."""
     if g.user:
         return redirect(url_for('timeline'))
     error = None
@@ -230,7 +209,6 @@ def register():
 
 @app.route('/logout')
 def logout():
-    """Logs the user out"""
     flash('You were logged out')
     session.pop('user_id', None)
     return redirect(url_for('public_timeline'))
@@ -246,3 +224,4 @@ app.debug = DEBUG
 
 if __name__ == '__main__':
     app.run()
+

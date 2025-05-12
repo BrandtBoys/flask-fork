@@ -245,3 +245,4 @@ intersphinx_mapping = {
     'http://www.sqlalchemy.org/docs/': None,
     'http://wtforms.simplecodes.com/docs/0.5/': None
 }
+

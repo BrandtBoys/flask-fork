@@ -29,12 +29,10 @@ app.debug = DEBUG
 
 
 def connect_db():
-    """Returns a new connection to the database."""
     return sqlite3.connect(DATABASE)
 
 
 def init_db():
-    """Creates the database tables."""
     with closing(connect_db()) as db:
         with app.open_resource('schema.sql') as f:
             db.cursor().executescript(f.read())
@@ -43,13 +41,11 @@ def init_db():
 
 @app.before_request
 def before_request():
-    """Make sure we are connected to the database each request."""
     g.db = connect_db()
 
 
 @app.after_request
 def after_request(response):
-    """Closes the database again at the end of the request."""
     g.db.close()
     return response
 
@@ -96,3 +92,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run()
+
