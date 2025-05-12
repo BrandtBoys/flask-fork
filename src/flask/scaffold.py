@@ -560,4 +560,3 @@ def find_package(import_name: str):
 
     # not installed
     return None, package_path
-
