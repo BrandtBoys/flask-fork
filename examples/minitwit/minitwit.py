@@ -64,7 +64,7 @@ Note:
     This function uses the MD5 hash of the email address's MD5 hash to ensure uniqueness and
     is case-insensitive due to the use of `lower()` on the input string.
 """
-return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
+    return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
         (md5(email.strip().lower().encode('utf-8')).hexdigest(), size)
 
 
