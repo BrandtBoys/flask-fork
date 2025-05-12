@@ -83,12 +83,42 @@ def get_flashed_messages():
 
 
 def render_template(template_name, **context):
-    current_app.update_template_context(context)
+    """
+Render a template with the given context.
+
+Args:
+    template_name (str): The name of the template to be rendered.
+    **context: A dictionary containing variables to be passed to the template.
+
+Returns:
+    str: The rendered HTML content of the template.
+
+Raises:
+    None
+"""
+current_app.update_template_context(context)
     return current_app.jinja_env.get_template(template_name).render(context)
 
 
 def render_template_string(source, **context):
-    current_app.update_template_context(context)
+    """
+Render a Jinja template string with given context.
+
+This function takes a source template string and a dictionary of context variables.
+It updates the application's template context with the provided variables,
+and then renders the template using the `Jinja` environment from the current application.
+
+Args:
+    source (str): The Jinja template string to render.
+    **context: A dictionary of variables to pass to the template.
+
+Returns:
+    str: The rendered template string.
+
+Raises:
+    None
+"""
+current_app.update_template_context(context)
     return current_app.jinja_env.from_string(source).render(context)
 
 
@@ -196,7 +226,19 @@ class Flask(object):
         return PackageLoader(self.package_name)
 
     def update_template_context(self, context):
-        reqctx = _request_ctx_stack.top
+        """
+Updates the template context with information from the request and session.
+
+Args:
+    context (dict): The dictionary to update with the new context values.
+    
+Returns:
+    None
+    
+Raises:
+    AttributeError: If _request_ctx_stack is not available or top is not a Request object.
+"""
+reqctx = _request_ctx_stack.top
         context['request'] = reqctx.request
         context['session'] = reqctx.session
         context['g'] = reqctx.g
@@ -298,7 +340,25 @@ class Flask(object):
         return response
 
     def wsgi_app(self, environ, start_response):
-        with self.request_context(environ):
+        """
+WSGI Application Function
+
+This function serves as the entry point for a WSGI-compliant web application.
+It processes incoming requests and returns a response to be sent back to the client.
+
+Parameters:
+    environ (dict): The environment dictionary containing information about the request.
+    start_response (str): A callable that takes the status code and headers as arguments.
+
+Returns:
+    response: An object representing the response to be sent back to the client.
+
+Notes:
+    This function uses a request context manager to ensure proper cleanup of resources.
+    It preprocesses the request, dispatches it if necessary, makes a response, processes it,
+    and finally returns the response to the WSGI server.
+"""
+with self.request_context(environ):
             rv = self.preprocess_request()
             if rv is None:
                 rv = self.dispatch_request()
@@ -315,7 +375,17 @@ class Flask(object):
             _request_ctx_stack.pop()
 
     def test_request_context(self, *args, **kwargs):
-        return self.request_context(create_environ(*args, **kwargs))
+        """
+Tests the request context by creating a mock environment and passing it to the `request_context` method.
+
+Args:
+    *args: Variable length argument list of arguments to be passed to `create_environ`.
+    **kwargs: Arbitrary keyword arguments to be passed to `create_environ`.
+
+Returns:
+    The result of calling `self.request_context` with the created mock environment.
+"""
+return self.request_context(create_environ(*args, **kwargs))
 
     def __call__(self, environ, start_response):
         return self.wsgi_app(environ, start_response)
