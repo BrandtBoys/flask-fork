@@ -348,31 +348,30 @@ class Blueprint(Scaffold):
         self._blueprints.append((blueprint, options))
 
     def register(self, app: "Flask", options: dict) -> None:
-        """Called by :meth:`Flask.register_blueprint` to register all
-        views and callbacks registered on the blueprint with the
-        application. Creates a :class:`.BlueprintSetupState` and calls
-        each :meth:`record` callback with it.
-
-        :param app: The application this blueprint is being registered
-            with.
-        :param options: Keyword arguments forwarded from
-            :meth:`~Flask.register_blueprint`.
-
-        .. versionchanged:: 2.0.1
-            Nested blueprints are registered with their dotted name.
-            This allows different blueprints with the same name to be
-            nested at different locations.
-
-        .. versionchanged:: 2.0.1
-            The ``name`` option can be used to change the (pre-dotted)
-            name the blueprint is registered with. This allows the same
-            blueprint to be registered multiple times with unique names
-            for ``url_for``.
-
-        .. versionchanged:: 2.0.1
-            Registering the same blueprint with the same name multiple
-            times is deprecated and will become an error in Flask 2.1.
         """
+Registers the blueprint with the application.
+
+This function is called by :meth:`Flask.register_blueprint` to register all views and callbacks registered on the blueprint with the application. It creates a :class:`.BlueprintSetupState` and calls each :meth:`record` callback with it.
+
+The name of the blueprint can be changed using the ``name`` option, which allows different blueprints with the same name to be registered at different locations. However, registering the same blueprint with the same name multiple times is deprecated and will become an error in Flask 2.1.
+
+Parameters
+----------
+app : "Flask"
+    The application this blueprint is being registered with.
+options : dict
+    Keyword arguments forwarded from :meth:`~Flask.register_blueprint`.
+
+Returns
+-------
+None
+
+Raises
+------
+ValueError
+    If the name of the blueprint already exists for a different blueprint.
+"""
+        
         name_prefix = options.get("name_prefix", "")
         self_name = options.get("name", self.name)
         name = f"{name_prefix}.{self_name}".lstrip(".")
