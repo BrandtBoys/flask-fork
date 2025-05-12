@@ -84,6 +84,23 @@ def stream_with_context(
 
 
 def make_response(*args: t.Any) -> Response:
+    """
+Makes a response for the application.
+
+This function takes any number of arguments, which are used to construct the response.
+If no arguments are provided, it returns an empty response. If one argument is provided,
+it is assumed to be a single value and is returned as-is. Otherwise, all arguments
+are passed through to `current_app.make_response()`.
+
+Args:
+    *args: Any number of values to include in the response (optional)
+
+Returns:
+    Response: The constructed response object
+
+Raises:
+    None
+"""
     if not args:
         return current_app.response_class()
     if len(args) == 1:
