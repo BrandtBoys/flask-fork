@@ -207,3 +207,4 @@ def test_clean_pop(app):
 
     assert called == ["flask_test", "TEARDOWN"]
     assert not flask.current_app
+
