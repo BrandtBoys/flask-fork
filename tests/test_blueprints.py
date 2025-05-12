@@ -1000,7 +1000,7 @@ No exceptions are expected to be raised by this function.
     assert response.status_code == 200
 
 
-def test_child_overrides_parent_subdomain(app, client) -> None:
+def test_child_and_parent_subdomain(app, client) -> None:
     """
 Test that a child Blueprint overrides the parent's subdomain.
 
@@ -1054,7 +1054,9 @@ No exceptions are expected to be raised by this function.
 
     domain_name = "domain.tld"
     app.config["SERVER_NAME"] = domain_name
-    response = client.get("/", base_url=f"http://{child_subdomain}.{domain_name}")
+    response = client.get(
+        "/", base_url=f"http://{child_subdomain}.{parent_subdomain}.{domain_name}"
+    )
 
     assert response.status_code == 200
 
