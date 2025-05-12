@@ -109,3 +109,4 @@ def test_prefix_package_paths(
     assert site_package.app.instance_path == os.fspath(
         modules_tmp_path / "var" / "site_package-instance"
     )
+
