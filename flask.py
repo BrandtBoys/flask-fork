@@ -152,7 +152,7 @@ This function retrieves the topmost request context from the `_request_ctx_stack
 Returns:
     dict: A dictionary containing the request, session, and group attributes.
 """
-reqctx = _request_ctx_stack.top
+    reqctx = _request_ctx_stack.top
     return dict(
         request=reqctx.request,
         session=reqctx.session,
@@ -286,7 +286,6 @@ Returns:
 Raises:
     AttributeError: If _request_ctx_stack is not available or top is not a Request object.
 """
-
         reqctx = _request_ctx_stack.top
         for func in self.template_context_processors:
             context.update(func())
@@ -385,7 +384,7 @@ Args:
 Returns:
     function: The original shutdown function passed in, with no changes made.
 """
-self.request_shutdown_funcs.append(f)
+        self.request_shutdown_funcs.append(f)
         return f
 
     def context_processor(self, f):
@@ -401,7 +400,7 @@ Args:
 Returns:
     function: The original processor function, which has been appended to the list of template context processors.
 """
-self.template_context_processors.append(f)
+        self.template_context_processors.append(f)
         return f
 
     def match_request(self):
