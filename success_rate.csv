@@ -38,3 +38,4 @@ Success,Comment
 
 
 "(True, '""""""\nLoads a Jinja template loader based on the presence of a template folder.\n\nReturns:\n    BaseLoader | None: A Jinja template loader instance if a template folder is present, otherwise None.\n""""""')"
+
