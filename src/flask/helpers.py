@@ -105,7 +105,7 @@ Raises:
         return current_app.response_class()
     if len(args) == 1:
         args = args[0]
-    return current_app.make_response(args)  # type: ignore
+    return current_app.make_response(args)
 
 
 def url_for(
