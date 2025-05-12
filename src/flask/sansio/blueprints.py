@@ -277,6 +277,17 @@ Returns:
     None
 """
         def wrapper(state: BlueprintSetupState) -> None:
+            """
+Wrapper function to handle first registration of users.
+
+This function checks if the user has registered for the first time and calls the `func` function with the provided `state` object if so.
+
+Args:
+    state (BlueprintSetupState): The current state of the application setup.
+
+Returns:
+    None
+"""
             if state.first_registration:
                 func(state)
 

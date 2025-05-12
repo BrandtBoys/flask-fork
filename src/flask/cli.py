@@ -464,6 +464,7 @@ Args:
 Returns:
     function: The original function, wrapped in a decorator that runs it with the application context.
 """
+    
     @click.pass_context
     def decorator(ctx: click.Context, /, *args: t.Any, **kwargs: t.Any) -> t.Any:
         """
