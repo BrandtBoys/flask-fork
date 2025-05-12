@@ -52,3 +52,4 @@ def test_limit_config(app: Flask):
         assert r.max_content_length == 90
         assert r.max_form_memory_size == 30
         assert r.max_form_parts == 4
+

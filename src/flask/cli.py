@@ -39,9 +39,6 @@ class NoAppException(click.UsageError):
 
 
 def find_best_app(module: ModuleType) -> Flask:
-    """Given a module instance this tries to find the best possible
-    application in the module or raises an exception.
-    """
     from . import Flask
 
     # Search for the most common names first.
@@ -92,13 +89,6 @@ def find_best_app(module: ModuleType) -> Flask:
 
 
 def _called_with_wrong_args(f: t.Callable[..., Flask]) -> bool:
-    """Check whether calling a function raised a ``TypeError`` because
-    the call failed or because something in the factory raised the
-    error.
-
-    :param f: The function that was called.
-    :return: ``True`` if the call failed.
-    """
     tb = sys.exc_info()[2]
 
     try:
@@ -118,9 +108,6 @@ def _called_with_wrong_args(f: t.Callable[..., Flask]) -> bool:
 
 
 def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
-    """Check if the given string is a variable name or a function. Call
-    a function to get the app instance, or return the variable directly.
-    """
     from . import Flask
 
     # Parse app_name as a single expression to determine if it's a valid
@@ -198,9 +185,6 @@ def find_app_by_string(module: ModuleType, app_name: str) -> Flask:
 
 
 def prepare_import(path: str) -> str:
-    """Given a filename this will try to calculate the python path, add it
-    to the search path and return the actual module name that is expected.
-    """
     path = os.path.realpath(path)
 
     fname, ext = os.path.splitext(path)
@@ -331,10 +315,6 @@ class ScriptInfo:
         self._loaded_app: Flask | None = None
 
     def load_app(self) -> Flask:
-        """Loads the Flask app (if not yet loaded) and returns it.  Calling
-        this multiple times will just result in the already loaded app to
-        be returned.
-        """
         if self._loaded_app is not None:
             return self._loaded_app
         app: Flask | None = None
@@ -378,18 +358,6 @@ F = t.TypeVar("F", bound=t.Callable[..., t.Any])
 
 
 def with_appcontext(f: F) -> F:
-    """Wraps a callback so that it's guaranteed to be executed with the
-    script's application context.
-
-    Custom commands (and their options) registered under ``app.cli`` or
-    ``blueprint.cli`` will always have an app context available, this
-    decorator is not required in that case.
-
-    .. versionchanged:: 2.2
-        The app context is active for subcommands as well as the
-        decorated callback. The app context is always available to
-        ``app.cli`` command and parameter callbacks.
-    """
 
     @click.pass_context
     def decorator(ctx: click.Context, /, *args: t.Any, **kwargs: t.Any) -> t.Any:
@@ -413,10 +381,6 @@ class AppGroup(click.Group):
     def command(  # type: ignore[override]
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Callable[[t.Callable[..., t.Any]], click.Command]:
-        """This works exactly like the method of the same name on a regular
-        :class:`click.Group` but it wraps callbacks in :func:`with_appcontext`
-        unless it's disabled by passing ``with_appcontext=False``.
-        """
         wrap_for_ctx = kwargs.pop("with_appcontext", True)
 
         def decorator(f: t.Callable[..., t.Any]) -> click.Command:
@@ -429,10 +393,6 @@ class AppGroup(click.Group):
     def group(  # type: ignore[override]
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Callable[[t.Callable[..., t.Any]], click.Group]:
-        """This works exactly like the method of the same name on a regular
-        :class:`click.Group` but it defaults the group class to
-        :class:`AppGroup`.
-        """
         kwargs.setdefault("cls", AppGroup)
         return super().group(*args, **kwargs)  # type: ignore[no-any-return]
 
@@ -695,46 +655,12 @@ class FlaskGroup(AppGroup):
 
 
 def _path_is_ancestor(path: str, other: str) -> bool:
-    """Take ``other`` and remove the length of ``path`` from it. Then join it
-    to ``path``. If it is the original value, ``path`` is an ancestor of
-    ``other``."""
     return os.path.join(path, other[len(path) :].lstrip(os.sep)) == other
 
 
 def load_dotenv(
     path: str | os.PathLike[str] | None = None, load_defaults: bool = True
 ) -> bool:
-    """Load "dotenv" files to set environment variables. A given path takes
-    precedence over ``.env``, which takes precedence over ``.flaskenv``. After
-    loading and combining these files, values are only set if the key is not
-    already set in ``os.environ``.
-
-    This is a no-op if `python-dotenv`_ is not installed.
-
-    .. _python-dotenv: https://github.com/theskumar/python-dotenv#readme
-
-    :param path: Load the file at this location.
-    :param load_defaults: Search for and load the default ``.flaskenv`` and
-        ``.env`` files.
-    :return: ``True`` if at least one env var was loaded.
-
-    .. versionchanged:: 3.1
-        Added the ``load_defaults`` parameter. A given path takes precedence
-        over default files.
-
-    .. versionchanged:: 2.0
-        The current directory is not changed to the location of the
-        loaded file.
-
-    .. versionchanged:: 2.0
-        When loading the env files, set the default encoding to UTF-8.
-
-    .. versionchanged:: 1.1.0
-        Returns ``False`` when python-dotenv is not installed, or when
-        the given path isn't a file.
-
-    .. versionadded:: 1.0
-    """
     try:
         import dotenv
     except ImportError:
@@ -770,9 +696,6 @@ def load_dotenv(
 
 
 def show_server_banner(debug: bool, app_import_path: str | None) -> None:
-    """Show extra startup messages the first time the server is run,
-    ignoring the reloader.
-    """
     if is_running_from_reloader():
         return
 
@@ -832,9 +755,6 @@ class CertParamType(click.ParamType):
 
 
 def _validate_key(ctx: click.Context, param: click.Parameter, value: t.Any) -> t.Any:
-    """The ``--key`` option must be specified when ``--cert`` is a file.
-    Modifies the ``cert`` param to be a ``(cert, key)`` pair if needed.
-    """
     cert = ctx.params.get("cert")
     is_adhoc = cert == "adhoc"
 
@@ -949,14 +869,6 @@ def run_command(
     extra_files: list[str] | None,
     exclude_patterns: list[str] | None,
 ) -> None:
-    """Run a local development server.
-
-    This server is for development purposes only. It does not provide
-    the stability, security, or performance of production WSGI servers.
-
-    The reloader and debugger are enabled by default with the '--debug'
-    option.
-    """
     try:
         app: WSGIApplication = info.load_app()  # pyright: ignore
     except Exception as e:
@@ -1005,13 +917,6 @@ run_command.params.insert(0, _debug_option)
 @click.command("shell", short_help="Run a shell in the app context.")
 @with_appcontext
 def shell_command() -> None:
-    """Run an interactive Python shell in the context of a given
-    Flask application.  The application will populate the default
-    namespace of this shell according to its configuration.
-
-    This is useful for executing small snippets of management code
-    without having to manually configure the application.
-    """
     import code
 
     banner = (
@@ -1065,7 +970,6 @@ def shell_command() -> None:
 @click.option("--all-methods", is_flag=True, help="Show HEAD and OPTIONS methods.")
 @with_appcontext
 def routes_command(sort: str, all_methods: bool) -> None:
-    """Show all registered routes with endpoints and methods."""
     rules = list(current_app.url_map.iter_rules())
 
     if not rules:
@@ -1131,3 +1035,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
