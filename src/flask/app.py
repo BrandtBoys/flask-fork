@@ -180,6 +180,7 @@ class Flask(App):
             "TESTING": False,
             "PROPAGATE_EXCEPTIONS": None,
             "SECRET_KEY": None,
+            "SECRET_KEY_FALLBACKS": None,
             "PERMANENT_SESSION_LIFETIME": timedelta(days=31),
             "USE_X_SENDFILE": False,
             "SERVER_NAME": None,
@@ -912,4 +913,3 @@ class Flask(App):
         self, environ: WSGIEnvironment, start_response: StartResponse
     ) -> cabc.Iterable[bytes]:
         return self.wsgi_app(environ, start_response)
-
