@@ -42,17 +42,3 @@ def load(fp: t.IO[t.AnyStr], **kwargs: t.Any) -> t.Any:
 
 def jsonify(*args: t.Any, **kwargs: t.Any) -> Response:
     return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
-    """
-Returns a JSON response.
-
-This function takes in any number of positional arguments and keyword arguments,
-which are then passed to the `json` method of the current application instance.
-The result is a JSON response object.
-
-Args:
-    *args (t.Any): Any positional arguments to be included in the response.
-    **kwargs (t.Any): Any keyword arguments to be included in the response.
-
-Returns:
-    Response: A JSON response object.
-"""
