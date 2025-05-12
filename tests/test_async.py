@@ -152,3 +152,4 @@ def test_async_before_after_request():
     test_client.get("/bp/")
     assert bp_before_called
     assert bp_after_called
+

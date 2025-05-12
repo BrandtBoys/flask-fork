@@ -83,11 +83,6 @@ class EnvironBuilder(werkzeug.test.EnvironBuilder):
         super().__init__(path, base_url, *args, **kwargs)
 
     def json_dumps(self, obj: t.Any, **kwargs: t.Any) -> str:  # type: ignore
-        """Serialize ``obj`` to a JSON-formatted string.
-
-        The serialization will be configured according to the config associated
-        with this EnvironBuilder's ``app``.
-        """
         return self.app.json.dumps(obj, **kwargs)
 
 
@@ -121,22 +116,6 @@ class FlaskClient(Client):
     def session_transaction(
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Generator[SessionMixin, None, None]:
-        """When used in combination with a ``with`` statement this opens a
-        session transaction.  This can be used to modify the session that
-        the test client uses.  Once the ``with`` block is left the session is
-        stored back.
-
-        ::
-
-            with client.session_transaction() as session:
-                session['value'] = 42
-
-        Internally this is implemented by going through a temporary test
-        request context and since session handling could depend on
-        request variables this function accepts the same arguments as
-        :meth:`~flask.Flask.test_request_context` which are directly
-        passed through.
-        """
         if self.cookie_jar is None:
             raise RuntimeError(
                 "Session transactions only make sense with cookies enabled."
@@ -263,20 +242,6 @@ class FlaskCliRunner(CliRunner):
     def invoke(  # type: ignore
         self, cli: t.Any = None, args: t.Any = None, **kwargs: t.Any
     ) -> t.Any:
-        """Invokes a CLI command in an isolated environment. See
-        :meth:`CliRunner.invoke <click.testing.CliRunner.invoke>` for
-        full method documentation. See :ref:`testing-cli` for examples.
-
-        If the ``obj`` argument is not given, passes an instance of
-        :class:`~flask.cli.ScriptInfo` that knows how to load the Flask
-        app being tested.
-
-        :param cli: Command object to invoke. Default is the app's
-            :attr:`~flask.app.Flask.cli` group.
-        :param args: List of strings to invoke the command with.
-
-        :return: a :class:`~click.testing.Result` object.
-        """
         if cli is None:
             cli = self.app.cli  # type: ignore
 
@@ -284,3 +249,4 @@ class FlaskCliRunner(CliRunner):
             kwargs["obj"] = ScriptInfo(create_app=lambda: self.app)
 
         return super().invoke(cli, args, **kwargs)
+
