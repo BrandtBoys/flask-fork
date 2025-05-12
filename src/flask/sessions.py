@@ -283,6 +283,15 @@ session_json_serializer = TaggedJSONSerializer()
 
 
 def _lazy_sha1(string: bytes = b"") -> t.Any:
+    """
+Calculates the SHA-1 hash of a given string.
+
+Args:
+    string (bytes, optional): The input string to be hashed. Defaults to an empty byte string.
+
+Returns:
+    Any: The calculated SHA-1 hash as a bytes object.
+"""
     return hashlib.sha1(string)
 
 
