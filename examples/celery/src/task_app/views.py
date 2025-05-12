@@ -36,3 +36,4 @@ def block() -> dict[str, object]:
 def process() -> dict[str, object]:
     result = tasks.process.delay(total=request.form.get("total", type=int))
     return {"result_id": result.id}
+
