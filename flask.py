@@ -273,28 +273,14 @@ Raises:
         if session is not None:
             session.save_cookie(response, self.session_cookie_name)
 
-    def add_url_rule(self, endpoint, **options):
-        options['endpoint'] = f.__name__
+    def add_url_rule(self, rule, endpoint, **options):
+        options['endpoint'] = endpoint
         options.setdefault('methods', ('GET',))
         self.url_map.add(Rule(rule, **options))
 
     def route(self, rule, **options):
         def decorator(f):
-            self.add_url_rule(f.__name__, **options)
-            """
-Decorates a function to register it with the URL map.
-
-This decorator is used to associate a view function with a specific endpoint in the application.
-It checks if an 'endpoint' key exists in the options dictionary, and if not, assigns the current function's name as the default endpoint.
-The methods for the endpoint are set to ('GET',) by default, but can be overridden using the `options` dictionary.
-The decorated function is then added to the URL map and stored in the view functions dictionary.
-
-Args:
-    f (function): The view function to be registered with the URL map.
-
-Returns:
-    function: The original view function, now decorated and registered with the URL map.
-"""
+            self.add_url_rule(rule, f.__name__, **options)
             self.view_functions[f.__name__] = f
             return f
         return decorator
