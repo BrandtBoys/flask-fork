@@ -9,6 +9,7 @@ from collections import defaultdict
 from functools import update_wrapper
 
 import click
+from jinja2 import BaseLoader
 from jinja2 import FileSystemLoader
 from werkzeug.exceptions import default_exceptions
 from werkzeug.exceptions import HTTPException
@@ -336,7 +337,7 @@ Returns:
         self._static_url_path = value
 
     @cached_property
-    def jinja_loader(self) -> FileSystemLoader | None:
+    def jinja_loader(self) -> BaseLoader | None:
         if self.template_folder is not None:
             return FileSystemLoader(os.path.join(self.root_path, self.template_folder))
         else:
