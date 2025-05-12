@@ -104,13 +104,30 @@ Raises:
 
 @app.request_shutdown
 def after_request(response):
-    g.db.close()
+    """
+Closes the database connection after each request.
+
+Args:
+    response (object): The HTTP response object.
+
+Returns:
+    object: The modified HTTP response object with the database connection closed.
+"""
+g.db.close()
     return response
 
 
 @app.route('/')
 def timeline():
-    if not g.user:
+    """
+Fetches the timeline of messages for the current user, including messages they have posted and those from their followers.
+
+Args:
+    - offset (int): The number of rows to skip before displaying messages. Defaults to 0.
+Returns:
+    A rendered HTML template containing the timeline of messages.
+"""
+if not g.user:
         return redirect(url_for('public_timeline'))
     offset = request.args.get('offset', type=int)
     return render_template('timeline.html', messages=query_db('''
@@ -133,7 +150,17 @@ def public_timeline():
 
 @app.route('/<username>')
 def user_timeline(username):
-    profile_user = query_db('select * from user where username = ?',
+    """
+Returns the user's timeline.
+
+This function retrieves a user's timeline based on their username. It first checks if the user exists in the database, and then queries the follower table to determine if the current user is following the target user. The timeline is then rendered with the retrieved data.
+
+Parameters:
+- username (str): The username of the user whose timeline is being requested.
+Returns:
+- A rendered HTML template containing the user's timeline data.
+"""
+profile_user = query_db('select * from user where username = ?',
                             [username], one=True)
     if profile_user is None:
         abort(404)
@@ -213,7 +240,21 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if g.user:
+    """
+Registers a new user.
+
+This function handles the registration process for a new user. It checks if the user is already logged in, 
+and if not, it proceeds with the registration form submission. The form validation includes checking for empty fields,
+valid email addresses, and matching passwords. If all conditions are met, the user's information is inserted into the database.
+
+Parameters:
+    None
+
+Returns:
+    redirect: Redirects to the timeline page if the user is already logged in.
+    render_template: Renders the registration template with any error messages.
+"""
+if g.user:
         return redirect(url_for('timeline'))
     error = None
     if request.method == 'POST':
