@@ -15,10 +15,22 @@ import sys
 
 from jinja2 import Environment, PackageLoader, FileSystemLoader
 from werkzeug import Request as RequestBase, Response as ResponseBase, \
-     LocalStack, LocalProxy, create_environ, SharedDataMiddleware
+     LocalStack, LocalProxy, create_environ, SharedDataMiddleware, \
+     cached_property
 from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException
 from werkzeug.contrib.securecookie import SecureCookie
+
+# try to load the best simplejson implementation available.  If JSON
+# is not installed, we add a failing class.
+json_available = True
+try:
+    import simplejson as json
+except ImportError:
+    try:
+        import json
+    except ImportError:
+        json_available = False
 
 # utilities we import from Werkzeug and Jinja2 that are unused
 # in the module but are exported as public interface.
@@ -48,6 +60,13 @@ class Request(RequestBase):
         RequestBase.__init__(self, environ)
         self.endpoint = None
         self.view_args = None
+
+    @cached_property
+    def json(self):
+        if not json_available:
+            raise AttributeError('simplejson not available')
+        if self.mimetype == 'application/json':
+            return json.loads(self.data)
 
 
 class Response(ResponseBase):
@@ -79,7 +98,6 @@ class _NullSession(SecureCookie):
     __setitem__ = __delitem__ = clear = pop = popitem = \
         update = setdefault = _fail
     del _fail
-
 
 
 class _RequestContext(object):
@@ -129,6 +147,11 @@ def get_flashed_messages():
         _request_ctx_stack.top.flashes = flashes = \
             session.pop('_flashes', [])
     return flashes
+
+
+def jsonify(*args, **kwargs):
+    return current_app.response_class(json.dumps(dict(*args, **kwargs),
+        indent=None if request.is_xhr else 2), mimetype='application/json')
 
 
 def render_template(template_name, **context):
@@ -276,6 +299,8 @@ class Flask(object):
             url_for=url_for,
             get_flashed_messages=get_flashed_messages
         )
+        if json_available:
+            self.jinja_env.filters['tojson'] = json.dumps
 
     def create_jinja_loader(self):
         if pkg_resources is None:
@@ -410,4 +435,3 @@ current_app = LocalProxy(lambda: _request_ctx_stack.top.app)
 request = LocalProxy(lambda: _request_ctx_stack.top.request)
 session = LocalProxy(lambda: _request_ctx_stack.top.session)
 g = LocalProxy(lambda: _request_ctx_stack.top.g)
-
