@@ -120,14 +120,14 @@ def test_app_tearing_down_with_unhandled_exception(app, client):
 
     @app.route("/")
     def index():
-        raise Exception("dummy")
+        raise ValueError("dummy")
 
-    with pytest.raises(Exception, match="dummy"):
+    with pytest.raises(ValueError, match="dummy"):
         with app.app_context():
             client.get("/")
 
     assert len(cleanup_stuff) == 1
-    assert isinstance(cleanup_stuff[0], Exception)
+    assert isinstance(cleanup_stuff[0], ValueError)
     assert str(cleanup_stuff[0]) == "dummy"
 
 
@@ -210,4 +210,3 @@ def test_clean_pop(app):
 
     assert called == ["flask_test", "TEARDOWN"]
     assert not flask.current_app
-
