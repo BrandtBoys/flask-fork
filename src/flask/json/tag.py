@@ -283,6 +283,17 @@ class TaggedJSONSerializer:
         return self.tags[key].to_python(value[key])
 
     def _untag_scan(self, value: t.Any) -> t.Any:
+        """
+Scans a dictionary or list to remove tags.
+
+This function recursively traverses the input data structure and removes any tags present. It handles both dictionaries and lists, untagging each item within them before returning the modified data structure.
+
+Args:
+    value (t.Any): The input data structure to be scanned for tags.
+
+Returns:
+    t.Any: The input data structure with all tags removed.
+"""
         if isinstance(value, dict):
             # untag each item recursively
             value = {k: self._untag_scan(v) for k, v in value.items()}
@@ -298,4 +309,17 @@ class TaggedJSONSerializer:
         return dumps(self.tag(value), separators=(",", ":"))
 
     def loads(self, value: str) -> t.Any:
+        """
+Loads and untags a given string.
+
+This method takes a string as input, applies the `_untag_scan` function to it, 
+and returns the result. The `_untag_scan` function is not defined in this snippet,
+but it's assumed to be a part of the class instance (`self`) that this method belongs to.
+
+Args:
+    value (str): The input string to be loaded and untagged.
+
+Returns:
+    t.Any: The result of applying `_untag_scan` to the input string.
+"""
         return self._untag_scan(loads(value))
