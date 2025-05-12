@@ -126,7 +126,7 @@ Args:
 Raises:
     ValueError: If the test fails to catch an unhandled exception.
 """
-app.config["PROPAGATE_EXCEPTIONS"] = True
+    app.config["PROPAGATE_EXCEPTIONS"] = True
     cleanup_stuff = []
 
     @app.teardown_appcontext
@@ -147,7 +147,7 @@ Parameters:
  Raises:
  ValueError: Dummy error message.
  """
-raise ValueError("dummy")
+        raise ValueError("dummy")
 
     with pytest.raises(ValueError, match="dummy"):
         with app.app_context():
