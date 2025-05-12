@@ -96,3 +96,4 @@ def github_link(name, rawtext, text, lineno, inliner, options=None, content=None
 
 def setup(app):
     app.add_role("gh", github_link)
+
