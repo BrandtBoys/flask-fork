@@ -37,11 +37,10 @@ Returns:
         self.get_converter = get_converter
 
     @t.overload
-    def __get__(self, obj: None, owner: None) -> te.Self:
-        ...
+    def __get__(self, obj: None, owner: None) -> te.Self: ...
 
     @t.overload
-    def __get__(self, obj: App, owner: type[App]) -> T:
+    def __get__(self, obj: App, owner: type[App]) -> T: ...
         """
 Gets an attribute from an instance of the class.
 
@@ -55,7 +54,6 @@ Args:
 Returns:
     T: The value of the attribute.
 """
-        ...
 
     def __get__(self, obj: App | None, owner: type[App] | None = None) -> T | te.Self:
         """

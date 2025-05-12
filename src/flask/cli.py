@@ -235,7 +235,7 @@ Returns:
 @t.overload
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[True] = True
-) -> Flask:
+) -> Flask: ...
     """
 Locate an application within a given Flask module.
 
@@ -253,13 +253,12 @@ Returns:
 Raises:
     ValueError: If `app_name` is not provided and `raise_if_not_found` is False.
 """
-    ...
 
 
 @t.overload
 def locate_app(
     module_name: str, app_name: str | None, raise_if_not_found: t.Literal[False] = ...
-) -> Flask | None:
+) -> Flask | None: ...
     """
 Locate an application within a given module.
 
@@ -277,7 +276,6 @@ Returns:
 Raises:
     ValueError: If `raise_if_not_found` is set to `True` and the application is not found.
 """
-    ...
 
 
 def locate_app(

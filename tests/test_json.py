@@ -173,7 +173,7 @@ def test_jsonify_aware_datetimes(tz):
 
 def test_jsonify_uuid_types(app, client):
 
-    test_uuid = uuid.UUID(bytes=b"\xDE\xAD\xBE\xEF" * 4)
+    test_uuid = uuid.UUID(bytes=b"\xde\xad\xbe\xef" * 4)
     url = "/uuid_test"
     app.add_url_rule(url, url, lambda: flask.jsonify(x=test_uuid))
 
@@ -341,4 +341,3 @@ def test_html_method():
 
     result = json.dumps(ObjectWithHTML())
     assert result == '"<p>test</p>"'
-
