@@ -70,6 +70,7 @@ Returns:
 Note:
     This function uses the `app.post` method to send a POST request to the `/login` endpoint with the provided username and password. The `follow_redirects=True` parameter ensures that any redirects are followed, allowing for more robust handling of login responses.
 """
+
         return self.app.post('/login', data={
             'username': username,
             'password': password
@@ -81,8 +82,6 @@ Note:
 
     def logout(self):
         """
-Logout the user by redirecting to the logout page.
-
 Redirects to the `/logout` endpoint and follows redirects.
 
 Args:
@@ -91,6 +90,7 @@ Args:
 Returns:
     A redirect response object
 """
+
         return self.app.get('/logout', follow_redirects=True)
 
     def add_message(self, text):
@@ -123,6 +123,7 @@ self (object): The instance of the class being tested.
 Returns:
 None
 """
+
         rv = self.register('user1', 'default')
         assert 'You were successfully registered ' \
                'and can login now' in rv.data
