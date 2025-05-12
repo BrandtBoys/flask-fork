@@ -185,7 +185,6 @@ client (Flask client): The Flask client instance.
 Returns:
 None
 """
-    
     test_uuid = uuid.UUID(bytes=b"\xde\xad\xbe\xef" * 4)
     url = "/uuid_test"
     app.add_url_rule(url, url, lambda: flask.jsonify(x=test_uuid))
