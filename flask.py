@@ -63,7 +63,17 @@ class Request(RequestBase):
 
     @cached_property
     def json(self):
-        if not json_available:
+        """
+Returns JSON data from the object's content.
+
+Raises:
+    AttributeError: If simplejson is not available.
+    ValueError: If the mimetype is not 'application/json'.
+
+Returns:
+    dict or list: The parsed JSON data.
+"""
+if not json_available:
             raise AttributeError('simplejson not available')
         if self.mimetype == 'application/json':
             return json.loads(self.data)
@@ -150,7 +160,25 @@ def get_flashed_messages():
 
 
 def jsonify(*args, **kwargs):
-    return current_app.response_class(json.dumps(dict(*args, **kwargs),
+    """
+Converts input arguments to a JSON response.
+
+This function takes in any number of positional and keyword arguments, 
+dumps them into a dictionary, and returns the result as a JSON response. 
+
+The `mimetype` is set to `'application/json'`, indicating that this response should be treated as JSON data.
+
+If the request is an AJAX (XHR) request, the indentation in the JSON output will not be preserved.
+Otherwise, the JSON output will have 2 spaces of indentation for readability.
+
+Args:
+    *args: Variable number of positional arguments to be converted into a dictionary
+    **kwargs: Variable number of keyword arguments to be converted into a dictionary
+
+Returns:
+    A Flask response object containing the JSON data
+"""
+return current_app.response_class(json.dumps(dict(*args, **kwargs),
         indent=None if request.is_xhr else 2), mimetype='application/json')
 
 

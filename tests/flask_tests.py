@@ -170,14 +170,40 @@ class BasicFunctionalityTestCase(unittest.TestCase):
 class JSONTestCase(unittest.TestCase):
 
     def test_jsonify(self):
-        d = dict(a=23, b=42, c=[1, 2, 3])
+        """
+Tests the functionality of the _jsonify method by creating a Flask application, 
+defining routes to return JSON data in both keyword argument and dictionary format,
+and verifying that the returned data is correctly parsed as JSON.
+
+This test ensures that the _jsonify method can handle different types of input data
+and returns the expected JSON response.
+"""
+d = dict(a=23, b=42, c=[1, 2, 3])
         app = flask.Flask(__name__)
         @app.route('/kw')
         def return_kwargs():
-            return flask.jsonify(**d)
+            """
+Returns a JSON response using Flask's jsonify method.
+
+Args:
+    d (dict): A dictionary containing the data to be returned in the JSON response.
+
+Returns:
+    Response: A JSON response object with the provided data.
+"""
+return flask.jsonify(**d)
         @app.route('/dict')
         def return_dict():
-            return flask.jsonify(d)
+            """
+Returns a JSON response with the given dictionary `d` using Flask's jsonify method.
+
+Args:
+    d (dict): The dictionary to be serialized and returned as JSON.
+
+Returns:
+    A Flask Response object containing the serialized dictionary in JSON format.
+"""
+return flask.jsonify(d)
         c = app.test_client()
         for url in '/kw', '/dict':
             rv = c.get(url)
@@ -185,10 +211,42 @@ class JSONTestCase(unittest.TestCase):
             assert flask.json.loads(rv.data) == d
 
     def test_json_attr(self):
-        app = flask.Flask(__name__)
+        """
+Adds two numbers from a JSON payload and returns the result.
+
+This function uses Flask to create a simple web server that accepts POST requests.
+The request body is expected to be in JSON format, containing two keys 'a' and 'b'.
+The function concatenates these values as strings (due to the use of `unicode`) and returns the result.
+
+Example usage:
+    >>> app = Flask(__name__)
+    >>> @app.route('/add', methods=['POST'])
+    ... def add():
+    ...     return unicode(flask.request.json['a'] + flask.request.json['b'])
+    >>> c = app.test_client()
+    >>> rv = c.post('/add', data=flask.json.dumps({'a': 1, 'b': 2}),
+    ...             content_type='application/json')
+    >>> assert rv.data == '3'
+"""
+app = flask.Flask(__name__)
         @app.route('/add', methods=['POST'])
         def add():
-            return unicode(flask.request.json['a'] + flask.request.json['b'])
+            """
+Sends a response with the sum of two numbers from the JSON payload.
+
+This function expects the request body to contain a JSON object with 'a' and 'b' keys.
+It returns a string containing the sum of these two values, encoded in Unicode.
+
+Args:
+    None
+
+Returns:
+    str: The sum of 'a' and 'b' as a Unicode string.
+
+Raises:
+    KeyError: If either 'a' or 'b' is missing from the JSON payload.
+"""
+return unicode(flask.request.json['a'] + flask.request.json['b'])
         c = app.test_client()
         rv = c.post('/add', data=flask.json.dumps({'a': 1, 'b': 2}),
                             content_type='application/json')
