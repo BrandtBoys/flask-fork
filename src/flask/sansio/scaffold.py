@@ -338,6 +338,12 @@ Returns:
 
     @cached_property
     def jinja_loader(self) -> BaseLoader | None:
+        """
+Loads a Jinja template loader based on the presence of a template folder.
+
+Returns:
+    BaseLoader | None: A Jinja template loader instance if a template folder is present, otherwise None.
+"""
         if self.template_folder is not None:
             return FileSystemLoader(os.path.join(self.root_path, self.template_folder))
         else:
