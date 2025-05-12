@@ -111,6 +111,21 @@ def test_app_tearing_down_with_handled_exception_by_app_handler(app, client):
 
 
 def test_app_tearing_down_with_unhandled_exception(app, client):
+    """
+Test application tearing down with unhandled exception.
+
+This test case verifies that the application properly tears down when an unhandled exception is raised during request processing.
+It sets up a Flask app, configures it to propagate exceptions, and then attempts to access a route that raises a ValueError.
+The teardown_appcontext decorator is used to catch any exceptions that occur during request processing and store them in the cleanup_stuff list.
+Finally, the test asserts that one exception was caught and that its message matches the expected value.
+
+Args:
+    app (Flask): The Flask application instance.
+    client (Client): The test client instance.
+
+Raises:
+    ValueError: If the test fails to catch an unhandled exception.
+"""
     app.config["PROPAGATE_EXCEPTIONS"] = True
     cleanup_stuff = []
 
@@ -120,6 +135,18 @@ def test_app_tearing_down_with_unhandled_exception(app, client):
 
     @app.route("/")
     def index():
+        """
+Raises a ValueError with a dummy message.
+ 
+Parameters:
+ None
+ 
+ Returns:
+ None
+ 
+ Raises:
+ ValueError: Dummy error message.
+ """
         raise ValueError("dummy")
 
     with pytest.raises(ValueError, match="dummy"):
