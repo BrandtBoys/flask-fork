@@ -207,7 +207,7 @@ Parameters:
 Returns:
 - Response: The HTTP response object containing the sent file data.
 """
-return werkzeug.utils.send_file(  # type: ignore[return-value]
+    return werkzeug.utils.send_file(  # type: ignore[return-value]
         **_prepare_send_file_kwargs(
             path_or_file=path_or_file,
             environ=request.environ,
