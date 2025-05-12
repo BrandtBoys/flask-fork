@@ -77,3 +77,4 @@ Success,Comment
 "(True, '""""""\nSaves a session cookie to the client\'s browser.\n\nThis method sets a session cookie based on the provided `app`, `session`, and `response` objects.\nIt determines the necessary cookie attributes (name, domain, path, secure, samesite, httponly) using\nthe `get_cookie_name`, `get_cookie_domain`, `get_cookie_path`, `get_cookie_secure`, \n`get_cookie_samesite`, and `get_cookie_httponly` methods.\n\nIf the session was accessed at all, a ""Vary: Cookie"" header is added to the response.\nIf the session is modified or empty, the cookie is removed or not set respectively.\nOtherwise, if the session should be set as a cookie according to the `should_set_cookie` method,\nthe necessary attributes are determined and the cookie is set.\n\nParameters:\napp (Flask): The Flask application instance.\nsession (SessionMixin): The session object.\nresponse (Response): The response object.\n\nReturns:\nNone\n""""""')"
 
 
+
