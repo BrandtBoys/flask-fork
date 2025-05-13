@@ -254,6 +254,25 @@ class FlaskCliRunner(CliRunner):
     def invoke(  # type: ignore
         self, cli: t.Any = None, args: t.Any = None, **kwargs: t.Any
     ) -> Result:
+        """
+Invokes the parent class's invoke method with optional CLI and arguments.
+
+This function is used to extend the functionality of the parent class by providing
+additional parameters such as `cli` and `args`. If `cli` is not provided, it defaults
+to the application's CLI. The `obj` parameter is also optional and defaults to a
+ScriptInfo object with a create_app lambda that returns the current application.
+
+Args:
+    cli (t.Any): The command-line interface. Defaults to None.
+    args (t.Any): Additional arguments. Defaults to None.
+    **kwargs: Keyword arguments, including 'obj' which defaults to ScriptInfo(create_app=lambda: self.app).
+
+Returns:
+    Result: The result of the parent class's invoke method.
+
+Raises:
+    t.Any: Any exception raised by the parent class's invoke method.
+"""
         if cli is None:
             cli = self.app.cli
 
