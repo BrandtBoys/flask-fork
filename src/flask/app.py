@@ -297,6 +297,20 @@ class Flask(App):
     def open_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = None
     ) -> t.IO[t.AnyStr]:
+        """
+Opens a resource file.
+
+Args:
+    - `resource` (str): The path to the resource file.
+    - `mode` (str, optional): The mode in which to open the file. Defaults to "rb". Supported modes are "r", "rt", and "rb".
+    - `encoding` (str | None, optional): The encoding to use when opening the file. Defaults to None.
+
+Returns:
+    t.IO[t.AnyStr]: A file object opened in the specified mode.
+
+Raises:
+    ValueError: If the mode is not one of "r", "rt", or "rb".
+"""
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 

@@ -55,6 +55,22 @@ class EnvironBuilder(werkzeug.test.EnvironBuilder):
         *args: t.Any,
         **kwargs: t.Any,
     ) -> None:
+        """
+Initialize the application.
+
+This method initializes a new instance of the class. It takes in several parameters:
+
+- `app`: The Flask application instance.
+- `path`: The path to serve the application from (defaults to "/").
+- `base_url`: The base URL for the application (can be set, but not used if `subdomain` or `url_scheme` are provided).
+- `subdomain`: The subdomain of the application (can be set, but not used if `base_url` is provided).
+- `url_scheme`: The scheme to use for the application's URLs (can be set, but not used if `base_url` is provided).
+- `*args` and `**kwargs`: Additional positional and keyword arguments.
+
+The method checks that either `base_url`, `subdomain`, or `url_scheme` are not provided, or that they are all provided with the same value. If so, it sets up the base URL based on the Flask application's configuration and the provided parameters.
+
+It then calls the parent class's constructor with the updated path and base URL.
+"""
         assert not (base_url or subdomain or url_scheme) or (
             base_url is not None
         ) != bool(

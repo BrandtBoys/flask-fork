@@ -77,6 +77,20 @@ class Blueprint(SansioBlueprint):
     def open_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
     ) -> t.IO[t.AnyStr]:
+        """
+Opens a resource file in the specified mode.
+
+Args:
+    - `resource` (str): The path to the resource file.
+    - `mode` (str, optional): The mode in which to open the file. Defaults to "rb". Supported modes are "r", "rt", and "rb".
+    - `encoding` (str, optional): The encoding to use when opening the file. Defaults to "utf-8".
+
+Returns:
+    A file-like object opened in the specified mode.
+
+Raises:
+    ValueError: If an unsupported mode is provided.
+"""
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 

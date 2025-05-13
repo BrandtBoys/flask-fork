@@ -100,6 +100,18 @@ class Request(RequestBase):
             attach_enctype_error_multidict(self)
 
     def on_json_loading_failed(self, e: ValueError | None) -> t.Any:
+        """
+Raises a BadRequest exception when the JSON loading fails, 
+unless the application is in debug mode. 
+
+If an error occurs during JSON loading, it will be re-raised as a BadRequest exception.
+
+Args:
+    e (ValueError | None): The error that occurred during JSON loading.
+
+Returns:
+    t.Any: The result of calling the superclass's on_json_loading_failed method.
+"""
         try:
             return super().on_json_loading_failed(e)
         except BadRequest as ebr:

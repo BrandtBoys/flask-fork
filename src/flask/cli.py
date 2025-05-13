@@ -301,6 +301,21 @@ class ScriptInfo:
         self._loaded_app: Flask | None = None
 
     def load_app(self) -> Flask:
+        """
+Loads a Flask application instance.
+
+This method attempts to load an existing Flask application from various sources,
+including environment variables, command-line options, and file imports. If no
+application can be found, it raises a `NoAppException`.
+
+If the `set_debug_flag` attribute is set, the loaded application's debug flag
+is updated through the descriptor.
+
+Returns:
+    The loaded Flask application instance.
+Raises:
+    NoAppException: If no Flask application can be located.
+"""
         if self._loaded_app is not None:
             return self._loaded_app
         app: Flask | None = None
