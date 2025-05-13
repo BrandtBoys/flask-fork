@@ -6,7 +6,6 @@ import pathlib
 import sys
 import typing as t
 from collections import defaultdict
-from datetime import timedelta
 from functools import update_wrapper
 
 from jinja2 import FileSystemLoader
@@ -14,15 +13,10 @@ from werkzeug.exceptions import default_exceptions
 from werkzeug.exceptions import HTTPException
 from werkzeug.utils import cached_property
 
-from . import typing as ft
-from .cli import AppGroup
-from .globals import current_app
-from .helpers import get_root_path
-from .helpers import send_from_directory
-from .templating import _default_template_ctx_processor
-
-if t.TYPE_CHECKING:  # pragma: no cover
-    from .wrappers import Response
+from .. import typing as ft
+from ..cli import AppGroup
+from ..helpers import get_root_path
+from ..templating import _default_template_ctx_processor
 
 # a singleton sentinel value for parameter defaults
 _sentinel = object()
@@ -403,7 +397,6 @@ Returns:
 
         self._static_url_path = value
 
-    def get_send_file_max_age(self, filename: str | None) -> int | None:
         """
 Returns the maximum age in seconds for sending files.
 
@@ -416,17 +409,6 @@ Args:
 Returns:
     int | None: The maximum age in seconds for sending files, or None if no default is set.
 """
-        value = current_app.config["SEND_FILE_MAX_AGE_DEFAULT"]
-
-        if value is None:
-            return None
-
-        if isinstance(value, timedelta):
-            return int(value.total_seconds())
-
-        return value
-
-    def send_static_file(self, filename: str) -> Response:
         """
 Sends a static file from the configured static folder.
 
@@ -443,16 +425,6 @@ Returns:
 Raises:
     RuntimeError: If 'static_folder' is not set.
 """
-        if not self.has_static_folder:
-            raise RuntimeError("'static_folder' must be set to serve static_files.")
-
-        # send_file only knows to call get_send_file_max_age on the app,
-        # call it here so it works for blueprints too.
-        max_age = self.get_send_file_max_age(filename)
-        return send_from_directory(
-            t.cast(str, self.static_folder), filename, max_age=max_age
-        )
-
     @cached_property
     def jinja_loader(self) -> FileSystemLoader | None:
         """
@@ -466,8 +438,6 @@ Returns:
             return FileSystemLoader(os.path.join(self.root_path, self.template_folder))
         else:
             return None
-
-    def open_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
         """
 Opens a resource file.
 
@@ -481,10 +451,6 @@ Returns:
 Raises:
     ValueError: If an unsupported mode is provided.
 """
-        if mode not in {"r", "rt", "rb"}:
-            raise ValueError("Resources can only be opened for reading.")
-
-        return open(os.path.join(self.root_path, resource), mode)
 
     def _method_route(
         self,
@@ -599,7 +565,7 @@ Args:
 Returns:
     T_route -> T_route: A decorator function that registers a view function with this router.
 """
-         def decorator(f: T_route) -> T_route:
+        def decorator(f: T_route) -> T_route:
             """
 Decorates a function to register it as an endpoint.
 
@@ -647,7 +613,7 @@ Args:
 Returns:
     Callable[[F], F]: A new function that wraps the original function and registers it as a view function.
 """
-         def decorator(f: F) -> F:
+        def decorator(f: F) -> F:
             """
 Decorates a view function with endpoint information.
 
@@ -779,7 +745,7 @@ Args:
 Returns:
     T_error_handler: The decorated function.
 """
-         def decorator(f: T_error_handler) -> T_error_handler:
+        def decorator(f: T_error_handler) -> T_error_handler:
             """
 Decorates a function to register it as an error handler.
 

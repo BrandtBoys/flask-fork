@@ -5,14 +5,14 @@ import typing as t
 from collections import defaultdict
 from functools import update_wrapper
 
-from . import typing as ft
+from .. import typing as ft
 from .scaffold import _endpoint_from_view_func
 from .scaffold import _sentinel
 from .scaffold import Scaffold
 from .scaffold import setupmethod
 
 if t.TYPE_CHECKING:  # pragma: no cover
-    from .app import Flask
+    from .app import App
 
 DeferredSetupFunction = t.Callable[["BlueprintSetupState"], t.Callable]
 T_after_request = t.TypeVar("T_after_request", bound=ft.AfterRequestCallable)
@@ -41,7 +41,7 @@ class BlueprintSetupState:
     def __init__(
         self,
         blueprint: Blueprint,
-        app: Flask,
+        app: App,
         options: t.Any,
         first_registration: bool,
     ) -> None:
@@ -291,7 +291,7 @@ Args:
 Returns:
     None
 """
-         def wrapper(state: BlueprintSetupState) -> None:
+        def wrapper(state: BlueprintSetupState) -> None:
             """
 Wrapper function to handle first registration of users.
 
@@ -309,7 +309,7 @@ Returns:
         self.record(update_wrapper(wrapper, func))
 
     def make_setup_state(
-        self, app: Flask, options: dict, first_registration: bool = False
+        self, app: App, options: dict, first_registration: bool = False
     ) -> BlueprintSetupState:
         """
 Creates a new setup state for the given application.
@@ -346,7 +346,7 @@ Returns:
             raise ValueError("Cannot register a blueprint on itself")
         self._blueprints.append((blueprint, options))
 
-    def register(self, app: Flask, options: dict) -> None:
+    def register(self, app: App, options: dict) -> None:
         name_prefix = options.get("name_prefix", "")
         self_name = options.get("name", self.name)
         name = f"{name_prefix}.{self_name}".lstrip(".")
@@ -371,7 +371,7 @@ Returns:
         if self.has_static_folder:
             state.add_url_rule(
                 f"{self.static_url_path}/<path:filename>",
-                view_func=self.send_static_file,
+                view_func=self.send_static_file,  # type: ignore[attr-defined]
                 endpoint="static",
             )
 
@@ -537,7 +537,7 @@ Args:
 Returns:
     None
 """
-         def register_template(state: BlueprintSetupState) -> None:
+        def register_template(state: BlueprintSetupState) -> None:
             """
 Registers a Jinja2 filter with the given application state.
 
@@ -569,7 +569,7 @@ Args:
 Returns:
     Callable: The decorated function with added metadata.
 """
-         def decorator(f: T_template_test) -> T_template_test:
+        def decorator(f: T_template_test) -> T_template_test:
             """
 Decorates a test function with an application template test.
 
@@ -604,7 +604,7 @@ Args:
 Returns:
     None
 """
-         def register_template(state: BlueprintSetupState) -> None:
+        def register_template(state: BlueprintSetupState) -> None:
             """
 Registers a Jinja template test in the application's setup state.
 
@@ -635,7 +635,7 @@ Args:
 Returns:
     T_template_global: A decorator function that adds the decorated function to the list of application template globals.
 """
-         def decorator(f: T_template_global) -> T_template_global:
+        def decorator(f: T_template_global) -> T_template_global:
             """
 Decorates a function to add it as an app template global.
 
@@ -667,7 +667,7 @@ Args:
 Returns:
     None
 """
-         def register_template(state: BlueprintSetupState) -> None:
+        def register_template(state: BlueprintSetupState) -> None:
             """
 Registers a template as a global variable in the Jinja environment.
 
@@ -782,7 +782,7 @@ Example:
         # Handle all exceptions
         pass
 """
-         def decorator(f: T_error_handler) -> T_error_handler:
+        def decorator(f: T_error_handler) -> T_error_handler:
             """
 Decorates a function with error handling.
 

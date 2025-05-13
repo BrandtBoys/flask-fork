@@ -9,7 +9,7 @@ from werkzeug.local import LocalProxy
 from .globals import request
 
 if t.TYPE_CHECKING:  # pragma: no cover
-    from .app import Flask
+    from .sansio.app import App
 
 
 @LocalProxy
@@ -41,7 +41,7 @@ default_handler.setFormatter(
 )
 
 
-def create_logger(app: Flask) -> logging.Logger:
+def create_logger(app: App) -> logging.Logger:
     logger = logging.getLogger(app.name)
 
     if app.debug and not logger.level:
@@ -51,4 +51,3 @@ def create_logger(app: Flask) -> logging.Logger:
         logger.addHandler(default_handler)
 
     return logger
-
