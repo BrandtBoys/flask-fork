@@ -293,14 +293,28 @@ class Flask(App):
             t.cast(str, self.static_folder), filename, max_age=max_age
         )
 
-    def open_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
+    def open_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = None
+    ) -> t.IO[t.AnyStr]:
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
-        return open(os.path.join(self.root_path, resource), mode)
+        path = os.path.join(self.root_path, resource)
 
-    def open_instance_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
-        return open(os.path.join(self.instance_path, resource), mode)
+        if mode == "rb":
+            return open(path, mode)
+
+        return open(path, mode, encoding=encoding)
+
+    def open_instance_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
+    ) -> t.IO[t.AnyStr]:
+        path = os.path.join(self.instance_path, resource)
+
+        if "b" in mode:
+            return open(path, mode)
+
+        return open(path, mode, encoding=encoding)
 
     def create_jinja_environment(self) -> Environment:
         options = dict(self.jinja_options)

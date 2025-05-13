@@ -74,9 +74,15 @@ class Blueprint(SansioBlueprint):
             t.cast(str, self.static_folder), filename, max_age=max_age
         )
 
-    def open_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
+    def open_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
+    ) -> t.IO[t.AnyStr]:
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
-        return open(os.path.join(self.root_path, resource), mode)
+        path = os.path.join(self.root_path, resource)
 
+        if mode == "rb":
+            return open(path, mode)
+
+        return open(path, mode, encoding=encoding)
