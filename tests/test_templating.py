@@ -69,10 +69,38 @@ def test_standard_context(app, client):
 
 
 def test_escaping(app, client):
+    """
+Tests the escaping of HTML characters in a Flask application.
+
+This function tests that the Flask application correctly escapes HTML characters
+in the `text` variable, which is passed to the `escaping_template.html` template.
+The test checks that the escaped characters are properly rendered as HTML entities.
+
+Parameters:
+app (Flask): The Flask application instance.
+client (Client): The client instance used for testing.
+
+Returns:
+None
+"""
     text = "<p>Hello World!"
 
     @app.route("/")
     def index():
+        """
+Returns an HTML template with escaped text and HTML markup.
+
+This function uses Flask's `render_template` method to render a template
+with the provided text and HTML markup. The `text` parameter is passed as-is,
+while the `html` parameter is marked up using Markup from the Marked library.
+
+Args:
+    text (str): The text to be rendered in the template.
+    html (Markup): The HTML markup to be rendered in the template.
+
+Returns:
+    flask.Response: The rendered HTML response.
+"""
         return flask.render_template(
             "escaping_template.html", text=text, html=Markup(text)
         )
@@ -89,10 +117,34 @@ def test_escaping(app, client):
 
 
 def test_no_escaping(app, client):
+    """
+Test function to verify that HTML escaping is not applied in the Flask application.
+
+This test checks if the `flask.render_template` function correctly passes through the HTML text without escaping it, 
+and if the client receives the escaped version of the HTML text.
+
+Parameters:
+app (Flask app): The Flask application instance.
+client (Client): The client instance used to make HTTP requests.
+
+Returns:
+None
+"""
     text = "<p>Hello World!"
 
     @app.route("/")
     def index():
+        """
+Returns an HTML page using Flask's render_template function.
+
+This function takes in a template file name and passes two variables: 'text' and 'html'. The 'text' variable is rendered as plain text, while the 'html' variable is rendered with HTML escaping enabled to prevent XSS attacks. 
+
+Parameters:
+    None
+
+Returns:
+    A rendered Flask template object
+"""
         return flask.render_template(
             "non_escaping_template.txt", text=text, html=Markup(text)
         )

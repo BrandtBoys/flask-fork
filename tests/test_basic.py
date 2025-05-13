@@ -466,11 +466,38 @@ def test_session_stored_last(app, client):
 
 
 def test_session_special_types(app, client):
+    """
+Test session special types.
+
+This function tests the behavior of Flask's session object when storing
+special types such as bytes, Markup objects, and UUIDs. It verifies that
+these types are stored correctly and can be retrieved later.
+
+Parameters:
+app (Flask application): The Flask application instance.
+client (Client): The client instance used for testing.
+
+Returns:
+None
+"""
     now = datetime.now(timezone.utc).replace(microsecond=0)
     the_uuid = uuid.uuid4()
 
     @app.route("/")
     def dump_session_contents():
+        """
+Dumps session contents into the Flask session.
+
+This function populates the Flask session with various data types, including a tuple, bytes, Markup object, UUID, datetime, and dictionaries. The returned value is an empty string and a status code of 204 (No Content).
+
+Note:
+- The `Markup` object is used to represent HTML content.
+- The `uuid` variable is assumed to be defined elsewhere in the codebase.
+- The `now` variable is assumed to be a datetime object representing the current time.
+
+Returns:
+    tuple: A tuple containing an empty string and a status code of 204 (No Content).
+"""
         flask.session["t"] = (1, 2, 3)
         flask.session["b"] = b"\xff"
         flask.session["m"] = Markup("<html>")
@@ -608,8 +635,47 @@ def test_extended_flashing(app):
     # in the view functions will cause a 500 response to the test client
     # instead of propagating exceptions.
 
-    @app.route("/")
+   """
+Test the functionality of the `flask.flash` function.
+
+This test suite checks that the `flask.flash` function correctly stores and retrieves
+messages with different categories. It also tests that messages can be filtered by category.
+
+The test suite consists of several routes, each testing a specific scenario:
+
+- `/`: Tests flashing a message without specifying a category.
+- `/test/`: Tests flashing multiple messages with different categories.
+- `/test_with_categories/`: Tests flashing a message with a category and retrieving it.
+- `/test_filter/`: Tests filtering messages by category.
+- `/test_filters/`: Tests filtering messages by multiple categories.
+- `/test_filters_without_returning_categories/`: Tests filtering messages without returning categories.
+
+Each test uses the `app.test_client()` to simulate a request to the route, ensuring that
+the flashed messages are properly cleaned after each test.
+
+Note: Make sure to set `app.testing=True` before running these tests, as otherwise,
+AssertionErrors in view functions will cause a 500 response instead of propagating exceptions.
+"""
+     @app.route("/")
     def index():
+        """
+Flask Flash Messages Function
+
+This function utilizes Flask's flash messaging system to display messages to the user.
+It takes advantage of the `flash` method provided by Flask, which can be used to set and retrieve
+messages for different types of notifications (e.g., success, error, warning).
+
+Parameters:
+None
+
+Returns:
+str: An empty string indicating the function has completed its task.
+
+Notes:
+- The first call to `flask.flash("Hello World")` sets a default message type as 'success'.
+- The second call to `flask.flash("Hello World", "error")` overrides the previous message with an error type.
+- The third call to `flask.flash(Markup("<em>Testing</em>"), "warning")` sets a warning message containing HTML markup.
+"""
         flask.flash("Hello World")
         flask.flash("Hello World", "error")
         flask.flash(Markup("<em>Testing</em>"), "warning")
@@ -627,6 +693,20 @@ def test_extended_flashing(app):
 
     @app.route("/test_with_categories/")
     def test_with_categories():
+        """
+Tests the functionality of getting flashed messages with categories.
+
+This function tests the `flask.get_flashed_messages(with_categories=True)` method, 
+which returns a list of tuples containing the category and message. The test 
+asserts that the length of the returned list is 3 and that it contains the expected
+messages with their respective categories.
+
+Args:
+    None
+
+Returns:
+    str: An empty string indicating successful execution.
+"""
         messages = flask.get_flashed_messages(with_categories=True)
         assert len(messages) == 3
         assert list(messages) == [
@@ -657,6 +737,13 @@ def test_extended_flashing(app):
 
     @app.route("/test_filters_without_returning_categories/")
     def test_filters2():
+        """
+Tests the functionality of getting flashed messages with a category filter.
+
+This function tests that the `flask.get_flashed_messages` method returns two messages
+when called with a category filter. The first message is expected to be "Hello World"
+and the second message is expected to be an HTML-marked string "<em>Testing</em>".
+"""
         messages = flask.get_flashed_messages(category_filter=["message", "warning"])
         assert len(messages) == 2
         assert messages[0] == "Hello World"
