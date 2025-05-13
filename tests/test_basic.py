@@ -656,7 +656,7 @@ the flashed messages are properly cleaned after each test.
 Note: Make sure to set `app.testing=True` before running these tests, as otherwise,
 AssertionErrors in view functions will cause a 500 response instead of propagating exceptions.
 """
-     @app.route("/")
+    @app.route("/")
     def index():
         """
 Flask Flash Messages Function
