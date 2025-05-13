@@ -5,7 +5,7 @@ import os
 import sys
 import typing as t
 from datetime import datetime
-from functools import cache
+from functools import lru_cache
 from functools import update_wrapper
 
 import werkzeug.utils
@@ -248,7 +248,7 @@ def get_root_path(import_name: str) -> str:
         return os.getcwd()
 
     if hasattr(loader, "get_filename"):
-        filepath = loader.get_filename(import_name)  # pyright: ignore
+        filepath = loader.get_filename(import_name)
     else:
         # Fall back to imports.
         __import__(import_name)
@@ -272,7 +272,7 @@ def get_root_path(import_name: str) -> str:
     return os.path.dirname(os.path.abspath(filepath))  # type: ignore[no-any-return]
 
 
-@cache
+@lru_cache(maxsize=None)
 def _split_blueprint_path(name: str) -> list[str]:
     out: list[str] = [name]
 
@@ -280,4 +280,3 @@ def _split_blueprint_path(name: str) -> list[str]:
         out.extend(_split_blueprint_path(name.rpartition(".")[0]))
 
     return out
-
