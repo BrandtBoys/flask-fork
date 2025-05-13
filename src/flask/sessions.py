@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import hashlib
 import typing as t
-import warnings
 from collections.abc import MutableMapping
 from datetime import datetime
 from datetime import timezone
@@ -9,11 +10,9 @@ from itsdangerous import BadSignature
 from itsdangerous import URLSafeTimedSerializer
 from werkzeug.datastructures import CallbackDict
 
-from .helpers import is_ip
 from .json.tag import TaggedJSONSerializer
 
 if t.TYPE_CHECKING:  # pragma: no cover
-    import typing_extensions as te
     from .app import Flask
     from .wrappers import Request, Response
 
@@ -93,7 +92,7 @@ class NullSession(SecureCookieSession):
     but fail on setting.
     """
 
-    def _fail(self, *args: t.Any, **kwargs: t.Any) -> "te.NoReturn":
+    def _fail(self, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:
         raise RuntimeError(
             "The session is unavailable because no secret "
             "key was set.  Set the secret_key on the "
@@ -154,7 +153,7 @@ class SessionInterface:
     #: .. versionadded:: 0.10
     pickle_based = False
 
-    def make_null_session(self, app: "Flask") -> NullSession:
+    def make_null_session(self, app: Flask) -> NullSession:
         """
 Creates and returns a null session instance for the given Flask application.
 
@@ -169,7 +168,7 @@ Returns:
     def is_null_session(self, obj: object) -> bool:
         return isinstance(obj, self.null_session_class)
 
-    def get_cookie_name(self, app: "Flask") -> str:
+    def get_cookie_name(self, app: Flask) -> str:
         """
 Returns the name of the cookie used to store session data in a Flask application.
 
@@ -181,57 +180,11 @@ Returns:
 """
         return app.config["SESSION_COOKIE_NAME"]
 
-    def get_cookie_domain(self, app: "Flask") -> t.Optional[str]:
-
+    def get_cookie_domain(self, app: Flask) -> str | None:
         rv = app.config["SESSION_COOKIE_DOMAIN"]
+        return rv if rv else None
 
-        # set explicitly, or cached from SERVER_NAME detection
-        # if False, return None
-        if rv is not None:
-            return rv if rv else None
-
-        rv = app.config["SERVER_NAME"]
-
-        # server name not set, cache False to return none next time
-        if not rv:
-            app.config["SESSION_COOKIE_DOMAIN"] = False
-            return None
-
-        # chop off the port which is usually not supported by browsers
-        # remove any leading '.' since we'll add that later
-        rv = rv.rsplit(":", 1)[0].lstrip(".")
-
-        if "." not in rv:
-            # Chrome doesn't allow names without a '.'. This should only
-            # come up with localhost. Hack around this by not setting
-            # the name, and show a warning.
-            warnings.warn(
-                f"{rv!r} is not a valid cookie domain, it must contain"
-                " a '.'. Add an entry to your hosts file, for example"
-                f" '{rv}.localdomain', and use that instead."
-            )
-            app.config["SESSION_COOKIE_DOMAIN"] = False
-            return None
-
-        ip = is_ip(rv)
-
-        if ip:
-            warnings.warn(
-                "The session cookie domain is an IP address. This may not work"
-                " as intended in some browsers. Add an entry to your hosts"
-                ' file, for example "localhost.localdomain", and use that'
-                " instead."
-            )
-
-        # if this is not an ip and app is mounted at the root, allow subdomain
-        # matching by adding a '.' prefix
-        if self.get_cookie_path(app) == "/" and not ip:
-            rv = f".{rv}"
-
-        app.config["SESSION_COOKIE_DOMAIN"] = rv
-        return rv
-
-    def get_cookie_path(self, app: "Flask") -> str:
+    def get_cookie_path(self, app: Flask) -> str:
         """
 Returns the path of the cookie used by a Flask application.
 
@@ -247,7 +200,7 @@ Returns:
 """
         return app.config["SESSION_COOKIE_PATH"] or app.config["APPLICATION_ROOT"]
 
-    def get_cookie_httponly(self, app: "Flask") -> bool:
+    def get_cookie_httponly(self, app: Flask) -> bool:
         """
 Returns whether the session cookie is set to be HTTP-only in the given Flask application.
 
@@ -259,7 +212,7 @@ Returns:
 """
         return app.config["SESSION_COOKIE_HTTPONLY"]
 
-    def get_cookie_secure(self, app: "Flask") -> bool:
+    def get_cookie_secure(self, app: Flask) -> bool:
         """
 Returns whether the session cookie is secure.
 
@@ -275,7 +228,7 @@ Returns:
 """
         return app.config["SESSION_COOKIE_SECURE"]
 
-    def get_cookie_samesite(self, app: "Flask") -> str:
+    def get_cookie_samesite(self, app: Flask) -> str:
         """
 Returns the value of the `SESSION_COOKIE_SAMESITE` configuration option from the provided Flask application.
 
@@ -287,9 +240,7 @@ Returns:
 """
         return app.config["SESSION_COOKIE_SAMESITE"]
 
-    def get_expiration_time(
-        self, app: "Flask", session: SessionMixin
-    ) -> t.Optional[datetime]:
+    def get_expiration_time(self, app: Flask, session: SessionMixin) -> datetime | None:
         """
 Returns the expiration time of a Flask session.
 
@@ -308,15 +259,13 @@ Returns:
             return datetime.now(timezone.utc) + app.permanent_session_lifetime
         return None
 
-    def should_set_cookie(self, app: "Flask", session: SessionMixin) -> bool:
+    def should_set_cookie(self, app: Flask, session: SessionMixin) -> bool:
 
         return session.modified or (
             session.permanent and app.config["SESSION_REFRESH_EACH_REQUEST"]
         )
 
-    def open_session(
-        self, app: "Flask", request: "Request"
-    ) -> t.Optional[SessionMixin]:
+    def open_session(self, app: Flask, request: Request) -> SessionMixin | None:
         """
 Opens a new session for the given Flask application and request.
 
@@ -333,7 +282,7 @@ Raises:
         raise NotImplementedError()
 
     def save_session(
-        self, app: "Flask", session: SessionMixin, response: "Response"
+        self, app: Flask, session: SessionMixin, response: Response
     ) -> None:
         """
 Saves a session.
@@ -378,9 +327,7 @@ class SecureCookieSessionInterface(SessionInterface):
     serializer = session_json_serializer
     session_class = SecureCookieSession
 
-    def get_signing_serializer(
-        self, app: "Flask"
-    ) -> t.Optional[URLSafeTimedSerializer]:
+    def get_signing_serializer(self, app: Flask) -> URLSafeTimedSerializer | None:
         """
 Returns a signing serializer for the provided Flask application.
 
@@ -406,9 +353,7 @@ Returns:
             signer_kwargs=signer_kwargs,
         )
 
-    def open_session(
-        self, app: "Flask", request: "Request"
-    ) -> t.Optional[SecureCookieSession]:
+    def open_session(self, app: Flask, request: Request) -> SecureCookieSession | None:
         """
 Opens a new session for the given Flask application and request.
 
@@ -433,7 +378,7 @@ Returns:
             return self.session_class()
 
     def save_session(
-        self, app: "Flask", session: SessionMixin, response: "Response"
+        self, app: Flask, session: SessionMixin, response: Response
     ) -> None:
         """
 Saves a session cookie to the client's browser.
@@ -451,7 +396,6 @@ response (Response): The HTTP response object.
 Returns:
 None
 """
-        
         name = self.get_cookie_name(app)
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
