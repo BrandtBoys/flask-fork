@@ -388,6 +388,11 @@ def test_flaskgroup_nested(app, runner):
 
 
 def test_no_command_echo_loading_error():
+    """
+Test the behavior of `CliRunner` when invoked with a missing command.
+
+This test checks that the `CliRunner` raises an error when attempting to run a command that is not defined, and that the error message includes the expected information.
+"""
     from flask.cli import cli
 
     try:
@@ -418,6 +423,17 @@ def test_help_echo_loading_error():
 
 
 def test_help_echo_exception():
+    """
+Test the functionality of the `CliRunner` class when invoking the help command.
+
+This test checks that:
+
+- The `CliRunner` class can handle exceptions raised by the application.
+- The help command is invoked successfully and returns the expected output.
+- The exception message is correctly displayed in the stderr output.
+
+The test uses a Flask app that raises an exception when called, simulating a real-world scenario where an error occurs during execution. It then checks that the `CliRunner` class can handle this exception and display the correct help message.
+"""
     def create_app():
         raise Exception("oh no")
 

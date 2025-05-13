@@ -294,6 +294,24 @@ class ScriptInfo:
         load_dotenv_defaults: bool = True,
     ) -> None:
         #: Optionally the import path for the Flask application.
+        """
+Initialize a ScriptInfo object with optional parameters to configure the application.
+
+Parameters:
+app_import_path (str | None): Optionally the import path for the Flask application.
+create_app (Callable[..., Flask] | None): Optionally a function that is passed the script info to create
+the instance of the application.
+set_debug_flag (bool): A dictionary with arbitrary data that can be associated with this script info.
+load_dotenv_defaults (bool): Whether default ``.flaskenv`` and ``.env`` files should be loaded.
+
+Returns:
+None
+
+Raises:
+None
+
+Version Added: 3.1
+"""
         self.app_import_path = app_import_path
         #: Optionally a function that is passed the script info to create
         #: the instance of the application.
@@ -453,6 +471,21 @@ _debug_option = click.Option(
 def _env_file_callback(
     ctx: click.Context, param: click.Option, value: str | None
 ) -> str | None:
+    """
+Loads an environment file using the python-dotenv library.
+
+If a value was passed to the function, it will attempt to load the environment file.
+If no value is passed and `load_dotenv_defaults` is set in the context object,
+it will also load default files. If neither condition is met, the function
+will return None.
+
+Raises:
+    click.BadParameter: If python-dotenv must be installed but was not found.
+    Exception: Any other exception that occurs during file loading.
+
+Returns:
+    str | None: The loaded environment value or None if no value was passed.
+"""
     try:
         import dotenv  # noqa: F401
     except ImportError:
@@ -632,6 +665,24 @@ class FlaskGroup(AppGroup):
         # Set a flag to tell app.run to become a no-op. If app.run was
         # not in a __name__ == __main__ guard, it would start the server
         # when importing, blocking whatever command is being called.
+        """
+Creates a Click context with optional information and extra settings.
+
+Args:
+    info_name (str | None): The name of the info to use.
+    args (list[str]): A list of arguments to pass to the command.
+    parent (click.Context | None): The parent context, defaults to None.
+    **extra: t.Any: Additional keyword arguments to include in the context.
+
+Returns:
+    click.Context: The created Click context.
+
+Note:
+    This function sets a flag to prevent Flask from running when importing
+    this module, ensuring that commands are executed correctly. It also adds
+    an 'obj' key to the extra dictionary if it's not already present, containing
+    a ScriptInfo object with necessary methods for creating and setting debug flags.
+"""
         os.environ["FLASK_RUN_FROM_CLI"] = "true"
 
         if "obj" not in extra and "obj" not in self.context_settings:
@@ -661,6 +712,22 @@ def _path_is_ancestor(path: str, other: str) -> bool:
 def load_dotenv(
     path: str | os.PathLike[str] | None = None, load_defaults: bool = True
 ) -> bool:
+    """
+Loads environment variables from a .env file.
+
+This function attempts to load environment variables from the current directory
+or from a specified path. If no .env files are found, it will display a tip
+message suggesting the installation of python-dotenv.
+
+Args:
+    path (str | os.PathLike[str] | None): The path to the .env file to load.
+        If None, the function will look for a .env file in the current directory.
+    load_defaults (bool): Whether to load default environment variables from
+        .flaskenv and .env files. Defaults to True.
+
+Returns:
+    bool: True if at least one environment variable was loaded, False otherwise.
+"""
     try:
         import dotenv
     except ImportError:
