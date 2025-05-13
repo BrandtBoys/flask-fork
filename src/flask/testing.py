@@ -10,6 +10,7 @@ from urllib.parse import urlsplit
 
 import werkzeug.test
 from click.testing import CliRunner
+from click.testing import Result
 from werkzeug.test import Client
 from werkzeug.wrappers import Request as BaseRequest
 
@@ -252,7 +253,7 @@ class FlaskCliRunner(CliRunner):
 
     def invoke(  # type: ignore
         self, cli: t.Any = None, args: t.Any = None, **kwargs: t.Any
-    ) -> t.Any:
+    ) -> Result:
         if cli is None:
             cli = self.app.cli
 
@@ -260,4 +261,3 @@ class FlaskCliRunner(CliRunner):
             kwargs["obj"] = ScriptInfo(create_app=lambda: self.app)
 
         return super().invoke(cli, args, **kwargs)
-
