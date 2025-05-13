@@ -216,6 +216,7 @@ Args:
 Raises:
     AssertionError: If the setup method has already been registered.
 """
+        
         if self._got_registered_once:
             raise AssertionError(
                 f"The setup method '{f_name}' can no longer be called on the blueprint"
