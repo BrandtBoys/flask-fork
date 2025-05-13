@@ -42,6 +42,22 @@ __version__ = "2.3.1.dev"
 
 
 def __getattr__(name):
+    """
+Returns the value of the requested attribute, or raises an AttributeError if it does not exist.
+
+The function is used to handle special attributes that are deprecated and will be removed in future versions of Flask.
+It provides a way to access these attributes while still raising a warning about their deprecation.
+
+Attributes:
+    - `_app_ctx_stack`: The application context stack. (Deprecated)
+    - `_request_ctx_stack`: The request context stack. (Deprecated)
+    - `escape`: A function for escaping HTML characters. (Deprecated, use markupsafe.escape instead)
+    - `Markup`: A class for representing unescaped HTML. (Deprecated, use markupsafe.Markup instead)
+    - `signals_available`: Always returns True, as signals are always available.
+
+Raises:
+    AttributeError: If the requested attribute does not exist.
+"""
     if name == "_app_ctx_stack":
         import warnings
         from .globals import __app_ctx_stack
