@@ -75,31 +75,12 @@ class View:
     init_every_request: t.ClassVar[bool] = True
 
     def dispatch_request(self) -> ft.ResponseReturnValue:
-        """The actual view function behavior. Subclasses must override
-        this and return a valid response. Any variables from the URL
-        rule are passed as keyword arguments.
-        """
         raise NotImplementedError()
 
     @classmethod
     def as_view(
         cls, name: str, *class_args: t.Any, **class_kwargs: t.Any
     ) -> ft.RouteCallable:
-        """Convert the class into a view function that can be registered
-        for a route.
-
-        By default, the generated view will create a new instance of the
-        view class for every request and call its
-        :meth:`dispatch_request` method. If the view class sets
-        :attr:`init_every_request` to ``False``, the same instance will
-        be used for every request.
-
-        Except for ``name``, all other arguments passed to this method
-        are forwarded to the view class ``__init__`` method.
-
-        .. versionchanged:: 2.2
-            Added the ``init_every_request`` class attribute.
-        """
         if cls.init_every_request:
 
             def view(**kwargs: t.Any) -> ft.ResponseReturnValue:
@@ -188,3 +169,4 @@ class MethodView(View):
 
         assert meth is not None, f"Unimplemented method {request.method!r}"
         return current_app.ensure_sync(meth)(**kwargs)
+
