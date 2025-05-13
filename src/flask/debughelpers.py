@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing as t
 
 from .app import Flask
@@ -149,4 +151,3 @@ def explain_template_loading_attempts(app: Flask, template, attempts) -> None:
         info.append("  See https://flask.palletsprojects.com/blueprints/#templates")
 
     app.logger.info("\n".join(info))
-

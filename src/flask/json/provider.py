@@ -50,7 +50,7 @@ class JSONProvider:
         return self.loads(fp.read(), **kwargs)
 
     def _prepare_response_obj(
-        self, args: t.Tuple[t.Any, ...], kwargs: t.Dict[str, t.Any]
+        self, args: tuple[t.Any, ...], kwargs: dict[str, t.Any]
     ) -> t.Any:
         if args and kwargs:
             raise TypeError("app.json.response() takes either args or kwargs, not both")
@@ -139,7 +139,7 @@ class DefaultJSONProvider(JSONProvider):
 
     def response(self, *args: t.Any, **kwargs: t.Any) -> Response:
         obj = self._prepare_response_obj(args, kwargs)
-        dump_args: t.Dict[str, t.Any] = {}
+        dump_args: dict[str, t.Any] = {}
 
         if (self.compact is None and self._app.debug) or self.compact is False:
             dump_args.setdefault("indent", 2)
@@ -149,4 +149,3 @@ class DefaultJSONProvider(JSONProvider):
         return self._app.response_class(
             f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
         )
-

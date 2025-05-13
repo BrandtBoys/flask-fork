@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import errno
 import json
 import os
@@ -10,7 +12,7 @@ from werkzeug.utils import import_string
 class ConfigAttribute:
     """Makes an attribute forward to the config"""
 
-    def __init__(self, name: str, get_converter: t.Optional[t.Callable] = None) -> None:
+    def __init__(self, name: str, get_converter: t.Callable | None = None) -> None:
         self.__name__ = name
         self.get_converter = get_converter
 
@@ -70,7 +72,7 @@ class Config(dict):
     :param defaults: an optional dictionary of default values
     """
 
-    def __init__(self, root_path: str, defaults: t.Optional[dict] = None) -> None:
+    def __init__(self, root_path: str, defaults: dict | None = None) -> None:
         super().__init__(defaults or {})
         self.root_path = root_path
 
@@ -143,7 +145,7 @@ class Config(dict):
         self.from_object(d)
         return True
 
-    def from_object(self, obj: t.Union[object, str]) -> None:
+    def from_object(self, obj: object | str) -> None:
         if isinstance(obj, str):
             obj = import_string(obj)
         for key in dir(obj):
@@ -172,9 +174,9 @@ class Config(dict):
         return self.from_mapping(obj)
 
     def from_mapping(
-        self, mapping: t.Optional[t.Mapping[str, t.Any]] = None, **kwargs: t.Any
+        self, mapping: t.Mapping[str, t.Any] | None = None, **kwargs: t.Any
     ) -> bool:
-        mappings: t.Dict[str, t.Any] = {}
+        mappings: dict[str, t.Any] = {}
         if mapping is not None:
             mappings.update(mapping)
         mappings.update(kwargs)
@@ -185,7 +187,7 @@ class Config(dict):
 
     def get_namespace(
         self, namespace: str, lowercase: bool = True, trim_namespace: bool = True
-    ) -> t.Dict[str, t.Any]:
+    ) -> dict[str, t.Any]:
         rv = {}
         for k, v in self.items():
             if not k.startswith(namespace):
@@ -201,4 +203,3 @@ class Config(dict):
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__} {dict.__repr__(self)}>"
-

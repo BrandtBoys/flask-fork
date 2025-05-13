@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextvars
 import sys
 import typing as t
@@ -60,7 +62,7 @@ class _AppCtxGlobals:
         except KeyError:
             raise AttributeError(name) from None
 
-    def get(self, name: str, default: t.Optional[t.Any] = None) -> t.Any:
+    def get(self, name: str, default: t.Any | None = None) -> t.Any:
         return self.__dict__.get(name, default)
 
     def pop(self, name: str, default: t.Any = _sentinel) -> t.Any:
@@ -131,17 +133,17 @@ class AppContext:
     running CLI commands.
     """
 
-    def __init__(self, app: "Flask") -> None:
+    def __init__(self, app: Flask) -> None:
         self.app = app
         self.url_adapter = app.create_url_adapter(None)
         self.g: _AppCtxGlobals = app.app_ctx_globals_class()
-        self._cv_tokens: t.List[contextvars.Token] = []
+        self._cv_tokens: list[contextvars.Token] = []
 
     def push(self) -> None:
         self._cv_tokens.append(_cv_app.set(self))
         appcontext_pushed.send(self.app, _async_wrapper=self.app.ensure_sync)
 
-    def pop(self, exc: t.Optional[BaseException] = _sentinel) -> None:  # type: ignore
+    def pop(self, exc: BaseException | None = _sentinel) -> None:  # type: ignore
         try:
             if len(self._cv_tokens) == 1:
                 if exc is _sentinel:
@@ -158,15 +160,15 @@ class AppContext:
 
         appcontext_popped.send(self.app, _async_wrapper=self.app.ensure_sync)
 
-    def __enter__(self) -> "AppContext":
+    def __enter__(self) -> AppContext:
         self.push()
         return self
 
     def __exit__(
         self,
-        exc_type: t.Optional[type],
-        exc_value: t.Optional[BaseException],
-        tb: t.Optional[TracebackType],
+        exc_type: type | None,
+        exc_value: BaseException | None,
+        tb: TracebackType | None,
     ) -> None:
         self.pop(exc_value)
 
@@ -195,10 +197,10 @@ class RequestContext:
 
     def __init__(
         self,
-        app: "Flask",
+        app: Flask,
         environ: dict,
-        request: t.Optional["Request"] = None,
-        session: t.Optional["SessionMixin"] = None,
+        request: Request | None = None,
+        session: SessionMixin | None = None,
     ) -> None:
         self.app = app
         if request is None:
@@ -210,16 +212,16 @@ class RequestContext:
             self.url_adapter = app.create_url_adapter(self.request)
         except HTTPException as e:
             self.request.routing_exception = e
-        self.flashes: t.Optional[t.List[t.Tuple[str, str]]] = None
-        self.session: t.Optional["SessionMixin"] = session
+        self.flashes: list[tuple[str, str]] | None = None
+        self.session: SessionMixin | None = session
         # Functions that should be executed after the request on the response
         # object.  These will be called before the regular "after_request"
         # functions.
-        self._after_request_functions: t.List[ft.AfterRequestCallable] = []
+        self._after_request_functions: list[ft.AfterRequestCallable] = []
 
-        self._cv_tokens: t.List[t.Tuple[contextvars.Token, t.Optional[AppContext]]] = []
+        self._cv_tokens: list[tuple[contextvars.Token, AppContext | None]] = []
 
-    def copy(self) -> "RequestContext":
+    def copy(self) -> RequestContext:
         return self.__class__(
             self.app,
             environ=self.request.environ,
@@ -263,7 +265,7 @@ class RequestContext:
         if self.url_adapter is not None:
             self.match_request()
 
-    def pop(self, exc: t.Optional[BaseException] = _sentinel) -> None:  # type: ignore
+    def pop(self, exc: BaseException | None = _sentinel) -> None:  # type: ignore
         clear_request = len(self._cv_tokens) == 1
 
         try:
@@ -293,15 +295,15 @@ class RequestContext:
                     f"Popped wrong request context. ({ctx!r} instead of {self!r})"
                 )
 
-    def __enter__(self) -> "RequestContext":
+    def __enter__(self) -> RequestContext:
         self.push()
         return self
 
     def __exit__(
         self,
-        exc_type: t.Optional[type],
-        exc_value: t.Optional[BaseException],
-        tb: t.Optional[TracebackType],
+        exc_type: type | None,
+        exc_value: BaseException | None,
+        tb: TracebackType | None,
     ) -> None:
         self.pop(exc_value)
 
@@ -310,4 +312,3 @@ class RequestContext:
             f"<{type(self).__name__} {self.request.url!r}"
             f" [{self.request.method}] of {self.app.name}>"
         )
-

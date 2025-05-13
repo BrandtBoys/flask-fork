@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import sys
 import typing as t
@@ -39,7 +41,7 @@ default_handler.setFormatter(
 )
 
 
-def create_logger(app: "Flask") -> logging.Logger:
+def create_logger(app: Flask) -> logging.Logger:
     logger = logging.getLogger(app.name)
 
     if app.debug and not logger.level:
@@ -49,4 +51,3 @@ def create_logger(app: "Flask") -> logging.Logger:
         logger.addHandler(default_handler)
 
     return logger
-

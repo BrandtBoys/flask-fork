@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import pkgutil
 import socket
@@ -41,9 +43,9 @@ def get_load_dotenv(default: bool = True) -> bool:
 
 
 def stream_with_context(
-    generator_or_function: t.Union[
-        t.Iterator[t.AnyStr], t.Callable[..., t.Iterator[t.AnyStr]]
-    ]
+    generator_or_function: (
+        t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]]
+    )
 ) -> t.Iterator[t.AnyStr]:
     try:
         gen = iter(generator_or_function)  # type: ignore
@@ -86,7 +88,7 @@ def stream_with_context(
     return wrapped_g
 
 
-def make_response(*args: t.Any) -> "Response":
+def make_response(*args: t.Any) -> Response:
     if not args:
         return current_app.response_class()
     if len(args) == 1:
@@ -97,10 +99,10 @@ def make_response(*args: t.Any) -> "Response":
 def url_for(
     endpoint: str,
     *,
-    _anchor: t.Optional[str] = None,
-    _method: t.Optional[str] = None,
-    _scheme: t.Optional[str] = None,
-    _external: t.Optional[bool] = None,
+    _anchor: str | None = None,
+    _method: str | None = None,
+    _scheme: str | None = None,
+    _external: bool | None = None,
     **values: t.Any,
 ) -> str:
     return current_app.url_for(
@@ -114,17 +116,15 @@ def url_for(
 
 
 def redirect(
-    location: str, code: int = 302, Response: t.Optional[t.Type["BaseResponse"]] = None
-) -> "BaseResponse":
+    location: str, code: int = 302, Response: type[BaseResponse] | None = None
+) -> BaseResponse:
     if current_app:
         return current_app.redirect(location, code=code)
 
     return _wz_redirect(location, code=code, Response=Response)
 
 
-def abort(
-    code: t.Union[int, "BaseResponse"], *args: t.Any, **kwargs: t.Any
-) -> "te.NoReturn":
+def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> te.NoReturn:
     if current_app:
         current_app.aborter(code, *args, **kwargs)
 
@@ -157,7 +157,7 @@ def flash(message: str, category: str = "message") -> None:
 
 def get_flashed_messages(
     with_categories: bool = False, category_filter: t.Iterable[str] = ()
-) -> t.Union[t.List[str], t.List[t.Tuple[str, str]]]:
+) -> list[str] | list[tuple[str, str]]:
     flashes = request_ctx.flashes
     if flashes is None:
         flashes = session.pop("_flashes") if "_flashes" in session else []
@@ -169,7 +169,7 @@ def get_flashed_messages(
     return flashes
 
 
-def _prepare_send_file_kwargs(**kwargs: t.Any) -> t.Dict[str, t.Any]:
+def _prepare_send_file_kwargs(**kwargs: t.Any) -> dict[str, t.Any]:
     if kwargs.get("max_age") is None:
         kwargs["max_age"] = current_app.get_send_file_max_age
 
@@ -183,17 +183,15 @@ def _prepare_send_file_kwargs(**kwargs: t.Any) -> t.Dict[str, t.Any]:
 
 
 def send_file(
-    path_or_file: t.Union[os.PathLike, str, t.BinaryIO],
-    mimetype: t.Optional[str] = None,
+    path_or_file: os.PathLike | str | t.BinaryIO,
+    mimetype: str | None = None,
     as_attachment: bool = False,
-    download_name: t.Optional[str] = None,
+    download_name: str | None = None,
     conditional: bool = True,
-    etag: t.Union[bool, str] = True,
-    last_modified: t.Optional[t.Union[datetime, int, float]] = None,
-    max_age: t.Optional[
-        t.Union[int, t.Callable[[t.Optional[str]], t.Optional[int]]]
-    ] = None,
-) -> "Response":
+    etag: bool | str = True,
+    last_modified: datetime | int | float | None = None,
+    max_age: None | (int | t.Callable[[str | None], int | None]) = None,
+) -> Response:
     return werkzeug.utils.send_file(  # type: ignore[return-value]
         **_prepare_send_file_kwargs(
             path_or_file=path_or_file,
@@ -210,10 +208,10 @@ def send_file(
 
 
 def send_from_directory(
-    directory: t.Union[os.PathLike, str],
-    path: t.Union[os.PathLike, str],
+    directory: os.PathLike | str,
+    path: os.PathLike | str,
     **kwargs: t.Any,
-) -> "Response":
+) -> Response:
     return werkzeug.utils.send_from_directory(  # type: ignore[return-value]
         directory, path, **_prepare_send_file_kwargs(**kwargs)
     )
@@ -276,8 +274,8 @@ class locked_cached_property(werkzeug.utils.cached_property):
     def __init__(
         self,
         fget: t.Callable[[t.Any], t.Any],
-        name: t.Optional[str] = None,
-        doc: t.Optional[str] = None,
+        name: str | None = None,
+        doc: str | None = None,
     ) -> None:
         import warnings
 
@@ -325,11 +323,10 @@ def is_ip(value: str) -> bool:
 
 
 @lru_cache(maxsize=None)
-def _split_blueprint_path(name: str) -> t.List[str]:
-    out: t.List[str] = [name]
+def _split_blueprint_path(name: str) -> list[str]:
+    out: list[str] = [name]
 
     if "." in name:
         out.extend(_split_blueprint_path(name.rpartition(".")[0]))
 
     return out
-
