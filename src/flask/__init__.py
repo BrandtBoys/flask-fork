@@ -46,6 +46,19 @@ __version__ = "2.3.0.dev"
 
 
 def __getattr__(name):
+    """
+Returns the value of a deprecated attribute.
+
+If the requested attribute is `_app_ctx_stack` or `_request_ctx_stack`, it returns its value and issues a deprecation warning. Otherwise, it raises an `AttributeError`.
+
+Args:
+    name (str): The name of the attribute to return.
+
+Returns:
+    object: The value of the requested attribute, or raises an AttributeError if not found.
+Raises:
+    DeprecationWarning: If the requested attribute is deprecated and will be removed in a future version of Flask.
+"""
     if name == "_app_ctx_stack":
         import warnings
         from .globals import __app_ctx_stack

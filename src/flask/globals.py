@@ -19,6 +19,13 @@ class _FakeStack:
 
     @property
     def top(self) -> t.Optional[t.Any]:
+        """
+Deprecation Warning: `_{self.name}_ctx_stack` is deprecated and will be removed in Flask 2.4.
+Use 'g' to store data, or '{self.name}_ctx' to access the current context.
+
+Returns:
+    t.Optional[t.Any]: The value stored in the context variable `None`, or `None` if not set.
+"""
         import warnings
 
         warnings.warn(

@@ -26,6 +26,17 @@ if t.TYPE_CHECKING:  # pragma: no cover
 
 
 def get_debug_flag() -> bool:
+    """
+Returns a boolean indicating whether debug mode is enabled.
+
+The value of the `FLASK_DEBUG` environment variable is checked. If it exists, its value is converted to lowercase and compared with '0', 'false', or 'no'. If the value matches any of these strings, debug mode is disabled; otherwise, it's enabled.
+
+Args:
+    None
+
+Returns:
+    bool: Whether debug mode is enabled.
+"""
     val = os.environ.get("FLASK_DEBUG")
     return bool(val and val.lower() not in {"0", "false", "no"})
 
