@@ -102,11 +102,11 @@ class Request(RequestBase):
     def on_json_loading_failed(self, e: ValueError | None) -> t.Any:
         try:
             return super().on_json_loading_failed(e)
-        except BadRequest as e:
+        except BadRequest as ebr:
             if current_app and current_app.debug:
                 raise
 
-            raise BadRequest() from e
+            raise BadRequest() from ebr
 
 
 class Response(ResponseBase):
@@ -140,4 +140,3 @@ class Response(ResponseBase):
 
         # return Werkzeug's default when not in an app context
         return super().max_cookie_size
-
