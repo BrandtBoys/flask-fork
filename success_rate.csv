@@ -15,3 +15,23 @@ Attributes:
 Raises:
     AttributeError: If the requested attribute does not exist.
 """""""
+False,"def make_response(self, rv: ft.ResponseReturnValue) -> Response:
+    """"""
+    Creates a response object from the given view function result.
+
+    The response object is created based on the type of the view function result.
+    If the result is a tuple, it is unpacked into body, status, and headers.
+    If the result is None, a TypeError is raised.
+    If the result is not an instance of the response class, it is converted to
+    the correct type.
+
+    Args:
+        rv: The view function result.
+
+    Returns:
+        A Response object.
+
+    Raises:
+        TypeError: If the view function did not return a valid response tuple,
+            or if the result is None.
+    """""""
