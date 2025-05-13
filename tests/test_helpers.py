@@ -219,6 +219,15 @@ class TestNoImports:
     """
 
     def test_name_with_import_error(self, modules_tmp_path):
+        """
+Tests the behavior of Flask when a module with an ImportError is passed to its constructor.
+
+Args:
+    modules_tmp_path (pathlib.Path): The temporary path where the "importerror.py" file will be created.
+
+Raises:
+    AssertionError: If Flask(import_name) does not raise an ImportError.
+"""
         (modules_tmp_path / "importerror.py").write_text("raise NotImplementedError()")
         try:
             flask.Flask("importerror")

@@ -113,6 +113,18 @@ def limit_loader(request, monkeypatch):
 
 @pytest.fixture
 def modules_tmp_path(tmp_path, monkeypatch):
+    """
+Returns a temporary path for modules.
+
+This function creates a new directory at the specified `tmp_path` and prepends it to the system path using `sys.path_prepend`. The returned path is then used as the base for module imports.
+
+Args:
+    tmp_path (Path): The base path where the temporary directory will be created.
+    monkeypatch (object): An object with a method to prepend the system path.
+
+Returns:
+    Path: The temporary path for modules.
+"""
     rv = tmp_path / "modules_tmp"
     rv.mkdir()
     monkeypatch.syspath_prepend(os.fspath(rv))
@@ -121,6 +133,22 @@ def modules_tmp_path(tmp_path, monkeypatch):
 
 @pytest.fixture
 def modules_tmp_path_prefix(modules_tmp_path, monkeypatch):
+    """
+Modifies the sys.prefix attribute to use a temporary path for module installation.
+
+Args:
+    modules_tmp_path (str): The temporary path where modules will be installed.
+    monkeypatch (object): An object used to modify the sys module's attributes.
+
+Returns:
+    str: The original temporary path, which is not modified by this function.
+
+Raises:
+    None
+
+Note:
+    This function uses the monkeypatching technique to temporarily modify the sys.prefix attribute. It does not persist these changes across function calls.
+"""
     monkeypatch.setattr(sys, "prefix", os.fspath(modules_tmp_path))
     return modules_tmp_path
 

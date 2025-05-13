@@ -242,6 +242,16 @@ def test_get_namespace():
 
 @pytest.mark.parametrize("encoding", ["utf-8", "iso-8859-15", "latin-1"])
 def test_from_pyfile_weird_encoding(tmp_path, encoding):
+    """
+Tests that the Flask application correctly reads configuration from a file with an unusual encoding.
+
+Args:
+    tmp_path (pathlib.Path): A temporary path for creating a test file.
+    encoding (str): The encoding to use in the test file.
+
+Returns:
+    None
+"""
     f = tmp_path / "my_config.py"
     f.write_text(f'# -*- coding: {encoding} -*-\nTEST_VALUE = "föö"\n', encoding)
     app = flask.Flask(__name__)
