@@ -432,6 +432,20 @@ Returns:
         raise FormDataRoutingRedirect(request)
 
     def update_template_context(self, context: dict) -> None:
+        """
+Updates the template context with additional information.
+
+This function is used to extend the context passed to a template, allowing it
+to be rendered outside of a request context. It iterates over the list of
+template context processors and applies their functions to the current
+context, updating it accordingly.
+
+Args:
+    context (dict): The initial context to update.
+
+Returns:
+    None
+"""
         names: t.Iterable[str | None] = (None,)
 
         # A template may be rendered outside a request context.
