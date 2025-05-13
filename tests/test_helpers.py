@@ -337,6 +337,20 @@ class TestHelpers:
 
 @pytest.mark.parametrize("mode", ("r", "rb", "rt"))
 def test_open_resource(mode):
+    """
+Test opening a resource from the Flask application.
+
+This function tests if the `open_resource` method of a Flask application can successfully open and read a file. It creates a new Flask application, opens the specified resource, reads its contents, and checks if the expected HTML string is present in the content.
+
+Parameters:
+    mode (str): The mode to use when opening the resource. Can be 'r' for reading or 'w' for writing.
+
+Returns:
+    None
+
+Raises:
+    AssertionError: If the expected HTML string is not found in the resource contents.
+"""
     app = flask.Flask(__name__)
 
     with app.open_resource("static/index.html", mode) as f:
@@ -345,6 +359,15 @@ def test_open_resource(mode):
 
 @pytest.mark.parametrize("mode", ("w", "x", "a", "r+"))
 def test_open_resource_exceptions(mode):
+    """
+Test that opening a resource raises a ValueError when in 'open' mode.
+
+Args:
+    mode (str): The mode to open the resource in. Must be either 'open' or 'read'.
+
+Raises:
+    ValueError: If the mode is 'open'.
+"""
     app = flask.Flask(__name__)
 
     with pytest.raises(ValueError):
@@ -353,6 +376,24 @@ def test_open_resource_exceptions(mode):
 
 @pytest.mark.parametrize("encoding", ("utf-8", "utf-16-le"))
 def test_open_resource_with_encoding(tmp_path, encoding):
+    """
+Tests opening a resource with the specified encoding.
+
+This function creates a Flask application, writes a test string to a file
+with the specified encoding, and then opens the file using the `open_resource`
+method. It asserts that the contents of the opened file match the original
+string.
+
+Parameters:
+    tmp_path (pathlib.Path): A temporary path for creating the test file.
+    encoding (str): The encoding to use when writing and reading the test string.
+
+Returns:
+    None
+
+Raises:
+    AssertionError: If the contents of the opened file do not match the original string.
+"""
     app = flask.Flask(__name__, root_path=os.fspath(tmp_path))
     (tmp_path / "test").write_text("test", encoding=encoding)
 

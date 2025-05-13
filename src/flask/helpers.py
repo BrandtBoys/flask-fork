@@ -53,6 +53,19 @@ def stream_with_context(
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]],
 ) -> t.Iterator[t.AnyStr] | t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]:
+    """
+Stream a generator or function with context.
+
+This function takes an iterator or callable that returns an iterator, and wraps it in a context manager. The context manager pushes the current request context onto the stack when the generator is started, and pops it off when the iteration completes.
+
+If the input is not a generator or function, but rather a decorator factory, this function will create a new decorator that takes arguments and keyword arguments, calls the original function with those arguments, and then wraps the result in another context manager.
+
+The `stream_with_context` function can only be used when a request context is active, such as in a view function. If no request context is available, it raises a RuntimeError.
+
+Returns:
+    An iterator that yields the same values as the original generator or function, but with the added benefit of being able to use the current request context.
+    A callable that takes an iterator and returns an iterator, if the input was not a generator or function.
+"""
     try:
         gen = iter(generator_or_function)  # type: ignore[arg-type]
     except TypeError:

@@ -296,6 +296,25 @@ class Flask(App):
     def open_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = None
     ) -> t.IO[t.AnyStr]:
+        """
+Opens a resource file.
+
+Args:
+    - `resource` (str): The name of the resource to be opened.
+    - `mode` (str, optional): The mode in which the resource is to be opened. Defaults to "rb". Supported modes are "r", "rt", and "rb".
+    - `encoding` (str | None, optional): The encoding to use when opening the file for reading. Defaults to None.
+
+Returns:
+    t.IO[t.AnyStr]: An open file object.
+
+Raises:
+    ValueError: If the mode is not one of "r", "rt", or "rb".
+
+Example:
+    >>> resource = "example.txt"
+    >>> with open_resource(resource, 'rt', encoding='utf-8') as f:
+    ...     print(f.read())
+"""
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
@@ -309,6 +328,22 @@ class Flask(App):
     def open_instance_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
     ) -> t.IO[t.AnyStr]:
+        """
+Opens an instance resource file.
+
+This method opens a specified resource file within the instance's directory.
+The file can be opened in binary or text mode. If the mode is binary,
+the file will be opened without any encoding conversion. Otherwise, it
+will be opened with the specified encoding.
+
+Args:
+    - `resource` (str): The name of the resource to open.
+    - `mode` (str, optional): The mode in which to open the file. Defaults to "rb".
+    - `encoding` (str | None, optional): The encoding to use when opening the file. Defaults to "utf-8".
+
+Returns:
+    t.IO[t.AnyStr]: A file object opened with the specified mode and encoding.
+"""
         path = os.path.join(self.instance_path, resource)
 
         if "b" in mode:
