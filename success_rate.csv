@@ -33,3 +33,4 @@ Success,Comment
 
 
 
+"(False, ""```\nAdds a URL rule to the application's URL map.\n\nParameters\n----------\nrule : str\n    The URL pattern for the new rule.\nendpoint : str | None, optional\n    The name of the endpoint function. If not provided, it will be automatically generated from the view function.\nview_func : ft.RouteCallable | None, optional\n    The endpoint function to associate with this rule. If not provided, a default endpoint will be created.\nprovide_automatic_options : bool | None, optional\n    Whether to provide automatic options for this rule. If not provided, it will be automatically enabled if the view function has `provide_automatic_options` set or if the application is configured to do so.\noptions : t.Any, optional\n    Additional keyword arguments to pass to the URL rule.\n\nReturns\n-------\nNone\n\nRaises\n------\nTypeError\n    If the methods argument is a string instead of a list of strings.\n```"")"
