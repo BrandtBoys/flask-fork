@@ -229,6 +229,25 @@ def test_session_transaction_needs_cookies(app):
 
 
 def test_test_client_context_binding(app, client):
+    """
+Test client context binding.
+
+This function tests the behavior of Flask's client context binding.
+It creates a test application, sets up routes for testing,
+and then uses the client to make requests to these routes.
+The function checks that the expected values are returned from
+the routes and that any exceptions are raised as expected.
+
+Parameters:
+app (Flask): The test application instance.
+client (Client): The client instance used for making requests.
+
+Returns:
+None
+
+Raises:
+RuntimeError: If an attempt is made to access `flask.g.value` outside of a context.
+"""
     app.testing = False
 
     @app.route("/")
@@ -238,6 +257,11 @@ def test_test_client_context_binding(app, client):
 
     @app.route("/other")
     def other():
+        """
+Raises a ZeroDivisionError exception when attempting to divide by zero.
+
+This function is intentionally designed to fail and should not be used in production code.
+"""
         raise ZeroDivisionError
 
     with client:

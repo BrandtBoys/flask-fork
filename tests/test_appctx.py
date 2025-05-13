@@ -191,11 +191,43 @@ def test_context_refcounts(app, client):
 
 
 def test_clean_pop(app):
+    """
+Test the cleanup functionality of a Flask application.
+
+This function tests that the `test_clean_pop` decorator correctly cleans up the 
+application context after each request, and also checks that the `app.testing`
+attribute is set to False. The test also verifies that the `called` list contains
+the expected values.
+
+Parameters:
+    app (Flask): The Flask application instance to be tested.
+
+Returns:
+    None
+
+Raises:
+    ZeroDivisionError: If an error occurs during teardown.
+"""
     app.testing = False
     called = []
 
     @app.teardown_request
     def teardown_req(error=None):
+        """
+Raises a ZeroDivisionError exception if an error is provided. 
+
+This function is intended to be used as part of a testing or validation process, 
+where it simulates an error condition that would otherwise cause a division by zero.
+
+Args:
+    error (Exception): The error message to raise. Defaults to None.
+
+Returns:
+    None
+
+Raises:
+    ZeroDivisionError: If no error message is provided.
+"""
         raise ZeroDivisionError
 
     @app.teardown_appcontext

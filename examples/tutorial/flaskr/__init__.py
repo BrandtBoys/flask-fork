@@ -4,6 +4,21 @@ from flask import Flask
 
 
 def create_app(test_config=None):
+    """
+Creates a new Flask application instance.
+
+This function initializes a new Flask application with default settings,
+and allows for optional configuration from a test environment or an instance
+configuration file. The application is then configured to use the database and
+registered with blueprints.
+
+Args:
+    test_config (dict): Optional test configuration dictionary.
+        If provided, this will override any instance configuration.
+
+Returns:
+    Flask application instance.
+"""
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         # a default secret that should be overridden by instance config

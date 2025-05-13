@@ -951,6 +951,22 @@ Returns:
         self,
         exc: BaseException | None = _sentinel,  # type: ignore[assignment]
     ) -> None:
+        """
+Tear down the application context.
+
+This function is responsible for cleaning up resources and releasing locks when an exception occurs or when the application context is being torn down.
+
+Args:
+    - self: The object instance that owns the teardown functions.
+    - exc (BaseException | None): The exception to be handled. If None, no action will be taken. Defaults to _sentinel.
+        - _sentinel: A sentinel value used to indicate that no exception is present.
+
+Returns:
+    None
+
+Raises:
+    None
+"""
         if exc is _sentinel:
             exc = sys.exc_info()[1]
 

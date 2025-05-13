@@ -632,9 +632,37 @@ def test_add_template_test_with_name_and_template(app, client):
 
 
 def test_context_processing(app, client):
+    """
+Test the context processing of a Flask application.
+
+This function tests the context processing of a Flask application by creating a blueprint with two context processors:
+- `not_answer_context_processor`: sets the global variable `notanswer` to 43.
+- `answer_context_processor`: sets the local variable `answer` to 42.
+
+The function then creates endpoints for testing and uses a client to make requests to these endpoints. It asserts that the expected values are present in the response data.
+
+Parameters:
+app (Flask): The Flask application instance.
+client (requests.Session): A session object used to make HTTP requests.
+
+Returns:
+None
+"""
     answer_bp = flask.Blueprint("answer_bp", __name__)
 
     def template_string():
+        """
+Returns a rendered Flask template string with conditional logic.
+
+The function uses Flask's `render_template_string` method to render a template
+string that includes conditional statements for displaying whether an input
+value (`notanswer`) or another value (`answer`) is the correct answer.
+If `notanswer` is not provided, it displays a message indicating so. If
+`answer` is provided, it displays a message stating that it's the correct answer.
+
+Returns:
+    str: The rendered template string with conditional logic.
+"""
         return flask.render_template_string(
             "{% if notanswer %}{{ notanswer }} is not the answer. {% endif %}"
             "{% if answer %}{{ answer }} is the answer.{% endif %}"

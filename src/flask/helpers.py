@@ -42,6 +42,23 @@ def get_load_dotenv(default: bool = True) -> bool:
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]]
 ) -> t.Iterator[t.AnyStr]:
+    """
+Stream a generator or function with context.
+
+This function takes an iterator or callable that returns an iterator, and wraps it in a context manager. The context manager pushes the current request context onto the stack when the generator is started, and pops it off when the iteration completes.
+
+If the input is not an iterator, but rather a callable that returns an iterator, this function will wrap the callable in a decorator to create a new function that takes any arguments and returns an iterator. This allows the original function to be used as if it were an iterator.
+
+The context manager uses the `_cv_request` object to get the current request context, and pushes it onto the stack when the generator is started. When the iteration completes, the context is popped off the stack.
+
+This function can only be used when a request context is active, such as in a view function.
+
+Args:
+    generator_or_function: An iterator or callable that returns an iterator.
+
+Returns:
+    An iterator over the results of the input generator or function.
+"""
     try:
         gen = iter(generator_or_function)  # type: ignore
     except TypeError:

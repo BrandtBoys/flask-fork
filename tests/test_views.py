@@ -39,11 +39,47 @@ def test_method_based_view(app):
 
 
 def test_view_patching(app):
+    """
+Patches the test view to raise a ZeroDivisionError on both GET and POST requests.
+
+This function creates two classes, `Index` and `Other`, which inherit from 
+`flask.views.MethodView`. The `Index` class raises a ZeroDivisionError when 
+the `get` or `post` methods are called. The `Other` class overrides the 
+`get` method to return "GET" instead of raising an error.
+
+The function then creates a view using the `as_view` method and assigns it to 
+the `view_class` attribute of the view. Finally, it adds a URL rule for the 
+root path ("/") using this patched view and calls the `common_test` function.
+"""
     class Index(flask.views.MethodView):
         def get(self):
+            """
+Raises a ZeroDivisionError exception when called. This method is intended to be overridden by subclasses.
+
+Args:
+    None
+
+Returns:
+    None
+
+Raises:
+    ZeroDivisionError: If the operation would result in division by zero.
+"""
             raise ZeroDivisionError
 
         def post(self):
+            """
+Raises a ZeroDivisionError exception when called. This method is intended to be overridden by subclasses.
+
+Args:
+    None
+
+Returns:
+    None
+
+Raises:
+    ZeroDivisionError: If this method is called.
+"""
             raise ZeroDivisionError
 
     class Other(Index):

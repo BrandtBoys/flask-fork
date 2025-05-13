@@ -28,9 +28,30 @@ async def before_async() -> None:
 
 @app.teardown_appcontext
 def teardown_sync(exc: BaseException | None) -> None:
+    """
+Teardowns synchronization after an exception.
+
+This function is called when an exception occurs during a sync operation. It ensures that any ongoing synchronization operations are properly cleaned up to prevent resource leaks or other issues.
+
+Args:
+    exc (BaseException | None): The exception that occurred during the sync operation, or None if no exception occurred.
+"""
     ...
 
 
 @app.teardown_appcontext
 async def teardown_async(exc: BaseException | None) -> None:
+    """
+Teardowns an asynchronous operation.
+
+This function is used to handle exceptions that occur during an asynchronous operation.
+It provides a way to clean up resources and restore the original state of the system
+after an exception has occurred.
+
+Args:
+    exc (BaseException | None): The exception that occurred during the operation. Can be None if no exception occurred.
+
+Returns:
+    None: This function does not return any value, it only cleans up resources.
+"""
     ...

@@ -93,11 +93,38 @@ def test_request_signals():
 
 
 def test_request_exception_signal():
+    """
+Test that a request exception signal is emitted when a ZeroDivisionError occurs.
+
+This test creates a Flask application with a route that raises a ZeroDivisionError.
+It then connects to the `got_request_exception` event and records any exceptions
+that occur during the execution of this route. Finally, it asserts that the status code
+of the response is 500 (Internal Server Error) and that one exception was recorded.
+
+Note: This test relies on the fact that Flask emits a request exception signal when an
+exception occurs during the execution of a route. The `got_request_exception` event
+is used to catch this signal and record any exceptions that occur.
+"""
     app = flask.Flask(__name__)
     recorded = []
 
     @app.route("/")
     def index():
+        """
+Raises a ZeroDivisionError exception when called. This function is intentionally designed to fail and should not be used in production code.
+
+Args:
+
+None
+
+Returns:
+
+None
+
+Raises:
+
+ZeroDivisionError: If the function is called without sufficient arguments or under invalid conditions.
+"""
         raise ZeroDivisionError
 
     def record(sender, exception):
@@ -161,6 +188,27 @@ def test_flash_signal(app):
 
 
 def test_appcontext_tearing_down_signal(app, client):
+    """
+Tear down signal handler for Flask application context.
+
+This function tests the behavior of Flask's `appcontext_tearing_down` signal when a
+teardown function is registered. It sets up an application with a route that raises
+a ZeroDivisionError, and then connects a teardown function to be called when the
+application context is torn down. The teardown function records any exceptions raised.
+Finally, it makes a GET request to the index route and asserts that the response status
+code is 500 (Internal Server Error) and that the recorded exception matches the one
+raised by the ZeroDivisionError.
+
+Parameters:
+    app (Flask): The Flask application instance.
+    client (Client): The test client instance.
+
+Returns:
+    None
+
+Raises:
+    ZeroDivisionError: If the index route raises a ZeroDivisionError.
+"""
     app.testing = False
     recorded = []
 
@@ -169,6 +217,21 @@ def test_appcontext_tearing_down_signal(app, client):
 
     @app.route("/")
     def index():
+        """
+Raises a ZeroDivisionError exception when called. This function is intentionally designed to fail and should not be used in production code.
+
+Args:
+
+None
+
+Returns:
+
+None
+
+Raises:
+
+ZeroDivisionError: If the function is called without sufficient arguments or under invalid conditions.
+"""
         raise ZeroDivisionError
 
     flask.appcontext_tearing_down.connect(record_teardown, app)

@@ -30,6 +30,21 @@ def hello_json() -> Response:
 
 @app.route("/json/dict")
 def hello_json_dict() -> dict[str, t.Any]:
+    """
+Returns a JSON dictionary with a greeting message.
+
+Args:
+
+None
+
+Returns:
+
+A dictionary containing a string response.
+
+Example:
+    >>> hello_json_dict()
+    {'response': 'Hello, World!'}
+"""
     return {"response": "Hello, World!"}
 
 

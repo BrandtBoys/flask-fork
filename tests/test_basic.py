@@ -210,6 +210,23 @@ def test_werkzeug_routing(app, client):
 
 
 def test_endpoint_decorator(app, client):
+    """
+Decorates a Flask application with a URL mount for the `/foo` path.
+
+This function adds a submount to the Flask application's URL map, mapping the `/foo`
+path to two endpoints: `/foo/bar` and `/foo/`. The `client.get()` method is used
+to test that the correct endpoint is returned for each URL.
+
+Parameters:
+    app (Flask): The Flask application instance.
+    client (Client): The HTTP client instance.
+
+Returns:
+    None
+
+Raises:
+    AssertionError: If the expected data is not received from the server.
+"""
     from werkzeug.routing import Rule
     from werkzeug.routing import Submount
 
@@ -421,12 +438,13 @@ special types such as bytes, Markup objects, and UUIDs. It verifies that
 these types are stored correctly and can be retrieved from the session.
 
 Parameters:
-app (Flask application): The Flask application instance.
-client (Client): The client instance used for testing.
+    app (Flask application): The Flask application instance.
+    client (Client): The client instance used for testing.
 
 Returns:
-None
+    None
 """
+    
     now = datetime.now(timezone.utc).replace(microsecond=0)
     the_uuid = uuid.uuid4()
 
@@ -778,12 +796,13 @@ It also checks that a request with a division by zero error is handled correctly
 and that an internal server error response is returned to the client.
 
 Parameters:
-app (Flask application): The Flask application instance being tested.
-client (requests session): The HTTP client used to make requests to the application.
+    app (Flask application): The Flask application instance being tested.
+    client (requests session): The HTTP client used to make requests to the application.
 
 Returns:
-None
+    None
 """
+    
     called = []
     app.testing = False
 
@@ -828,6 +847,18 @@ Raises:
 
     @app.route("/")
     def fails():
+        """
+Raises a ZeroDivisionError exception when called. This function is intentionally designed to fail and should not be used in production code.
+
+Args:
+    None
+
+Returns:
+    None
+
+Raises:
+    ZeroDivisionError: If the function is called without providing a valid divisor.
+"""
         raise ZeroDivisionError
 
     rv = client.get("/")
@@ -895,6 +926,18 @@ def test_error_handling(app, client):
 
     @app.route("/error")
     def error():
+        """
+Raises a ZeroDivisionError exception when called. This function is intended to be used as an example of how to raise a specific exception in Python.
+
+Args:
+    None
+
+Returns:
+    None
+
+Raises:
+    ZeroDivisionError: If the function is called without any arguments.
+"""
         raise ZeroDivisionError
 
     @app.route("/forbidden")
@@ -921,6 +964,18 @@ def test_error_handling_processing(app, client):
 
     @app.route("/")
     def broken_func():
+        """
+Raises a ZeroDivisionError when called. This function is intentionally designed to fail and should not be used in production code.
+
+Args:
+    None
+
+Returns:
+    None
+
+Raises:
+    ZeroDivisionError: If division by zero occurs.
+"""
         raise ZeroDivisionError
 
     @app.after_request
@@ -1086,15 +1141,53 @@ def test_trapping_of_all_http_exceptions(app, client):
 
 
 def test_error_handler_after_processor_error(app, client):
+    """
+Test error handler after processor error.
+
+This function tests the behavior of an application's error handling mechanism when a request is made to a route that has already raised an exception. The test checks if the error handler correctly catches and returns the expected response code and data.
+
+Parameters:
+app (Flask app): The Flask application instance.
+client (requests Session): The requests session used for testing.
+
+Returns:
+None
+"""
     app.testing = False
 
     @app.before_request
     def before_request():
+        """
+Raises a ZeroDivisionError when the request is triggered before its expected time.
+
+This function should be used as a middleware in a web application to ensure that certain actions are performed at specific points during the request lifecycle. The `_trigger` variable is assumed to be set elsewhere in the codebase, and this function will raise an exception if it is not equal to "before".
+
+Args:
+    None
+
+Raises:
+    ZeroDivisionError: If the request is triggered before its expected time.
+
+Note:
+    This function should be used with caution, as it can cause unexpected behavior if not implemented correctly. It is recommended to use a more robust solution for handling request timing.
+"""
         if _trigger == "before":
             raise ZeroDivisionError
 
     @app.after_request
     def after_request(response):
+        """
+Raises a ZeroDivisionError if the request is triggered 'after' and returns the original response.
+
+Args:
+    response: The HTTP response to be returned.
+
+Returns:
+    The original response.
+
+Raises:
+    ZeroDivisionError: If the request is triggered 'after'.
+"""
         if _trigger == "after":
             raise ZeroDivisionError
 
@@ -1548,10 +1641,43 @@ def test_server_name_subdomain():
 
 @pytest.mark.parametrize("key", ["TESTING", "PROPAGATE_EXCEPTIONS", "DEBUG", None])
 def test_exception_propagation(app, client, key):
+    """
+Propagates an exception from the application to the client.
+
+This function tests if the application correctly propagates exceptions to the client.
+It sets up a Flask application, defines a route that raises a ZeroDivisionError,
+and then checks if the client receives this error when making a request to the route.
+If `key` is provided, it configures the application with this key and verifies
+that the client receives a 500 status code. If no `key` is provided, it tests that
+the client receives a ZeroDivisionError.
+
+Parameters:
+app (Flask): The Flask application instance.
+client (Client): The client instance to test against.
+key (str): The configuration key to set in the application (optional).
+
+Returns:
+None
+
+Raises:
+ZeroDivisionError: If the application does not propagate this exception correctly.
+"""
     app.testing = False
 
     @app.route("/")
     def index():
+        """
+Raises a ZeroDivisionError when attempting to divide by zero.
+
+Args:
+    None
+
+Returns:
+    None
+
+Raises:
+    ZeroDivisionError: If division by zero is attempted.
+"""
         raise ZeroDivisionError
 
     if key is not None:

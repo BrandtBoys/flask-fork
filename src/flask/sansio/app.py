@@ -920,6 +920,16 @@ Returns:
         return False
 
     def redirect(self, location: str, code: int = 302) -> BaseResponse:
+        """
+Redirects to a specified URL with an optional HTTP status code.
+
+Args:
+    location (str): The URL to redirect to.
+    code (int, optional): The HTTP status code. Defaults to 302.
+
+Returns:
+    BaseResponse: A response object containing the redirect URL and status code.
+"""
         return _wz_redirect(
             location,
             code=code,
