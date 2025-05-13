@@ -364,6 +364,15 @@ Raises:
         return rv
 
     def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
+        """
+Creates an URL adapter based on the provided request or server configuration.
+
+If a request is provided, it will be used to bind the URL map to the environment.
+Otherwise, it will use the server name from the configuration to create the adapter.
+
+Returns:
+    MapAdapter | None: The created URL adapter or None if no valid configuration is found.
+"""
         if request is not None:
             subdomain = None
             server_name = self.config["SERVER_NAME"]

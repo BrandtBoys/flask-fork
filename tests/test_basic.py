@@ -1538,6 +1538,22 @@ def test_server_name_matching(
     expect_abc: str,
     expect_xyz: str,
 ) -> None:
+    """
+Serves a Flask application that matches server name components.
+
+This function sets up a Flask application and tests its behavior for different server name configurations.
+It checks the response of the application's root route for various base, ABC, and XYZ expectations.
+
+Parameters:
+    subdomain_matching (bool): Whether to match subdomains in the server name.
+    host_matching (bool): Whether to match hosts in the server name.
+    expect_base (str): The expected response text when matching the base component of the server name.
+    expect_abc (str): The expected response text when matching the ABC component of the server name.
+    expect_xyz (str): The expected response text when matching the XYZ component of the server name.
+
+Returns:
+    None
+"""
     app = flask.Flask(
         __name__,
         subdomain_matching=subdomain_matching,
@@ -1549,6 +1565,19 @@ def test_server_name_matching(
     @app.route("/", defaults={"name": "default"}, host="<name>")
     @app.route("/", subdomain="<name>", host="<name>.example.test")
     def index(name: str) -> str:
+        """
+Returns the input string as is.
+
+Args:
+    name (str): The input string to be returned.
+
+Returns:
+    str: The input string.
+
+Example:
+    >>> x("Hello, World!")
+    'Hello, World!'
+"""
         return name
 
     client = app.test_client()
