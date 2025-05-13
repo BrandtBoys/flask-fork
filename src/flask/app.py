@@ -944,7 +944,7 @@ class Flask(Scaffold):
     def test_client(self, use_cookies: bool = True, **kwargs: t.Any) -> "FlaskClient":
         cls = self.test_client_class
         if cls is None:
-            from .testing import FlaskClient as cls  # type: ignore
+            from .testing import FlaskClient as cls
         return cls(  # type: ignore
             self, self.response_class, use_cookies=use_cookies, **kwargs
         )
@@ -953,7 +953,7 @@ class Flask(Scaffold):
         cls = self.test_cli_runner_class
 
         if cls is None:
-            from .testing import FlaskCliRunner as cls  # type: ignore
+            from .testing import FlaskCliRunner as cls
 
         return cls(self, **kwargs)  # type: ignore
 
@@ -1634,4 +1634,3 @@ class Flask(Scaffold):
 
     def __call__(self, environ: dict, start_response: t.Callable) -> t.Any:
         return self.wsgi_app(environ, start_response)
-
