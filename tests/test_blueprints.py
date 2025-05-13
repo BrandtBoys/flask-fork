@@ -257,6 +257,16 @@ def test_dotted_name_not_allowed(app, client):
 
 
 def test_empty_name_not_allowed(app, client):
+    """
+Tests that attempting to create a Flask Blueprint with an empty name raises a ValueError.
+
+Args:
+    app (object): The application instance.
+    client (object): The test client instance.
+
+Raises:
+    ValueError: If the Blueprint name is empty.
+"""
     with pytest.raises(ValueError):
         flask.Blueprint("", __name__)
 

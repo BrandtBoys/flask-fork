@@ -178,6 +178,33 @@ class Blueprint(Scaffold):
         root_path: t.Optional[str] = None,
         cli_group: t.Optional[str] = _sentinel,  # type: ignore
     ):
+        """
+Initialize a new instance of the class.
+
+Parameters:
+    name (str): The name of the application or module.
+    import_name (str): The import name of the application or module.
+    static_folder (t.Optional[t.Union[str, os.PathLike]], optional): The path to the static folder. Defaults to None.
+    static_url_path (t.Optional[str], optional): The URL path for static files. Defaults to None.
+    template_folder (t.Optional[t.Union[str, os.PathLike]], optional): The path to the template folder. Defaults to None.
+    url_prefix (t.Optional[str], optional): The prefix for URLs. Defaults to None.
+    subdomain (t.Optional[str], optional): The subdomain for URLs. Defaults to None.
+    url_defaults (t.Optional[dict], optional): Default values for URL parameters. Defaults to None.
+    root_path (t.Optional[str], optional): The root path of the application or module. Defaults to None.
+    cli_group (t.Optional[str], optional): The CLI group name. Defaults to _sentinel.
+
+Raises:
+    ValueError: If 'name' is empty or contains a dot '.' character.
+
+Attributes:
+    name (str): The name of the application or module.
+    url_prefix (str): The prefix for URLs.
+    subdomain (str): The subdomain for URLs.
+    deferred_functions (list): A list of deferred functions.
+    url_values_defaults (dict): Default values for URL parameters.
+    cli_group (str): The CLI group name.
+    _blueprints (list): A list of blueprints and their configurations.
+"""
         super().__init__(
             import_name=import_name,
             static_folder=static_folder,
