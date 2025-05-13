@@ -205,10 +205,10 @@ def test_session_transactions_keep_context(app, client, req_ctx):
 
 def test_session_transaction_needs_cookies(app):
     c = app.test_client(use_cookies=False)
-    with pytest.raises(RuntimeError) as e:
+
+    with pytest.raises(TypeError, match="Cookies are disabled."):
         with c.session_transaction():
             pass
-    assert "cookies" in str(e.value)
 
 
 def test_test_client_context_binding(app, client):
@@ -400,4 +400,3 @@ def test_client_pop_all_preserved(app, req_ctx, client):
     rv.close()
     # only req_ctx fixture should still be pushed
     assert _cv_request.get(None) is req_ctx
-
