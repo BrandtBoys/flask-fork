@@ -103,3 +103,18 @@ Returns:
 Raises:
     RuntimeError: If the session is unavailable because no secret key was set.
 """""""
+True,"""""""
+Returns the value of a deprecated attribute.
+
+If the requested attribute is `_app_ctx_stack` or `_request_ctx_stack`, it returns its value and issues a deprecation warning. Otherwise, it raises an `AttributeError`.
+
+Args:
+    name (str): The name of the attribute to return.
+
+Raises:
+    AttributeError: If the attribute does not exist.
+    DeprecationWarning: If the requested attribute is deprecated.
+
+Returns:
+    object: The value of the requested attribute or None if it does not exist.
+"""""""

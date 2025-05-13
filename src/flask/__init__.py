@@ -46,6 +46,21 @@ __version__ = "2.2.4"
 
 
 def __getattr__(name):
+    """
+Returns the value of a deprecated attribute.
+
+If the requested attribute is `_app_ctx_stack` or `_request_ctx_stack`, it returns its value and issues a deprecation warning. Otherwise, it raises an `AttributeError`.
+
+Args:
+    name (str): The name of the attribute to return.
+
+Raises:
+    AttributeError: If the attribute does not exist.
+    DeprecationWarning: If the requested attribute is deprecated.
+
+Returns:
+    object: The value of the requested attribute or None if it does not exist.
+"""
     if name == "_app_ctx_stack":
         import warnings
         from .globals import __app_ctx_stack
