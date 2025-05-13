@@ -32,3 +32,4 @@ Success,Comment
 "(True, '""""""\nInvokes the parent class\'s invoke method with optional CLI and arguments.\n\nThis function is used to extend the functionality of the parent class by providing\nadditional parameters such as `cli` and `args`. If `cli` is not provided, it defaults\nto the application\'s CLI. The `obj` parameter is also optional and defaults to a\nScriptInfo object with a create_app lambda that returns the current application.\n\nArgs:\n    cli (t.Any): The command-line interface. Defaults to None.\n    args (t.Any): Additional arguments. Defaults to None.\n    **kwargs: Keyword arguments, including \'obj\' which defaults to ScriptInfo(create_app=lambda: self.app).\n\nReturns:\n    Result: The result of the parent class\'s invoke method.\n\nRaises:\n    t.Any: Any exception raised by the parent class\'s invoke method.\n""""""')"
 
 
+
