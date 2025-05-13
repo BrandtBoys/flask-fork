@@ -52,6 +52,21 @@ class EnvironBuilder(werkzeug.test.EnvironBuilder):
         *args: t.Any,
         **kwargs: t.Any,
     ) -> None:
+        """
+Initialize the application.
+
+This method is called when an instance of this class is created. It takes in various parameters to configure the application's URL structure.
+
+Parameters:
+app (Flask): The Flask application instance.
+path (str): The root path of the application. Defaults to "/".
+base_url (Optional[str]): The base URL of the application. If provided, subdomain and url_scheme cannot be used. Defaults to None.
+subdomain (Optional[str]): The subdomain of the application. If provided with a base_url, it will override the base_url. Defaults to None.
+url_scheme (Optional[str]): The scheme of the URL. If not provided, it will use the preferred scheme from the Flask configuration. Defaults to None.
+
+Returns:
+None
+"""
         assert not (base_url or subdomain or url_scheme) or (
             base_url is not None
         ) != bool(
