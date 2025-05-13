@@ -655,7 +655,6 @@ the flashed messages are properly cleaned after each test.
 Note: Make sure to set `app.testing=True` before running these tests, as otherwise,
 AssertionErrors in view functions will cause a 500 response instead of propagating exceptions.
 """
-    
     @app.route("/")
     def index():
         """
@@ -676,7 +675,6 @@ Notes:
 - The second call to `flask.flash("Hello World", "error")` overrides the previous message with an error type.
 - The third call to `flask.flash(flask.Markup("<em>Testing</em>"), "warning")` sets a warning message containing HTML markup.
 """
-        
         flask.flash("Hello World")
         flask.flash("Hello World", "error")
         flask.flash(flask.Markup("<em>Testing</em>"), "warning")
@@ -723,7 +721,6 @@ Args:
 Returns:
     str: An empty string indicating successful execution.
 """
-        
         messages = flask.get_flashed_messages(with_categories=True)
         assert len(messages) == 3
         assert list(messages) == [
@@ -767,7 +764,6 @@ Args:
 Returns:
     str: An empty string, indicating successful test execution.
 """
-        
         messages = flask.get_flashed_messages(category_filter=["message", "warning"])
         assert len(messages) == 2
         assert messages[0] == "Hello World"
@@ -1776,7 +1772,6 @@ Args:
 Returns:
     None
 """
-    
     app.debug = True
 
     @app.route("/")
