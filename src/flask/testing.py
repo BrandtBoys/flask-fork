@@ -51,6 +51,21 @@ class EnvironBuilder(werkzeug.test.EnvironBuilder):
         *args: t.Any,
         **kwargs: t.Any,
     ) -> None:
+        """
+Initialize the application.
+
+This method is called when an instance of this class is created. It takes in various parameters to configure the application's URL structure.
+
+Parameters:
+app (Flask): The Flask application instance.
+path (str): The root path of the application. Defaults to "/".
+base_url (Optional[str]): The base URL of the application. If provided, subdomain and url_scheme cannot be used. Defaults to None.
+subdomain (Optional[str]): The subdomain of the application. If provided with a base_url, it will override the base_url. Defaults to None.
+url_scheme (Optional[str]): The scheme of the URL. If not provided, it will use the preferred scheme from the Flask configuration. Defaults to None.
+
+Returns:
+None
+"""
         assert not (base_url or subdomain or url_scheme) or (
             base_url is not None
         ) != bool(
@@ -190,6 +205,20 @@ class FlaskClient(Client):
         follow_redirects: bool = False,
         **kwargs: t.Any,
     ) -> "TestResponse":
+        """
+Opens a new test request.
+
+This method is used to create a new test request, which can be used to simulate HTTP requests and responses.
+It takes several keyword arguments that control the behavior of the request:
+
+- `buffered`: If True, the response will be buffered. Otherwise, it will be sent immediately.
+- `follow_redirects`: If True, redirects will be followed.
+
+If no request is provided, one will be created from the given arguments and keyword arguments.
+
+Returns:
+    TestResponse: The response object for the test request.
+"""
         if args and isinstance(
             args[0], (werkzeug.test.EnvironBuilder, dict, BaseRequest)
         ):
@@ -229,6 +258,19 @@ class FlaskClient(Client):
         return response
 
     def __enter__(self) -> "FlaskClient":
+        """
+    Enters the context of a Flask client.
+
+    This method is used to create a new context for the Flask client. It sets the `preserve_context` attribute to `True`, 
+    indicating that subsequent invocations will preserve the current context. If an attempt is made to nest client invocations, 
+    a RuntimeError is raised.
+
+    Returns:
+        The instance of the FlaskClient class, allowing for method chaining.
+    
+    Raises:
+        RuntimeError: If an attempt is made to nest client invocations.
+"""
         if self.preserve_context:
             raise RuntimeError("Cannot nest client invocations")
         self.preserve_context = True
@@ -240,6 +282,19 @@ class FlaskClient(Client):
         exc_value: t.Optional[BaseException],
         tb: t.Optional[TracebackType],
     ) -> None:
+        """
+Closes the context stack and sets preserve_context to False.
+
+This method is called when the exception handling context is exited. It ensures that the context is properly cleaned up by closing the context stack, which helps prevent resource leaks. The `preserve_context` flag is also set to False to indicate that the current context should not be preserved for future use.
+
+Args:
+    exc_type (type): The type of the exception that was raised.
+    exc_value (BaseException): The value of the exception that was raised.
+    tb (TracebackType): The traceback object associated with the exception.
+
+Returns:
+    None
+"""
         self.preserve_context = False
         self._context_stack.close()
 
@@ -251,6 +306,16 @@ class FlaskCliRunner(CliRunner):
     """
 
     def __init__(self, app: "Flask", **kwargs: t.Any) -> None:
+        """
+Initialize a new instance of the class.
+
+Args:
+    app (Flask): The Flask application instance.
+    **kwargs (t.Any): Additional keyword arguments to pass to the superclass's __init__ method.
+
+Returns:
+    None
+"""
         self.app = app
         super().__init__(**kwargs)
 

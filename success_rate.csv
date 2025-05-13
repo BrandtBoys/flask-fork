@@ -161,3 +161,108 @@ Attributes:
 Raises:
     AttributeError: If the requested attribute does not exist.
 """""""
+True,"""""""
+Initialize the application.
+
+This method is called when an instance of this class is created. It takes in various parameters to configure the application's URL structure.
+
+Parameters:
+app (Flask): The Flask application instance.
+path (str): The root path of the application. Defaults to ""/"".
+base_url (Optional[str]): The base URL of the application. If provided, subdomain and url_scheme cannot be used. Defaults to None.
+subdomain (Optional[str]): The subdomain of the application. If provided with a base_url, it will override the base_url. Defaults to None.
+url_scheme (Optional[str]): The scheme of the URL. If not provided, it will use the preferred scheme from the Flask configuration. Defaults to None.
+
+Returns:
+None
+"""""""
+False,"""""""
+Initialize the documentation assistant.
+
+This function initializes a new instance of the documentation assistant, 
+setting default values for its attributes and calling the parent class's constructor.
+
+Args:
+    *args: Variable length argument list containing any additional arguments.
+    **kwargs: Keyworded arguments containing any additional keyword arguments.
+
+Returns:
+    None
+""""""
+def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
+    super().__init__(*args, **kwargs)
+    self.preserve_context = False
+    self._new_contexts: t.List[t.ContextManager[t.Any]] = []
+    self._context_stack = ExitStack()
+    self.environ_base = {
+        ""REMOTE_ADDR"": ""127.0.0.1"",
+        ""HTTP_USER_AGENT"": f""werkzeug/{werkzeug.__version__}"",
+    }"
+False,"""""""
+Yields a new session object for the given test request context.
+
+This function is used to create and manage sessions in a test environment.
+It handles the creation of cookies and updates them based on the response headers.
+
+Args:
+    *args: Variable arguments passed to the test request context.
+    **kwargs: Keyword arguments passed to the test request context.
+
+Returns:
+    A generator yielding session objects, or None if no session is created.
+""""""
+def session_transaction(
+        self, 
+        *args: t.Any, 
+        **kwargs: t.Any
+    ) -> t.Generator[SessionMixin, None, None]:"
+True,"""""""
+Opens a new test request.
+
+This method is used to create a new test request, which can be used to simulate HTTP requests and responses.
+It takes several keyword arguments that control the behavior of the request:
+
+- `buffered`: If True, the response will be buffered. Otherwise, it will be sent immediately.
+- `follow_redirects`: If True, redirects will be followed.
+
+If no request is provided, one will be created from the given arguments and keyword arguments.
+
+Returns:
+    TestResponse: The response object for the test request.
+"""""""
+True,"""""""
+    Enters the context of a Flask client.
+
+    This method is used to create a new context for the Flask client. It sets the `preserve_context` attribute to `True`, 
+    indicating that subsequent invocations will preserve the current context. If an attempt is made to nest client invocations, 
+    a RuntimeError is raised.
+
+    Returns:
+        The instance of the FlaskClient class, allowing for method chaining.
+    
+    Raises:
+        RuntimeError: If an attempt is made to nest client invocations.
+"""""""
+True,"""""""
+Closes the context stack and sets preserve_context to False.
+
+This method is called when the exception handling context is exited. It ensures that the context is properly cleaned up by closing the context stack, which helps prevent resource leaks. The `preserve_context` flag is also set to False to indicate that the current context should not be preserved for future use.
+
+Args:
+    exc_type (type): The type of the exception that was raised.
+    exc_value (BaseException): The value of the exception that was raised.
+    tb (TracebackType): The traceback object associated with the exception.
+
+Returns:
+    None
+"""""""
+True,"""""""
+Initialize a new instance of the class.
+
+Args:
+    app (Flask): The Flask application instance.
+    **kwargs (t.Any): Additional keyword arguments to pass to the superclass's __init__ method.
+
+Returns:
+    None
+"""""""
