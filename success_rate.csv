@@ -59,3 +59,4 @@ Success,Comment
 "(False, 'Teardowns an asynchronous operation.\n\nThis function is used to handle exceptions that occur during an asynchronous operation.\nIt provides a way to clean up resources and restore the original state of the system\nafter an exception has occurred.\n\nArgs:\n    exc (BaseException | None): The exception that occurred during the operation. Can be None if no exception occurred.\n\nReturns:\n    None: This function does not return any value, it only cleans up resources.')"
 
 
+
