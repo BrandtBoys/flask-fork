@@ -256,3 +256,4 @@ def test_from_pyfile_weird_encoding(tmpdir, encoding):
     app.config.from_pyfile(str(f))
     value = app.config["TEST_VALUE"]
     assert value == "föö"
+

@@ -1051,3 +1051,4 @@ def test_blueprint_renaming(app, client) -> None:
     assert client.get("/b/a/").data == b"alt.sub.index2"
     assert client.get("/a/error").data == b"Error"
     assert client.get("/b/error").data == b"Error"
+
