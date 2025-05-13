@@ -3,8 +3,8 @@ from datetime import timezone
 from uuid import uuid4
 
 import pytest
+from markupsafe import Markup
 
-from flask import Markup
 from flask.json.tag import JSONTag
 from flask.json.tag import TaggedJSONSerializer
 
@@ -84,4 +84,3 @@ def test_tag_order():
 
     s.register(Tag2, index=None)
     assert isinstance(s.order[-1], Tag2)
-
