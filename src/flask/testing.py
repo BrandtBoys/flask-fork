@@ -65,7 +65,15 @@ url_scheme (Optional[str]): The scheme of the URL. If not provided, it will use 
 
 Returns:
 None
+
+Raises:
+AssertionError: If "subdomain" or "url_scheme" is passed with "base_url".
+
+Note:
+- This method modifies the `app` instance and its configuration.
+- It uses the `super()` method to call the parent class's constructor, passing in the modified parameters.
 """
+        
         assert not (base_url or subdomain or url_scheme) or (
             base_url is not None
         ) != bool(
@@ -236,6 +244,7 @@ Returns:
 Raises:
     ValueError: If the request cannot be created from the given arguments and keyword arguments.
 """
+        
         if args and isinstance(
             args[0], (werkzeug.test.EnvironBuilder, dict, BaseRequest)
         ):
@@ -312,6 +321,7 @@ Args:
 Returns:
     None
 """
+        
         self.preserve_context = False
         self._context_stack.close()
 
@@ -333,6 +343,7 @@ Args:
 Returns:
     None
 """
+        
         self.app = app
         super().__init__(**kwargs)
 

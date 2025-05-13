@@ -62,6 +62,7 @@ Attributes:
 Raises:
     AttributeError: If the requested attribute does not exist.
 """
+    
     if name == "_app_ctx_stack":
         import warnings
         from .globals import __app_ctx_stack

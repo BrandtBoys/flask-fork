@@ -107,6 +107,7 @@ Returns:
 Raises:
     RuntimeError: If the session is unavailable because no secret key was set.
 """
+        
         raise RuntimeError(
             "The session is unavailable because no secret "
             "key was set.  Set the secret_key on the "
@@ -183,6 +184,7 @@ Raises:
 Note:
 This method creates a new instance of the `NullSession` class, which does not store any data. It is intended for use in testing or other scenarios where no session data needs to be stored.
 """
+        
         return self.null_session_class()
 
     def is_null_session(self, obj: object) -> bool:
@@ -210,6 +212,7 @@ Args:
 Returns:
     str | None: The domain of the session cookie, or None if not set.
 """
+        
         rv = app.config["SESSION_COOKIE_DOMAIN"]
 
         # set explicitly, or cached from SERVER_NAME detection
@@ -300,6 +303,7 @@ Args:
 Returns:
     bool: Whether the session cookie is secure.
 """
+        
         return app.config["SESSION_COOKIE_SECURE"]
 
     def get_cookie_samesite(self, app: "Flask") -> str:
@@ -312,6 +316,7 @@ Args:
 Returns:
     str: The value of the `SESSION_COOKIE_SAMESITE` configuration option.
 """
+        
         return app.config["SESSION_COOKIE_SAMESITE"]
 
     def get_expiration_time(
@@ -478,6 +483,7 @@ Parameters:
 Returns:
     None
 """
+        
         name = self.get_cookie_name(app)
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
