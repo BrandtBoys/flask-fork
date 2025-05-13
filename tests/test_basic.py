@@ -468,19 +468,18 @@ def test_session_stored_last(app, client):
 
 def test_session_special_types(app, client):
     """
-Test session special types.
+Tests the behavior of Flask's session object when storing special types such as bytes, Markup objects, and UUIDs.
 
-This function tests the behavior of Flask's session object when storing
-special types such as bytes, Markup objects, and UUIDs. It verifies that
-these types are stored correctly and can be retrieved later.
+This function tests that these types are stored correctly and can be retrieved later.
 
 Parameters:
-app (Flask application): The Flask application instance.
-client (Client): The client instance used for testing.
+    app (Flask application): The Flask application instance.
+    client (Client): The client instance used for testing.
 
 Returns:
-None
+    None
 """
+    
     now = datetime.now(timezone.utc).replace(microsecond=0)
     the_uuid = uuid.uuid4()
 
@@ -657,6 +656,7 @@ the flashed messages are properly cleaned after each test.
 Note: Make sure to set `app.testing=True` before running these tests, as otherwise,
 AssertionErrors in view functions will cause a 500 response instead of propagating exceptions.
 """
+    
     @app.route("/")
     def index():
         """
@@ -667,16 +667,17 @@ It takes advantage of the `flash` method provided by Flask, which can be used to
 messages for different types of notifications (e.g., success, error, warning).
 
 Parameters:
-None
+    None
 
 Returns:
-str: An empty string indicating the function has completed its task.
+    str: An empty string indicating the function has completed its task.
 
 Notes:
 - The first call to `flask.flash("Hello World")` sets a default message type as 'success'.
 - The second call to `flask.flash("Hello World", "error")` overrides the previous message with an error type.
-- The third call to `flask.flash(Markup("<em>Testing</em>"), "warning")` sets a warning message containing HTML markup.
+- The third call to `flask.flash(flask.Markup("<em>Testing</em>"), "warning")` sets a warning message containing HTML markup.
 """
+        
         flask.flash("Hello World")
         flask.flash("Hello World", "error")
         flask.flash(flask.Markup("<em>Testing</em>"), "warning")
@@ -684,6 +685,21 @@ Notes:
 
     @app.route("/test/")
     def test():
+        """
+Tests that the `get_flashed_messages` function returns a list of flashed messages.
+
+This test case checks if the `get_flashed_messages` function correctly retrieves and returns a list of flashed messages.
+It asserts that the returned list contains the expected messages, including HTML markup.
+
+Args:
+    None
+
+Returns:
+    str: An empty string indicating successful execution of the test.
+
+Raises:
+    AssertionError: If the returned list does not match the expected output.
+"""
         messages = flask.get_flashed_messages()
         assert list(messages) == [
             "Hello World",
@@ -708,6 +724,7 @@ Args:
 Returns:
     str: An empty string indicating successful execution.
 """
+        
         messages = flask.get_flashed_messages(with_categories=True)
         assert len(messages) == 3
         assert list(messages) == [
@@ -744,7 +761,14 @@ Tests the functionality of getting flashed messages with a category filter.
 This function tests that the `flask.get_flashed_messages` method returns two messages
 when called with a category filter. The first message is expected to be "Hello World"
 and the second message is expected to be an HTML-marked string "<em>Testing</em>".
+
+Args:
+    None
+
+Returns:
+    str: An empty string, indicating successful test execution.
 """
+        
         messages = flask.get_flashed_messages(category_filter=["message", "warning"])
         assert len(messages) == 2
         assert messages[0] == "Hello World"
@@ -1739,6 +1763,20 @@ def test_nonascii_pathinfo(app, client):
 
 
 def test_no_setup_after_first_request(app, client):
+    """
+Renders the first request to an application.
+
+This function simulates a client making a GET request to the root URL of the application.
+It asserts that the `debug` attribute is set to True, and that the response from the server matches the expected value.
+Additionally, it tests that attempting to add a new route after the first request raises an AssertionError with a specific message.
+
+Args:
+    app (Flask application): The Flask application instance being tested.
+    client (requests.Session): A requests session object used to simulate the client's request.
+
+Returns:
+    None
+"""
     app.debug = True
 
     @app.route("/")
@@ -1755,12 +1793,29 @@ def test_no_setup_after_first_request(app, client):
 
 
 def test_before_first_request_functions(app, client):
+    """
+Request Functions for Application Testing
+
+This function tests the application's behavior when making requests before and after the first request.
+
+Parameters:
+app (object): The application object to be tested.
+client (object): The client object used to make HTTP requests.
+
+Returns:
+None
+"""
     got = []
 
     with pytest.deprecated_call():
 
         @app.before_first_request
         def foo():
+            """
+Adds 42 to the 'got' list.
+
+This function is not intended for external use and should only be accessed internally within the application.
+"""
             got.append(42)
 
     client.get("/")
@@ -1771,12 +1826,36 @@ def test_before_first_request_functions(app, client):
 
 
 def test_before_first_request_functions_concurrent(app, client):
+    """
+Concurrently tests the application's routing functionality by making a request to the root URL while another thread is asserting that a value was appended to the `got` list.
+
+This function uses pytest's deprecated_call context manager to ensure that the `foo` function, which appends a value to the `got` list, is called before the first request is made. It then creates a new thread that runs the `get_and_assert` function in parallel with the main thread.
+
+The `get_and_assert` function makes a GET request to the root URL and asserts that the value appended to the `got` list matches the expected value. The main thread waits for the thread to finish before asserting that the application's `got_first_request` attribute is set to True.
+
+This test ensures that the application's routing functionality works correctly even when multiple threads are making requests concurrently.
+"""
     got = []
 
     with pytest.deprecated_call():
 
         @app.before_first_request
         def foo():
+            """
+Returns the result of appending 42 to the 'got' list after a 200ms delay.
+
+Args:
+    None
+
+Returns:
+    None
+
+Raises:
+    None
+
+Example:
+    >>> get_and_asse()
+"""
             time.sleep(0.2)
             got.append(42)
 

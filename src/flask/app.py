@@ -276,6 +276,18 @@ class Flask(Scaffold):
 
     @property
     def session_cookie_name(self) -> str:
+        """
+Returns the name of the session cookie.
+
+This method is deprecated and will be removed in Flask 2.3. Instead, use
+`app.config['SESSION_COOKIE_NAME']`.
+
+Args:
+    None
+
+Returns:
+    str: The name of the session cookie.
+"""
         import warnings
 
         warnings.warn(
@@ -288,6 +300,18 @@ class Flask(Scaffold):
 
     @session_cookie_name.setter
     def session_cookie_name(self, value: str) -> None:
+        """
+Deprecation Notice:
+
+The `session_cookie_name` method is deprecated and will be removed in Flask 2.3.
+Use the 'SESSION_COOKIE_NAME' configuration option in 'app.config' instead.
+
+Parameters:
+value (str): The new session cookie name.
+
+Returns:
+None
+"""
         import warnings
 
         warnings.warn(
@@ -311,6 +335,21 @@ class Flask(Scaffold):
 
     @property
     def send_file_max_age_default(self) -> t.Optional[timedelta]:
+        """
+Deprecation Notice:
+
+The `send_file_max_age_default` method is deprecated and will be removed in Flask 2.3.
+Use 'SEND_FILE_MAX_AGE_DEFAULT' in 'app.config' instead.
+
+Returns:
+    Optional[timedelta]: The maximum age for sending files, or None if not set.
+
+Raises:
+    DeprecationWarning: If the deprecated method is called.
+
+Note:
+This function is only available for backwards compatibility and should not be used in new code.
+"""
         import warnings
 
         warnings.warn(
@@ -323,6 +362,21 @@ class Flask(Scaffold):
 
     @send_file_max_age_default.setter
     def send_file_max_age_default(self, value: t.Union[int, timedelta, None]) -> None:
+        """
+Deprecation Notice:
+
+The `send_file_max_age_default` method is deprecated and will be removed in Flask 2.3.
+Use 'SEND_FILE_MAX_AGE_DEFAULT' in 'app.config' instead.
+
+Parameters:
+    value (Union[int, timedelta, None]): The maximum age of sent files in seconds.
+        If int, the value is used directly as a number of seconds.
+        If timedelta, the value is converted to seconds.
+        If None, no default is set.
+
+Returns:
+    None
+"""
         import warnings
 
         warnings.warn(
@@ -335,6 +389,19 @@ class Flask(Scaffold):
 
     @property
     def use_x_sendfile(self) -> bool:
+        """
+Deprecation Notice:
+
+The `use_x_sendfile` method is deprecated and will be removed in Flask 2.3.
+Instead, use the 'USE_X_SENDFILE' configuration option in the application's
+configuration dictionary.
+
+Returns:
+    bool: The value of the 'USE_X_SENDFILE' configuration option.
+
+Raises:
+    DeprecationWarning: If the 'use_x_sendfile' method is called.
+"""
         import warnings
 
         warnings.warn(
@@ -362,6 +429,18 @@ class Flask(Scaffold):
 
     @property  # type: ignore[override]
     def json_encoder(self) -> t.Type[json.JSONEncoder]:
+        """
+Returns the JSON encoder class for this application.
+
+This method is deprecated in favor of customizing 'app.json_provider_class' or 'app.json'.
+The `DeprecationWarning` will be raised when calling this function.
+ 
+Args:
+    None
+ 
+Returns:
+    t.Type[json.JSONEncoder]: The JSON encoder class.
+"""
         import warnings
 
         warnings.warn(
@@ -380,6 +459,16 @@ class Flask(Scaffold):
 
     @json_encoder.setter
     def json_encoder(self, value: t.Type[json.JSONEncoder]) -> None:
+        """
+Deprecation Warning: `json_encoder` is deprecated and will be removed in Flask 2.3.
+Customize `json_provider_class` or `json` instead.
+
+Args:
+    value (t.Type[json.JSONEncoder]): The new JSON encoder class to use.
+
+Returns:
+    None
+"""
         import warnings
 
         warnings.warn(
@@ -392,6 +481,20 @@ class Flask(Scaffold):
 
     @property  # type: ignore[override]
     def json_decoder(self) -> t.Type[json.JSONDecoder]:
+        """
+Returns the JSON decoder class.
+
+This function returns the JSON decoder class used by the application. It is deprecated in favor of customizing 'app.json_provider_class' or 'app.json'. 
+
+Parameters:
+    None
+
+Returns:
+    t.Type[json.JSONDecoder]: The JSON decoder class.
+
+Raises:
+    DeprecationWarning: If 'app.json_decoder' is called, it will raise a deprecation warning.
+"""
         import warnings
 
         warnings.warn(
@@ -410,6 +513,18 @@ class Flask(Scaffold):
 
     @json_decoder.setter
     def json_decoder(self, value: t.Type[json.JSONDecoder]) -> None:
+        """
+Decodes JSON data using the provided decoder.
+
+This function is deprecated in Flask 2.3 and will be removed.
+Instead, customize `app.json_provider_class` or `app.json`.
+
+Args:
+    value (t.Type[json.JSONDecoder]): The JSON decoder to use.
+
+Returns:
+    None
+"""
         import warnings
 
         warnings.warn(
@@ -699,6 +814,20 @@ class Flask(Scaffold):
 
     @property
     def propagate_exceptions(self) -> bool:
+        """
+Propagates exceptions to the application's context.
+
+This function checks the value of `PROPAGATE_EXCEPTIONS` in the Flask configuration.
+If it exists, its value is returned. Otherwise, the function returns whether the application is running in testing or debug mode.
+
+Deprecation Warning: This method is deprecated and will be removed in Flask 2.3. It's recommended to use a different approach for exception propagation.
+
+Args:
+    None
+
+Returns:
+    bool: Whether exceptions should be propagated to the application's context.
+"""
         import warnings
 
         warnings.warn(
@@ -755,6 +884,19 @@ Raises:
 
     @property
     def templates_auto_reload(self) -> bool:
+        """
+Returns the value of `TEMPLATES_AUTO_RELOAD` from the application configuration.
+
+If `TEMPLATES_AUTO_RELOAD` is set, its value is returned. Otherwise, the value of `debug` is used as a fallback.
+
+Deprecated since Flask 2.3 in favor of using `TEMPLATES_AUTO_RELOAD` in `app.config`.
+
+Args:
+    None
+
+Returns:
+    bool: The value of `TEMPLATES_AUTO_RELOAD` or `debug` if not set.
+"""
         import warnings
 
         warnings.warn(
@@ -841,6 +983,21 @@ Raises:
 
     @property
     def env(self) -> str:
+        """
+Returns the environment variable as a string.
+
+Deprecation Warning: This method is deprecated and will be removed in Flask 2.3.
+Use `app.debug` instead.
+
+Args:
+    None
+
+Returns:
+    str: The environment variable value.
+
+Raises:
+    DeprecationWarning: If the 'app.env' method is called.
+"""
         import warnings
 
         warnings.warn(
@@ -853,6 +1010,16 @@ Raises:
 
     @env.setter
     def env(self, value: str) -> None:
+        """
+Deprecation Warning: `env` method is deprecated and will be removed in Flask 2.3.
+Use `debug` attribute instead.
+
+Args:
+    value (str): The environment variable to set.
+
+Returns:
+    None
+"""
         import warnings
 
         warnings.warn(
@@ -1085,6 +1252,20 @@ Raises:
 
     @setupmethod
     def before_first_request(self, f: T_before_first_request) -> T_before_first_request:
+        """
+Deprecation Warning: before_first_request function is deprecated and will be removed in Flask 2.3.
+ 
+   To avoid deprecation warnings, run setup code while creating the application instead.
+
+   Parameters:
+       f (T_before_first_request): The function to be executed before the first request.
+
+   Returns:
+       T_before_first_request: The input function for appending to self.before_first_request_funcs.
+
+   Note:
+       This function is deprecated and should not be used in new applications. Instead, run setup code while creating the application.
+"""
         import warnings
 
         warnings.warn(
@@ -1252,6 +1433,21 @@ Raises:
         # Run before_first_request functions if this is the thread's first request.
         # Inlined to avoid a method call on subsequent requests.
         # This is deprecated, will be removed in Flask 2.3.
+        """
+Dispatches the full request, including running before_first_request functions and handling exceptions.
+
+This method is deprecated in favor of a more efficient implementation. It should not be used in new code.
+
+Parameters
+----------
+self : object
+    The instance of the class that this method belongs to.
+
+Returns
+-------
+Response
+    The response from the dispatching process.
+"""
         if not self._got_first_request:
             with self._before_request_lock:
                 if not self._got_first_request:
