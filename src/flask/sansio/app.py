@@ -526,32 +526,6 @@ Returns:
             return os.path.join(package_path, "instance")
         return os.path.join(prefix, "var", f"{self.name}-instance")
 
-        """
-Opens an instance resource file.
-
-Args:
-    - `resource` (str): The path to the resource file.
-    - `mode` (str, optional): The mode in which to open the file. Defaults to "rb".
-
-Returns:
-    A file object opened at the specified location with the given mode.
-
-Raises:
-    FileNotFoundError: If the instance_path does not exist or the resource is not found.
-"""
-        """
-Creates a Jinja environment with custom options and updates its globals.
-
-This method creates a new Jinja environment based on the provided options.
-It also updates the environment's globals dictionary to include necessary functions
-and variables for use in templates.
-
-Args:
-    self: The object instance that owns this method.
-
-Returns:
-    Environment: A newly created Jinja environment with custom options and updated globals.
-"""
     def create_global_jinja_loader(self) -> DispatchingJinjaLoader:
         """
 Creates and returns a global Jinja loader instance.
@@ -578,36 +552,6 @@ Returns:
             return True
         return filename.endswith((".html", ".htm", ".xml", ".xhtml", ".svg"))
 
-        """
-Updates the template context with additional information.
-
-This function is used to extend the context passed to a template, allowing
-for dynamic rendering of templates outside of a request context. It first
-checks if a request object is available and adds any blueprint names from
-it to the list of names to process. Then it iterates over this list,
-applying any context processors that have been registered for each name.
-
-The original context is preserved and updated with the new values after all
-context processors have been applied.
-
-Args:
-    context (dict): The initial template context.
-
-Returns:
-    None
-"""
-        """
-Returns a dictionary representing the shell context.
-
-This function combines the application object (`self`) with the global object (`g`), 
-and then updates it with the results of each processor function in `self.shell_context_processors`.
-
-Args:
-    None
-
-Returns:
-    dict: The constructed shell context.
-"""
     @property
     def debug(self) -> bool:
         """
@@ -640,28 +584,6 @@ Returns:
         if self.config["TEMPLATES_AUTO_RELOAD"] is None:
             self.jinja_env.auto_reload = value
 
-        """
-Returns a test client instance for the application.
-
-Args:
-    use_cookies (bool): Whether to include cookies in the request. Defaults to True.
-    **kwargs: Additional keyword arguments to pass to the FlaskClient constructor.
-
-Returns:
-    FlaskClient: A test client instance for the application.
-"""
-        """
-Returns an instance of `FlaskCliRunner` initialized with the provided keyword arguments.
-
-Args:
-    **kwargs (t.Any): Keyword arguments to be passed to the `FlaskCliRunner` constructor.
-
-Returns:
-    FlaskCliRunner: An instance of `FlaskCliRunner`.
-
-Raises:
-    None
-"""
     @setupmethod
     def register_blueprint(self, blueprint: Blueprint, **options: t.Any) -> None:
         """
@@ -809,7 +731,6 @@ Args:
 Returns:
     Callable[[T_template_test], T_template_test]: The decorated function.
 """
-        
         def decorator(f: T_template_test) -> T_template_test:
             self.add_template_test(f, name=name)
             return f
@@ -863,7 +784,6 @@ Args:
 Returns:
     T_template_global: The decorated function, which is now accessible as a template global variable.
 """
-            
             self.add_template_global(f, name=name)
             return f
 
@@ -1001,119 +921,7 @@ Returns:
     def redirect(self, location: str, code: int = 302) -> BaseResponse:
         return _wz_redirect(
             location, code=code, Response=self.response_class  # type: ignore[arg-type]
-        """
-Handles exceptions raised during request processing.
-
-Raises an exception if propagation is enabled and the current exception
-is different from the one passed in. Otherwise, re-raises the original
-exception. If no error handler is found, logs the exception and returns a
-server error response.
-
-Args:
-    e (Exception): The exception to be handled.
-
-Returns:
-    Response: A server error response.
-"""
-        """
-Logs an exception with the provided error information.
-
-Args:
-    - `self`: The instance of the class that this method belongs to.
-    - `exc_info`: A tuple containing the type, value, and traceback of the exception. Can be a single value if only one is available (e.g., for sys.exc_info()).
-
-Returns:
-    None
-"""
         )
-        """
-Dispatches the full request and handles any exceptions that may occur.
-
-This method initiates the request dispatching process, ensuring that all necessary steps are taken to fulfill the user's request.
-It also catches any exceptions that may be raised during this process and handles them accordingly.
-
-Returns:
-    Response: The response object after successful request dispatching or exception handling.
-
-Raises:
-    Exception: If an error occurs during request dispatching or exception handling.
-"""
-        """
-Finalizes a request by processing the response and sending a signal to indicate that the request has finished.
-
-Args:
-    rv (ft.ResponseReturnValue | HTTPException): The response value or exception to be finalized.
-    from_error_handler (bool, optional): Whether this is being called from an error handler. Defaults to False.
-
-Returns:
-    Response: The finalized response object.
-
-Raises:
-    Exception: If the request finalizing fails and `from_error_handler` is False.
-"""
-        """
-Returns a default options response for the current request.
-
-This method creates a new response object with the allowed HTTP methods from the URL adapter.
-The `allow` attribute of the response is updated to include these methods, allowing the client to specify which methods are supported by the server.
-
-Args:
-    None
-
-Returns:
-    Response: A new response object with the default options configuration.
-"""
-        """
-Determines whether an exception should be ignored.
-
-Args:
-    error (BaseException | None): The exception to check. Can be None for no exception.
-Returns:
-    bool: True if the exception should be ignored, False otherwise.
-"""
-        """
-Ensures that a provided function is synchronous by converting it to a synchronous function if it's a coroutine.
-
-Args:
-    func (t.Callable): The function to be ensured as synchronous.
-
-Returns:
-    t.Callable: The synchronous version of the input function, or the original function if it's already synchronous.
-"""
-        """
-Converts an asynchronous function to a synchronous one.
-
-This function takes an asynchronous callable and returns a new function that can be called synchronously.
-It uses the `asgiref.sync.async_to_sync` function from Flask, which is only available when Flask is installed with the 'async' extra.
-
-If the required import fails, it raises a RuntimeError indicating that Flask needs to be installed with the 'async' extra.
-
-Args:
-    func: The asynchronous function to convert.
-
-Returns:
-    A new synchronous function wrapping the original asynchronous one.
-"""
-        """
-Redirects to a specified URL with an optional HTTP status code.
-
-Args:
-    location (str): The URL to redirect to.
-    code (int, optional): The HTTP status code. Defaults to 302.
-
-Returns:
-    BaseResponse: A response object containing the redirect URL and status code.
-"""
-        """
-Creates a URL adapter for the current request.
-
-If `subdomain_matching` is disabled, uses the default subdomain in all cases.
-Otherwise, does not use a subdomain. The adapter binds to the environment,
-server name, and other configuration settings from the application's config.
-
-Returns:
-    MapAdapter | None: A bound URL map adapter or None if no adapter can be created.
-"""
 
     def inject_url_defaults(self, endpoint: str, values: dict) -> None:
         names: t.Iterable[str | None] = (None,)
@@ -1149,96 +957,3 @@ Returns:
             raise
 
         raise error
-
-        """
-Preprocesses the request by applying URL value preprocessors and before request functions.
-
-This method iterates over the blueprint names in reverse order, applying any URL value preprocessors to each endpoint.
-It then checks for any before request functions associated with the current blueprint and executes them if present.
-
-If a before request function returns a non-None response, it is returned immediately. Otherwise, the method proceeds to check the next blueprint.
-
-Returns:
-    ft.ResponseReturnValue | None: The result of the last executed before request function, or None if no such function was found.
-"""
-        """
-Processes the given response by executing any after-request functions and saving the session.
-
-Args:
-    response (Response): The response to be processed.
-
-Returns:
-    Response: The processed response.
-"""
-        """
-Tear down the application context.
-
-This function is called after the application context has been torn down. It ensures that any teardown functions are executed in a synchronous manner and sends an event to notify other parts of the application that the context is being torn down.
-
-Args:
-    exc (BaseException | None): The exception that caused the tear down, or None if no exception was raised.
-        Defaults to `_sentinel` which will be replaced with the actual exception if present.
-
-Returns:
-    None
-"""
-        """
-Returns an instance of `AppContext` initialized with the current object.
-
-Args:
-    None
-
-Returns:
-    AppContext: An instance of `AppContext` initialized with the current object.
-"""
-        """
-Returns a new instance of RequestContext with the given environment.
-
-Args:
-    environ (dict): The current HTTP environment.
-
-Returns:
-    RequestContext: A new instance of RequestContext.
-"""
-        """
-Tests the creation of a request context using an `EnvironBuilder`.
-
-This function creates an instance of `EnvironBuilder` with the provided arguments,
-uses it to create an environment, and then attempts to create a request context
-using that environment. The `finally` block ensures the `EnvironBuilder` is properly
-closed after use.
-
-Args:
-    *args: Variable number of positional arguments to pass to the `EnvironBuilder`.
-    **kwargs: Keyword arguments to pass to the `EnvironBuilder`.
-
-Returns:
-    A `RequestContext` object representing the created request context.
-Raises:
-    Exception: If an error occurs while creating the request context.
-"""
-        """
-WSGI Application Function
-
-This function serves as the entry point for the WSGI application. It takes in an environment dictionary and a start response callable, 
-and returns any response object generated by the application.
-
-The function first creates a request context using `self.request_context(environ)`. It then attempts to execute the full dispatch of the request,
-handling any exceptions that may occur during this process. If an exception is caught, it will be handled and propagated up the call stack.
-Finally, the response object is returned to the caller.
-
-Note: This function should not be called directly by users of the application. Instead, it should be used as part of a larger WSGI server or framework.
-"""
-        """
-    Calls the WSGI application with the provided environment and response callback.
-
-    Args:
-        environ (dict): The HTTP request environment.
-        start_response (t.Callable): A callable that takes a status code and headers as arguments.
-
-    Returns:
-        t.Any: The result of calling the WSGI application.
-
-    Note:
-        This method is part of the WSGI protocol and is used to call the WSGI application with the provided environment and response callback.
-"""

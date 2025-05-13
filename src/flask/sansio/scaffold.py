@@ -397,34 +397,6 @@ Returns:
 
         self._static_url_path = value
 
-        """
-Returns the maximum age in seconds for sending files.
-
-If `filename` is provided, it will be used to retrieve the default send file max age from the application configuration.
-Otherwise, the default value will be returned.
-
-Args:
-    filename (str | None): The name of the file to use for retrieving the default send file max age. Defaults to None.
-
-Returns:
-    int | None: The maximum age in seconds for sending files, or None if no default is set.
-"""
-        """
-Sends a static file from the configured static folder.
-
-This method is used to serve static files. It checks if the `static_folder` attribute has been set and raises a RuntimeError if not.
-It then calls `get_send_file_max_age` to determine the maximum age for the file, which is necessary for blueprints to work correctly.
-Finally, it uses `send_from_directory` to send the file from the static folder.
-
-Args:
-    filename (str): The name of the file to be sent.
-
-Returns:
-    Response: A response object containing the sent file.
-
-Raises:
-    RuntimeError: If 'static_folder' is not set.
-"""
     @cached_property
     def jinja_loader(self) -> FileSystemLoader | None:
         """
@@ -438,19 +410,6 @@ Returns:
             return FileSystemLoader(os.path.join(self.root_path, self.template_folder))
         else:
             return None
-        """
-Opens a resource file.
-
-Args:
-    resource (str): The path to the resource file.
-    mode (str, optional): The mode in which to open the file. Defaults to "rb". Supported modes are "r", "rt", and "rb".
-
-Returns:
-    t.IO[t.AnyStr]: A file object opened in the specified mode.
-
-Raises:
-    ValueError: If an unsupported mode is provided.
-"""
 
     def _method_route(
         self,
@@ -628,7 +587,6 @@ Args:
 Returns:
     F: The decorated view function.
 """
-            
             self.view_functions[endpoint] = f
             return f
 
