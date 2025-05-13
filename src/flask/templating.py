@@ -19,9 +19,6 @@ if t.TYPE_CHECKING:  # pragma: no cover
 
 
 def _default_template_ctx_processor() -> t.Dict[str, t.Any]:
-    """Default template context processor.  Injects `request`,
-    `session` and `g`.
-    """
     appctx = _cv_app.get(None)
     reqctx = _cv_request.get(None)
     rv: t.Dict[str, t.Any] = {}
@@ -140,24 +137,12 @@ def render_template(
     template_name_or_list: t.Union[str, Template, t.List[t.Union[str, Template]]],
     **context: t.Any,
 ) -> str:
-    """Render a template by name with the given context.
-
-    :param template_name_or_list: The name of the template to render. If
-        a list is given, the first name to exist will be rendered.
-    :param context: The variables to make available in the template.
-    """
     app = current_app._get_current_object()  # type: ignore[attr-defined]
     template = app.jinja_env.get_or_select_template(template_name_or_list)
     return _render(app, template, context)
 
 
 def render_template_string(source: str, **context: t.Any) -> str:
-    """Render a template from the given source string with the given
-    context.
-
-    :param source: The source code of the template to render.
-    :param context: The variables to make available in the template.
-    """
     app = current_app._get_current_object()  # type: ignore[attr-defined]
     template = app.jinja_env.from_string(source)
     return _render(app, template, context)
@@ -190,31 +175,13 @@ def stream_template(
     template_name_or_list: t.Union[str, Template, t.List[t.Union[str, Template]]],
     **context: t.Any,
 ) -> t.Iterator[str]:
-    """Render a template by name with the given context as a stream.
-    This returns an iterator of strings, which can be used as a
-    streaming response from a view.
-
-    :param template_name_or_list: The name of the template to render. If
-        a list is given, the first name to exist will be rendered.
-    :param context: The variables to make available in the template.
-
-    .. versionadded:: 2.2
-    """
     app = current_app._get_current_object()  # type: ignore[attr-defined]
     template = app.jinja_env.get_or_select_template(template_name_or_list)
     return _stream(app, template, context)
 
 
 def stream_template_string(source: str, **context: t.Any) -> t.Iterator[str]:
-    """Render a template from the given source string with the given
-    context as a stream. This returns an iterator of strings, which can
-    be used as a streaming response from a view.
-
-    :param source: The source code of the template to render.
-    :param context: The variables to make available in the template.
-
-    .. versionadded:: 2.2
-    """
     app = current_app._get_current_object()  # type: ignore[attr-defined]
     template = app.jinja_env.from_string(source)
     return _stream(app, template, context)
+
