@@ -30,9 +30,6 @@ class NoAppException(click.UsageError):
 
 
 def find_best_app(module):
-    """Given a module instance this tries to find the best possible
-    application in the module or raises an exception.
-    """
     from . import Flask
 
     # Search for the most common names first.
@@ -83,13 +80,6 @@ def find_best_app(module):
 
 
 def _called_with_wrong_args(f):
-    """Check whether calling a function raised a ``TypeError`` because
-    the call failed or because something in the factory raised the
-    error.
-
-    :param f: The function that was called.
-    :return: ``True`` if the call failed.
-    """
     tb = sys.exc_info()[2]
 
     try:
@@ -109,9 +99,6 @@ def _called_with_wrong_args(f):
 
 
 def find_app_by_string(module, app_name):
-    """Check if the given string is a variable name or a function. Call
-    a function to get the app instance, or return the variable directly.
-    """
     from . import Flask
 
     # Parse app_name as a single expression to determine if it's a valid
@@ -185,9 +172,6 @@ def find_app_by_string(module, app_name):
 
 
 def prepare_import(path):
-    """Given a filename this will try to calculate the python path, add it
-    to the search path and return the actual module name that is expected.
-    """
     path = os.path.realpath(path)
 
     fname, ext = os.path.splitext(path)
@@ -290,10 +274,6 @@ class ScriptInfo:
         self._loaded_app: Flask | None = None
 
     def load_app(self) -> Flask:
-        """Loads the Flask app (if not yet loaded) and returns it.  Calling
-        this multiple times will just result in the already loaded app to
-        be returned.
-        """
         if self._loaded_app is not None:
             return self._loaded_app
 
@@ -335,18 +315,6 @@ pass_script_info = click.make_pass_decorator(ScriptInfo, ensure=True)
 
 
 def with_appcontext(f):
-    """Wraps a callback so that it's guaranteed to be executed with the
-    script's application context.
-
-    Custom commands (and their options) registered under ``app.cli`` or
-    ``blueprint.cli`` will always have an app context available, this
-    decorator is not required in that case.
-
-    .. versionchanged:: 2.2
-        The app context is active for subcommands as well as the
-        decorated callback. The app context is always available to
-        ``app.cli`` command and parameter callbacks.
-    """
 
     @click.pass_context
     def decorator(__ctx, *args, **kwargs):
@@ -368,10 +336,6 @@ class AppGroup(click.Group):
     """
 
     def command(self, *args, **kwargs):
-        """This works exactly like the method of the same name on a regular
-        :class:`click.Group` but it wraps callbacks in :func:`with_appcontext`
-        unless it's disabled by passing ``with_appcontext=False``.
-        """
         wrap_for_ctx = kwargs.pop("with_appcontext", True)
 
         def decorator(f):
@@ -382,10 +346,6 @@ class AppGroup(click.Group):
         return decorator
 
     def group(self, *args, **kwargs):
-        """This works exactly like the method of the same name on a regular
-        :class:`click.Group` but it defaults the group class to
-        :class:`AppGroup`.
-        """
         kwargs.setdefault("cls", AppGroup)
         return click.Group.group(self, *args, **kwargs)
 
@@ -645,38 +605,10 @@ class FlaskGroup(AppGroup):
 
 
 def _path_is_ancestor(path, other):
-    """Take ``other`` and remove the length of ``path`` from it. Then join it
-    to ``path``. If it is the original value, ``path`` is an ancestor of
-    ``other``."""
     return os.path.join(path, other[len(path) :].lstrip(os.sep)) == other
 
 
 def load_dotenv(path: str | os.PathLike | None = None) -> bool:
-    """Load "dotenv" files in order of precedence to set environment variables.
-
-    If an env var is already set it is not overwritten, so earlier files in the
-    list are preferred over later files.
-
-    This is a no-op if `python-dotenv`_ is not installed.
-
-    .. _python-dotenv: https://github.com/theskumar/python-dotenv#readme
-
-    :param path: Load the file at this location instead of searching.
-    :return: ``True`` if a file was loaded.
-
-    .. versionchanged:: 2.0
-        The current directory is not changed to the location of the
-        loaded file.
-
-    .. versionchanged:: 2.0
-        When loading the env files, set the default encoding to UTF-8.
-
-    .. versionchanged:: 1.1.0
-        Returns ``False`` when python-dotenv is not installed, or when
-        the given path isn't a file.
-
-    .. versionadded:: 1.0
-    """
     try:
         import dotenv
     except ImportError:
@@ -713,9 +645,6 @@ def load_dotenv(path: str | os.PathLike | None = None) -> bool:
 
 
 def show_server_banner(debug, app_import_path):
-    """Show extra startup messages the first time the server is run,
-    ignoring the reloader.
-    """
     if is_running_from_reloader():
         return
 
@@ -773,9 +702,6 @@ class CertParamType(click.ParamType):
 
 
 def _validate_key(ctx, param, value):
-    """The ``--key`` option must be specified when ``--cert`` is a file.
-    Modifies the ``cert`` param to be a ``(cert, key)`` pair if needed.
-    """
     cert = ctx.params.get("cert")
     is_adhoc = cert == "adhoc"
 
@@ -885,14 +811,6 @@ def run_command(
     extra_files,
     exclude_patterns,
 ):
-    """Run a local development server.
-
-    This server is for development purposes only. It does not provide
-    the stability, security, or performance of production WSGI servers.
-
-    The reloader and debugger are enabled by default with the '--debug'
-    option.
-    """
     try:
         app = info.load_app()
     except Exception as e:
@@ -939,13 +857,6 @@ run_command.params.insert(0, _debug_option)
 @click.command("shell", short_help="Run a shell in the app context.")
 @with_appcontext
 def shell_command() -> None:
-    """Run an interactive Python shell in the context of a given
-    Flask application.  The application will populate the default
-    namespace of this shell according to its configuration.
-
-    This is useful for executing small snippets of management code
-    without having to manually configure the application.
-    """
     import code
 
     banner = (
@@ -999,7 +910,6 @@ def shell_command() -> None:
 @click.option("--all-methods", is_flag=True, help="Show HEAD and OPTIONS methods.")
 @with_appcontext
 def routes_command(sort: str, all_methods: bool) -> None:
-    """Show all registered routes with endpoints and methods."""
     rules = list(current_app.url_map.iter_rules())
 
     if not rules:
@@ -1065,3 +975,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
