@@ -91,6 +91,18 @@ class BlueprintSetupState:
         view_func: t.Callable | None = None,
         **options: t.Any,
     ) -> None:
+        """
+Adds a URL rule to the application.
+
+Parameters:
+    rule (str): The URL pattern.
+    endpoint (str | None, optional): The endpoint name. Defaults to None.
+    view_func (t.Callable | None, optional): The view function. Defaults to None.
+    **options (t.Any): Additional options for the URL rule.
+
+Returns:
+    None
+"""
         if self.url_prefix is not None:
             if rule:
                 rule = "/".join((self.url_prefix.rstrip("/"), rule.lstrip("/")))
@@ -180,6 +192,36 @@ class Blueprint(Scaffold):
         root_path: str | None = None,
         cli_group: str | None = _sentinel,  # type: ignore
     ):
+        """
+Initialize a Flask Blueprint.
+
+This function initializes a new Flask Blueprint with the given parameters. It sets up the blueprint's metadata and configuration options.
+
+Parameters:
+    name (str): The name of the blueprint.
+    import_name (str): The import name of the blueprint.
+    static_folder (str | os.PathLike | None, optional): The folder containing static files. Defaults to None.
+    static_url_path (str | None, optional): The URL path for static files. Defaults to None.
+    template_folder (str | os.PathLike | None, optional): The folder containing templates. Defaults to None.
+    url_prefix (str | None, optional): The prefix for URLs. Defaults to None.
+    subdomain (str | None, optional): The subdomain for the blueprint. Defaults to None.
+    url_defaults (dict | None, optional): Default values for URL parameters. Defaults to None.
+    root_path (str | None, optional): The root path of the blueprint. Defaults to None.
+    cli_group (str | None, optional): The CLI group for the blueprint. Defaults to _sentinel.
+
+Raises:
+    ValueError: If 'name' is empty or contains a dot '.' character.
+
+Attributes:
+    name (str): The name of the blueprint.
+    url_prefix (str): The prefix for URLs.
+    subdomain (str): The subdomain for the blueprint.
+    deferred_functions (list[DeferredSetupFunction]): A list of deferred setup functions.
+    url_values_defaults (dict): Default values for URL parameters.
+    cli_group (str): The CLI group for the blueprint.
+    _blueprints (list[tuple[Blueprint, dict]]): A list of blueprints and their configurations.
+
+"""
         super().__init__(
             import_name=import_name,
             static_folder=static_folder,
@@ -207,6 +249,20 @@ class Blueprint(Scaffold):
         self._blueprints: list[tuple[Blueprint, dict]] = []
 
     def _check_setup_finished(self, f_name: str) -> None:
+        """
+Raises an AssertionError if the setup method has already been registered.
+
+If the setup method has been called at least once, this function will raise
+an AssertionError with a message indicating that further calls to the setup
+method will not be applied consistently. This is intended to prevent changes
+to imports, decorators, functions, etc. from being made after registration.
+
+Args:
+    f_name (str): The name of the setup method that was called.
+
+Raises:
+    AssertionError: If the setup method has already been registered.
+"""
         if self._got_registered_once:
             raise AssertionError(
                 f"The setup method '{f_name}' can no longer be called on the blueprint"
@@ -223,7 +279,30 @@ class Blueprint(Scaffold):
     @setupmethod
     def record_once(self, func: t.Callable) -> None:
 
-        def wrapper(state: BlueprintSetupState) -> None:
+       """
+Records a function to be executed once during the first registration of a blueprint.
+
+This method is used to register a function that should only be executed during the initial setup of a blueprint.
+The function will be called when the blueprint's first registration occurs.
+
+Args:
+    func (t.Callable): The function to be recorded and executed.
+
+Returns:
+    None
+"""
+         def wrapper(state: BlueprintSetupState) -> None:
+            """
+Wrapper function to handle first registration of users.
+
+This function checks if the user has registered for the first time and calls the `func` function with the provided `state` object if so.
+
+Args:
+    state (BlueprintSetupState): The current state of the application setup.
+
+Returns:
+    None
+"""
             if state.first_registration:
                 func(state)
 
@@ -232,10 +311,37 @@ class Blueprint(Scaffold):
     def make_setup_state(
         self, app: Flask, options: dict, first_registration: bool = False
     ) -> BlueprintSetupState:
+        """
+Creates a new setup state for the given application.
+
+Args:
+    - `app`: The Flask application instance.
+    - `options`: A dictionary of configuration options.
+    - `first_registration` (optional): Whether this is the first registration. Defaults to False.
+
+Returns:
+    A BlueprintSetupState object representing the created setup state.
+
+Raises:
+    None
+"""
         return BlueprintSetupState(self, app, options, first_registration)
 
     @setupmethod
     def register_blueprint(self, blueprint: Blueprint, **options: t.Any) -> None:
+        """
+Registers a blueprint with the current instance.
+
+Args:
+    - blueprint (Blueprint): The blueprint to be registered.
+    - **options (t.Any): Optional keyword arguments for the blueprint registration.
+
+Raises:
+    ValueError: If the provided blueprint is the same as the current instance.
+
+Returns:
+    None
+"""
         if blueprint is self:
             raise ValueError("Cannot register a blueprint on itself")
         self._blueprints.append((blueprint, options))
@@ -273,6 +379,20 @@ class Blueprint(Scaffold):
         if first_bp_registration or first_name_registration:
 
             def extend(bp_dict, parent_dict):
+                """
+Extends a dictionary with another dictionary's values.
+
+This function takes two dictionaries as input: `bp_dict` and `parent_dict`. It iterates over the items in `bp_dict`, 
+constructs new keys by appending the current key to the parent dictionary's name if it exists, and extends the 
+values of the corresponding item in `parent_dict`.
+
+Args:
+    bp_dict (dict): The dictionary containing values to be extended.
+    parent_dict (dict): The dictionary whose values will be extended.
+
+Returns:
+    None
+"""
                 for key, values in bp_dict.items():
                     key = name if key is None else f"{name}.{key}"
                     parent_dict[key].extend(values)
@@ -357,6 +477,22 @@ class Blueprint(Scaffold):
         provide_automatic_options: bool | None = None,
         **options: t.Any,
     ) -> None:
+        """
+Adds a URL rule to the application.
+
+This method is used to register a new route for the application. It takes in several parameters:
+
+- `rule`: The path of the URL rule.
+- `endpoint`: The name of the endpoint associated with this URL rule (optional).
+- `view_func`: The view function that will handle requests to this URL rule (optional).
+- `provide_automatic_options`: A boolean indicating whether to provide automatic options for this URL rule (optional).
+- `**options`: Any additional keyword arguments to pass to the `add_url_rule` method of the view function.
+
+If either the `endpoint` or `view_func.__name__` contains a dot ('.'), a ValueError is raised. The `record` method is then called with a closure that adds this URL rule to the application.
+
+Returns:
+    None
+"""
         if endpoint and "." in endpoint:
             raise ValueError("'endpoint' may not contain a dot '.' character.")
 
@@ -389,7 +525,28 @@ class Blueprint(Scaffold):
         self, f: ft.TemplateFilterCallable, name: str | None = None
     ) -> None:
 
-        def register_template(state: BlueprintSetupState) -> None:
+       """
+Adds a template filter to the application's Jinja environment.
+
+This function registers a new template filter with the given name, which can be used in templates to perform custom operations. If no name is provided, the filter will be registered under its original name (i.e., the name of the `f` function).
+
+Args:
+    f: A callable that implements the template filter functionality.
+    name: The name under which the filter should be registered (optional). Defaults to None.
+
+Returns:
+    None
+"""
+         def register_template(state: BlueprintSetupState) -> None:
+            """
+Registers a Jinja2 filter with the given application state.
+
+Args:
+    state (BlueprintSetupState): The application state to modify.
+
+Returns:
+    None
+"""
             state.app.jinja_env.filters[name or f.__name__] = f
 
         self.record_once(register_template)
@@ -399,7 +556,32 @@ class Blueprint(Scaffold):
         self, name: str | None = None
     ) -> t.Callable[[T_template_test], T_template_test]:
 
-        def decorator(f: T_template_test) -> T_template_test:
+       """
+Decorates a function with the `app_template_test` metadata.
+
+This decorator adds an application template test to the decorated function.
+It takes an optional `name` parameter to specify the test name.
+
+Args:
+    f (Callable): The function to be decorated.
+    name (str, optional): The name of the test. Defaults to None.
+
+Returns:
+    Callable: The decorated function with added metadata.
+"""
+         def decorator(f: T_template_test) -> T_template_test:
+            """
+Decorates a test function with an application template test.
+
+This function takes a test function `f` as input and adds it to the list of 
+application template tests. The decorated function is then returned.
+
+Args:
+    f (T_template_test): The test function to be decorated.
+
+Returns:
+    T_template_test: The decorated test function.
+"""
             self.add_app_template_test(f, name=name)
             return f
 
@@ -410,7 +592,28 @@ class Blueprint(Scaffold):
         self, f: ft.TemplateTestCallable, name: str | None = None
     ) -> None:
 
-        def register_template(state: BlueprintSetupState) -> None:
+       """
+Adds a template test to the application's Jinja environment.
+
+This function registers a template test with the given name (defaulting to the test function's name if not provided).
+
+Args:
+    f (ft.TemplateTestCallable): The test function to register.
+    name (str | None, optional): The name of the test. Defaults to None.
+
+Returns:
+    None
+"""
+         def register_template(state: BlueprintSetupState) -> None:
+            """
+Registers a Jinja template test in the application's setup state.
+
+Args:
+    state (BlueprintSetupState): The current state of the application's setup.
+
+Returns:
+    None
+"""
             state.app.jinja_env.tests[name or f.__name__] = f
 
         self.record_once(register_template)
@@ -420,7 +623,28 @@ class Blueprint(Scaffold):
         self, name: str | None = None
     ) -> t.Callable[[T_template_global], T_template_global]:
 
-        def decorator(f: T_template_global) -> T_template_global:
+       """
+Decorates a function to make it available as an application template global.
+
+This decorator adds the decorated function to the list of application template globals.
+It is typically used in conjunction with the `add_app_template_global` method.
+
+Args:
+    name (str | None): The name under which the decorated function should be added. If None, no name will be specified.
+
+Returns:
+    T_template_global: A decorator function that adds the decorated function to the list of application template globals.
+"""
+         def decorator(f: T_template_global) -> T_template_global:
+            """
+Decorates a function to add it as an app template global.
+
+Args:
+    f (T_template_global): The function to be decorated.
+
+Returns:
+    T_template_global: The decorated function.
+"""
             self.add_app_template_global(f, name=name)
             return f
 
@@ -431,13 +655,46 @@ class Blueprint(Scaffold):
         self, f: ft.TemplateGlobalCallable, name: str | None = None
     ) -> None:
 
-        def register_template(state: BlueprintSetupState) -> None:
+       """
+Adds a template global to the application.
+
+This function registers a template global with the given name. If no name is provided, it defaults to the name of the provided callable.
+
+Args:
+    f (ft.TemplateGlobalCallable): The callable to register as a template global.
+    name (str | None, optional): The name of the template global. Defaults to None.
+
+Returns:
+    None
+"""
+         def register_template(state: BlueprintSetupState) -> None:
+            """
+Registers a template as a global variable in the Jinja environment.
+
+Args:
+    state (BlueprintSetupState): The current setup state of the application.
+    
+Returns:
+    None
+    
+Raises:
+    TypeError: If `state` is not an instance of BlueprintSetupState.
+"""
             state.app.jinja_env.globals[name or f.__name__] = f
 
         self.record_once(register_template)
 
     @setupmethod
     def before_app_request(self, f: T_before_request) -> T_before_request:
+        """
+Records a function to be executed before the application request.
+
+Args:
+    f (T_before_request): The function to be recorded.
+
+Returns:
+    T_before_request: The input function with the record added.
+"""
         self.record_once(
             lambda s: s.app.before_request_funcs.setdefault(None, []).append(f)
         )
@@ -445,6 +702,15 @@ class Blueprint(Scaffold):
 
     @setupmethod
     def after_app_request(self, f: T_after_request) -> T_after_request:
+        """
+Records a function as an 'after-app-request' hook.
+
+Args:
+    f (T_after_request): The function to be recorded.
+
+Returns:
+    T_after_request: The input function.
+"""
         self.record_once(
             lambda s: s.app.after_request_funcs.setdefault(None, []).append(f)
         )
@@ -452,6 +718,15 @@ class Blueprint(Scaffold):
 
     @setupmethod
     def teardown_app_request(self, f: T_teardown) -> T_teardown:
+        """
+Records a teardown request function for the current application context.
+
+Args:
+    f (T_teardown): The teardown request function to be recorded.
+
+Returns:
+    T_teardown: The original teardown request function.
+"""
         self.record_once(
             lambda s: s.app.teardown_request_funcs.setdefault(None, []).append(f)
         )
@@ -461,6 +736,18 @@ class Blueprint(Scaffold):
     def app_context_processor(
         self, f: T_template_context_processor
     ) -> T_template_context_processor:
+        """
+Processes the template context for an application.
+
+This function is used to add a new template context processor to the existing list.
+It ensures that the processor is added only once by using the `record_once` method.
+
+Args:
+    f (T_template_context_processor): The template context processor to be added.
+
+Returns:
+    T_template_context_processor: The original template context processor, which has been modified in-place.
+"""
         self.record_once(
             lambda s: s.app.template_context_processors.setdefault(None, []).append(f)
         )
@@ -471,7 +758,42 @@ class Blueprint(Scaffold):
         self, code: type[Exception] | int
     ) -> t.Callable[[T_error_handler], T_error_handler]:
 
-        def decorator(f: T_error_handler) -> T_error_handler:
+       """
+App Error Handler Decorator.
+
+This function returns a decorator that can be used to handle application errors.
+The decorator takes an error handling function as input and wraps it with the provided app error handler.
+
+Args:
+    code (type[Exception] | int): The type of exception or error code to use for error handling.
+    f (T_error_handler): The error handling function to wrap.
+
+Returns:
+    T_error_handler: The wrapped error handling function.
+
+Example:
+    @app_errorhandler(404)
+    def handle_404(f):
+        # Handle 404 errors
+        pass
+
+    @app_errorhandler(Exception)
+    def handle_all_errors(f):
+        # Handle all exceptions
+        pass
+"""
+         def decorator(f: T_error_handler) -> T_error_handler:
+            """
+Decorates a function with error handling.
+
+This decorator records the first occurrence of an exception and uses it to update the application's error handler.
+
+Args:
+    f (function): The function to be decorated.
+
+Returns:
+    function: The decorated function.
+"""
             self.record_once(lambda s: s.app.errorhandler(code)(f))
             return f
 
@@ -481,6 +803,15 @@ class Blueprint(Scaffold):
     def app_url_value_preprocessor(
         self, f: T_url_value_preprocessor
     ) -> T_url_value_preprocessor:
+        """
+Preprocesses the given URL value preprocessor and records it in the application's internal state.
+
+Args:
+    f (T_url_value_preprocessor): The URL value preprocessor to be recorded.
+
+Returns:
+    T_url_value_preprocessor: The original preprocessor, which has been marked as recorded.
+"""
         self.record_once(
             lambda s: s.app.url_value_preprocessors.setdefault(None, []).append(f)
         )
@@ -488,6 +819,15 @@ class Blueprint(Scaffold):
 
     @setupmethod
     def app_url_defaults(self, f: T_url_defaults) -> T_url_defaults:
+        """
+Returns a URL default function and records it in the `url_default_functions` set.
+
+Args:
+    f (T_url_defaults): The URL default function to be returned.
+
+Returns:
+    T_url_defaults: The provided URL default function.
+"""
         self.record_once(
             lambda s: s.app.url_default_functions.setdefault(None, []).append(f)
         )
