@@ -2286,3 +2286,40 @@ False,"def _find_package_path(import_name):
         ValueError: If the module or package is not found.
     """"""
     # ... (rest of the code remains the same)"
+True,"""""""
+Returns the root path of the given module.
+
+The function first checks if the module has already been imported and
+has a file attribute. If so, it returns the directory of that file.
+If not, it attempts to find the spec of the import using `importlib.util.find_spec`.
+If the spec is found, it uses the loader's get_filename method to get the filepath.
+If the filepath is None, it raises a RuntimeError.
+
+Args:
+    import_name (str): The name of the module to find the root path for.
+
+Returns:
+    str: The root path of the given module.
+
+Raises:
+    ValueError: If the spec is not found.
+    RuntimeError: If no file path can be found for the module.
+"""""""
+False,"""""""
+Find the path to a Python package or module.
+
+This function takes an import name as input and returns the path to the corresponding package or module.
+If the package or module is not found, it raises a ValueError. If the import fails for any reason, it falls back to the current working directory.
+
+Parameters:
+    import_name (str): The name of the package or module to find.
+
+Returns:
+    str: The path to the package or module.
+
+Raises:
+    ValueError: If the package or module is not found.
+""""""
+
+def _find_package_path(import_name):
+    # ... (rest of the code remains the same)"
