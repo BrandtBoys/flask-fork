@@ -575,24 +575,6 @@ Note: This method does not create a new environment instance; it simply delegate
             DeprecationWarning,
             stacklevel=2,
         )
-        """
-Returns an instance of the Logger class.
-
-This method is used to initialize and return a new logger object. The logger object is created using the `create_logger` function, which takes the current object (`self`) as an argument.
-
-Args:
-    self: The current object.
-
-Returns:
-    logging.Logger: An instance of the Logger class.
-"""
-        """
-Returns an instance of Jinja2's Environment class.
-
-This method is a wrapper around `create_jinja_environment` and provides a more Pythonic interface for creating a new Jinja environment. The returned environment can be used to compile templates, render templates with data, and perform other template-related tasks.
-
-Note: This method does not create a new environment instance; it simply delegates the creation to the underlying `create_jinja_environment` method.
-"""
         return self._got_first_request
 
     def make_config(self, instance_relative: bool = False) -> Config:
