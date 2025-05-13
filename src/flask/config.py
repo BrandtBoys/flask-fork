@@ -155,11 +155,12 @@ class Config(dict):
         filename: str,
         load: t.Callable[[t.IO[t.Any]], t.Mapping],
         silent: bool = False,
+        text: bool = True,
     ) -> bool:
         filename = os.path.join(self.root_path, filename)
 
         try:
-            with open(filename) as f:
+            with open(filename, "r" if text else "rb") as f:
                 obj = load(f)
         except OSError as e:
             if silent and e.errno in (errno.ENOENT, errno.EISDIR):
@@ -200,4 +201,3 @@ class Config(dict):
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__} {dict.__repr__(self)}>"
-
