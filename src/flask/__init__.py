@@ -44,6 +44,21 @@ from .wrappers import Response as Response
 
 
 def __getattr__(name: str) -> t.Any:
+    """
+Returns the version of Flask.
+
+This function is deprecated and will be removed in Flask 3.2.
+Instead, use feature detection or 'importlib.metadata.version("flask")'.
+
+Args:
+    name (str): The attribute being accessed.
+
+Returns:
+    t.Any: The version of Flask as a string.
+
+Raises:
+    AttributeError: If the attribute does not exist.
+"""
     if name == "__version__":
         import importlib.metadata
         import warnings
