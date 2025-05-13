@@ -424,6 +424,18 @@ def test_help_echo_exception():
 class TestRoutes:
     @pytest.fixture
     def app(self):
+        """
+Creates a new Flask application instance.
+
+This function initializes a new Flask application, adds two URL rules,
+and returns the configured application instance.
+
+Args:
+    None
+
+Returns:
+    A configured Flask application instance.
+"""
         app = Flask(__name__)
         app.add_url_rule(
             "/get_post/<int:x>/<int:y>",
@@ -471,6 +483,16 @@ class TestRoutes:
         assert "GET, HEAD, OPTIONS, POST" in output
 
     def test_no_routes(self, runner):
+        """
+Tests that invoking the 'routes' command with no routes registered returns a success exit code and an output indicating so.
+
+Args:
+    self (object): The test object.
+    runner (object): The test runner object.
+
+Returns:
+    None
+"""
         app = Flask(__name__, static_folder=None)
         cli = FlaskGroup(create_app=lambda: app)
         result = runner.invoke(cli, ["routes"])
@@ -478,6 +500,19 @@ class TestRoutes:
         assert "No routes were registered." in result.output
 
     def test_subdomain(self, runner):
+        """
+Tests the functionality of the test_subdomain method.
+
+This function tests the creation and invocation of a Flask application with subdomains.
+It creates two routes, "/a" and "/b", each with its own subdomain, and then invokes the `routes` command using the `cli` object.
+The function asserts that the exit code is 0 (indicating success) and that the output contains the string "Subdomain".
+
+Parameters:
+    self: The test case instance.
+
+Returns:
+    None
+"""
         app = Flask(__name__, static_folder=None)
         app.add_url_rule("/a", subdomain="a", endpoint="a")
         app.add_url_rule("/b", subdomain="b", endpoint="b")
@@ -487,6 +522,18 @@ class TestRoutes:
         assert "Subdomain" in result.output
 
     def test_host(self, runner):
+        """
+Tests the functionality of the test_host method.
+
+This function tests the creation and invocation of a Flask application with multiple routes.
+It verifies that the application is created successfully and that the 'routes' command can be invoked without errors.
+
+Parameters:
+self (object): The instance of the class being tested.
+
+Returns:
+None
+"""
         app = Flask(__name__, static_folder=None, host_matching=True)
         app.add_url_rule("/a", host="a", endpoint="a")
         app.add_url_rule("/b", host="b", endpoint="b")

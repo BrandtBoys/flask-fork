@@ -1,0 +1,61 @@
+Success,Comment
+False,"def routes_command(sort: str, all_methods: bool) -> None:
+    """"""
+    Prints a table of registered routes.
+
+    Args:
+    - sort (str): The column to sort by. Can be 'endpoint', 'methods', or 'domain'.
+    - all_methods (bool): If True, includes methods other than HEAD and OPTIONS in the output.
+        Defaults to False.
+
+    Returns:
+    None
+    """"""
+    # ..."
+True,"""""""
+Creates a new Flask application instance.
+
+This function initializes a new Flask application, adds two URL rules,
+and returns the configured application instance.
+
+Args:
+    None
+
+Returns:
+    A configured Flask application instance.
+"""""""
+True,"""""""
+Tests that invoking the 'routes' command with no routes registered returns a success exit code and an output indicating so.
+
+Args:
+    self (object): The test object.
+    runner (object): The test runner object.
+
+Returns:
+    None
+"""""""
+True,"""""""
+Tests the functionality of the test_subdomain method.
+
+This function tests the creation and invocation of a Flask application with subdomains.
+It creates two routes, ""/a"" and ""/b"", each with its own subdomain, and then invokes the `routes` command using the `cli` object.
+The function asserts that the exit code is 0 (indicating success) and that the output contains the string ""Subdomain"".
+
+Parameters:
+    self: The test case instance.
+
+Returns:
+    None
+"""""""
+True,"""""""
+Tests the functionality of the test_host method.
+
+This function tests the creation and invocation of a Flask application with multiple routes.
+It verifies that the application is created successfully and that the 'routes' command can be invoked without errors.
+
+Parameters:
+self (object): The instance of the class being tested.
+
+Returns:
+None
+"""""""
