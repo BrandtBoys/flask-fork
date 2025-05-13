@@ -1,6 +1,5 @@
 import hashlib
 import typing as t
-import warnings
 from collections.abc import MutableMapping
 from datetime import datetime
 from datetime import timezone
@@ -9,7 +8,6 @@ from itsdangerous import BadSignature
 from itsdangerous import URLSafeTimedSerializer
 from werkzeug.datastructures import CallbackDict
 
-from .helpers import is_ip
 from .json.tag import TaggedJSONSerializer
 
 if t.TYPE_CHECKING:  # pragma: no cover
@@ -164,54 +162,8 @@ class SessionInterface:
         return app.config["SESSION_COOKIE_NAME"]
 
     def get_cookie_domain(self, app: "Flask") -> t.Optional[str]:
-
         rv = app.config["SESSION_COOKIE_DOMAIN"]
-
-        # set explicitly, or cached from SERVER_NAME detection
-        # if False, return None
-        if rv is not None:
-            return rv if rv else None
-
-        rv = app.config["SERVER_NAME"]
-
-        # server name not set, cache False to return none next time
-        if not rv:
-            app.config["SESSION_COOKIE_DOMAIN"] = False
-            return None
-
-        # chop off the port which is usually not supported by browsers
-        # remove any leading '.' since we'll add that later
-        rv = rv.rsplit(":", 1)[0].lstrip(".")
-
-        if "." not in rv:
-            # Chrome doesn't allow names without a '.'. This should only
-            # come up with localhost. Hack around this by not setting
-            # the name, and show a warning.
-            warnings.warn(
-                f"{rv!r} is not a valid cookie domain, it must contain"
-                " a '.'. Add an entry to your hosts file, for example"
-                f" '{rv}.localdomain', and use that instead."
-            )
-            app.config["SESSION_COOKIE_DOMAIN"] = False
-            return None
-
-        ip = is_ip(rv)
-
-        if ip:
-            warnings.warn(
-                "The session cookie domain is an IP address. This may not work"
-                " as intended in some browsers. Add an entry to your hosts"
-                ' file, for example "localhost.localdomain", and use that'
-                " instead."
-            )
-
-        # if this is not an ip and app is mounted at the root, allow subdomain
-        # matching by adding a '.' prefix
-        if self.get_cookie_path(app) == "/" and not ip:
-            rv = f".{rv}"
-
-        app.config["SESSION_COOKIE_DOMAIN"] = rv
-        return rv
+        return rv if rv else None
 
     def get_cookie_path(self, app: "Flask") -> str:
         return app.config["SESSION_COOKIE_PATH"] or app.config["APPLICATION_ROOT"]
@@ -346,4 +298,3 @@ class SecureCookieSessionInterface(SessionInterface):
             secure=secure,
             samesite=samesite,
         )
-

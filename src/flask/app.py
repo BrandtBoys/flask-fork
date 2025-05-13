@@ -557,38 +557,6 @@ class Flask(Scaffold):
             DeprecationWarning,
             stacklevel=2,
         )
-        """
-Returns an instance of the Logger class.
-
-This method is used to initialize and return a new logger object. The logger object is created using the `create_logger` function, which takes the current object (`self`) as an argument.
-
-Args:
-    self: The current object.
-
-Returns:
-    logging.Logger: An instance of the Logger class.
-"""
-        """
-Returns an instance of Jinja2's Environment class.
-
-This method is a wrapper around `create_jinja_environment` and provides a more Pythonic interface for creating a new Jinja environment. The returned environment can be used to compile templates, render templates with data, and perform other template-related tasks.
-
-Note: This method does not create a new environment instance; it simply delegates the creation to the underlying `create_jinja_environment` method.
-"""
-        """
-Propagates exceptions to the application's context.
-
-This function checks the value of `PROPAGATE_EXCEPTIONS` in the Flask configuration.
-If it exists, its value is returned. Otherwise, the function returns whether the application is running in testing or debug mode.
-
-Deprecation Warning: This method is deprecated and will be removed in Flask 2.3. It's recommended to use a different approach for exception propagation.
-
-Args:
-    None
-
-Returns:
-    bool: Whether exceptions should be propagated to the application's context.
-"""
         return self._got_first_request
 
     def make_config(self, instance_relative: bool = False) -> Config:
