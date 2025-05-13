@@ -484,6 +484,44 @@ def test_session_cookie_setting(app):
 
 
 def test_session_vary_cookie(app, client):
+    """
+Test session vary cookie functionality.
+
+This function tests the behavior of Flask's session object when
+varying headers. It checks that the 'Vary' header is set correctly
+for different routes and scenarios.
+
+Parameters:
+app (Flask application): The Flask application instance.
+client (requests Session): The requests client instance.
+
+Returns:
+None
+
+Tests:
+
+- /set: Tests setting a value in the session and verifying the 'Vary'
+  header is not set.
+- /get: Tests getting a value from the session and verifying the 'Vary'
+  header is not set.
+- /getitem: Tests getting a value from the session using indexing and
+  verifying the 'Vary' header is not set.
+- /setdefault: Tests setting a default value in the session and verifying
+  the 'Vary' header is not set.
+- /clear: Tests clearing the session and verifying the 'Vary' header is
+  not set.
+- /vary-cookie-header-set: Tests varying the 'Cookie' header when setting
+  a value in the session.
+- /vary-header-set: Tests varying multiple headers when setting a value
+  in the session.
+- /no-vary-header: Tests that no 'Vary' header is set for this route.
+
+Note:
+The `expect` function is used to test each route. It sends a GET request
+to the specified path and verifies the 'Vary' header is set correctly.
+If the expected value is not provided, it checks that the 'Vary' header
+is not present at all.
+"""
     @app.route("/set")
     def set_session():
         flask.session["test"] = "test"
@@ -503,6 +541,17 @@ def test_session_vary_cookie(app, client):
 
     @app.route("/clear")
     def clear():
+        """
+Clears the Flask session.
+
+This function uses the `flask.session.clear()` method to remove all items from the current session. It returns an empty string, indicating that no data was cleared.
+
+Args:
+    None
+
+Returns:
+    str: An empty string indicating success
+"""
         flask.session.clear()
         return ""
 
@@ -545,14 +594,55 @@ def test_session_vary_cookie(app, client):
 
 
 def test_session_refresh_vary(app, client):
+    """
+Tests the behavior of session refresh with the Vary header.
+
+This test suite verifies that when a user navigates to a login page and then
+refreshes their session, the server responds with a Vary: Cookie header.
+Additionally, it checks that this behavior is consistent even when navigating
+to an ignored route.
+
+Args:
+    app (Flask application): The Flask application instance.
+    client (TestClient): A TestClient instance for making HTTP requests.
+
+Returns:
+    None
+
+Raises:
+    AssertionError: If the Vary header does not match the expected value.
+"""
     @app.get("/login")
     def login():
+        """
+Login Function.
+
+This function sets the user ID in the session to 1 and makes the session permanent.
+ 
+Parameters:
+None
+ 
+Returns:
+An empty string indicating successful login.
+ 
+Raises:
+None
+ 
+Notes:
+This function is a placeholder for actual authentication logic. It should be replaced with a secure method of verifying user credentials.
+"""
         flask.session["user_id"] = 1
         flask.session.permanent = True
         return ""
 
     @app.get("/ignored")
     def ignored():
+        """
+This function is intentionally left empty and does not perform any meaningful operation. It is intended to be an example of a function that returns an empty string.
+
+Returns:
+    str: An empty string, indicating that no value was returned by this function.
+"""
         return ""
 
     rv = client.get("/login")

@@ -250,6 +250,26 @@ class SecureCookieSessionInterface(SessionInterface):
     def save_session(
         self, app: Flask, session: SessionMixin, response: Response
     ) -> None:
+        """
+Saves a session cookie to the client's browser.
+
+This method sets a session cookie based on the provided `app`, `session`, and `response` objects.
+It determines the necessary cookie attributes (name, domain, path, secure, samesite, httponly) using
+the `get_cookie_name`, `get_cookie_domain`, `get_cookie_path`, `get_cookie_secure`, 
+`get_cookie_samesite`, and `get_cookie_httponly` methods.
+
+If the session was accessed at all, it adds a "Vary: Cookie" header to the response.
+If the session is empty or modified to be empty, it removes the cookie from the response.
+Otherwise, it sets the cookie with the determined attributes and adds a "Vary: Cookie" header.
+
+Parameters:
+app (Flask): The Flask application instance.
+session (SessionMixin): The session object being saved.
+response (Response): The HTTP response object.
+
+Returns:
+None
+"""
         name = self.get_cookie_name(app)
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
