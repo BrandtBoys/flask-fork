@@ -155,12 +155,30 @@ class SessionInterface:
     pickle_based = False
 
     def make_null_session(self, app: "Flask") -> NullSession:
+        """
+Creates and returns a null session instance for the given Flask application.
+
+Args:
+    app (Flask): The Flask application instance.
+
+Returns:
+    NullSession: A null session instance.
+"""
         return self.null_session_class()
 
     def is_null_session(self, obj: object) -> bool:
         return isinstance(obj, self.null_session_class)
 
     def get_cookie_name(self, app: "Flask") -> str:
+        """
+Returns the name of the cookie used to store session data in a Flask application.
+
+Args:
+    app (Flask): The Flask application instance.
+
+Returns:
+    str: The name of the session cookie.
+"""
         return app.config["SESSION_COOKIE_NAME"]
 
     def get_cookie_domain(self, app: "Flask") -> t.Optional[str]:
@@ -214,20 +232,78 @@ class SessionInterface:
         return rv
 
     def get_cookie_path(self, app: "Flask") -> str:
+        """
+Returns the path of the cookie used by a Flask application.
+
+If 'SESSION_COOKIE_PATH' is set in the application's configuration,
+its value will be returned. Otherwise, the value of
+'APPLICATION_ROOT' will be used as a fallback.
+
+Args:
+    app (Flask): The Flask application instance.
+
+Returns:
+    str: The path of the cookie.
+"""
         return app.config["SESSION_COOKIE_PATH"] or app.config["APPLICATION_ROOT"]
 
     def get_cookie_httponly(self, app: "Flask") -> bool:
+        """
+Returns whether the session cookie is set to be HTTP-only in the given Flask application.
+
+Args:
+    app (Flask): The Flask application instance.
+
+Returns:
+    bool: True if the session cookie is HTTP-only, False otherwise.
+"""
         return app.config["SESSION_COOKIE_HTTPONLY"]
 
     def get_cookie_secure(self, app: "Flask") -> bool:
+        """
+Returns whether the session cookie is secure.
+
+This method checks if the `SESSION_COOKIE_SECURE` configuration variable
+is set to True in the Flask application's configuration. If it is, the
+session cookie will be transmitted over a secure protocol (HTTPS).
+
+Args:
+    app: The Flask application instance.
+
+Returns:
+    bool: Whether the session cookie is secure.
+"""
         return app.config["SESSION_COOKIE_SECURE"]
 
     def get_cookie_samesite(self, app: "Flask") -> str:
+        """
+Returns the value of the `SESSION_COOKIE_SAMESITE` configuration option from the provided Flask application.
+
+Args:
+    app (Flask): The Flask application instance.
+
+Returns:
+    str: The value of the `SESSION_COOKIE_SAMESITE` configuration option.
+"""
         return app.config["SESSION_COOKIE_SAMESITE"]
 
     def get_expiration_time(
         self, app: "Flask", session: SessionMixin
     ) -> t.Optional[datetime]:
+        """
+Returns the expiration time of a Flask session.
+
+If the session is permanent, returns the current UTC time plus the permanent session lifetime.
+Otherwise, returns None.
+
+Args:
+    self: The instance of the class that this method belongs to (not used in this implementation).
+    app: A Flask application object.
+    session: A SessionMixin object representing the session.
+
+Returns:
+    datetime: The expiration time of the session, or None if the session is not permanent.
+"""
         if session.permanent:
             return datetime.now(timezone.utc) + app.permanent_session_lifetime
         return None
@@ -241,11 +317,42 @@ class SessionInterface:
     def open_session(
         self, app: "Flask", request: "Request"
     ) -> t.Optional[SessionMixin]:
+        """
+Opens a new session for the given Flask application and request.
+
+Args:
+    - `app`: The Flask application instance.
+    - `request`: The HTTP request object.
+
+Returns:
+    An optional SessionMixin object, indicating whether a session was successfully opened. If not implemented by subclasses, raises NotImplementedError.
+
+Raises:
+    NotImplementedError: If the method is not implemented by subclasses.
+"""
         raise NotImplementedError()
 
     def save_session(
         self, app: "Flask", session: SessionMixin, response: "Response"
     ) -> None:
+        """
+Saves a session.
+
+This method is intended to be overridden by subclasses. It takes in the Flask application,
+the session object, and the response object as parameters. The implementation of this
+method should be provided by the subclass.
+
+Parameters:
+app (Flask): The Flask application instance.
+session (SessionMixin): The session object.
+response (Response): The response object.
+
+Returns:
+None
+
+Raises:
+NotImplementedError: This method is intended to be overridden and should not be called directly.
+"""
         raise NotImplementedError()
 
 
@@ -274,6 +381,19 @@ class SecureCookieSessionInterface(SessionInterface):
     def get_signing_serializer(
         self, app: "Flask"
     ) -> t.Optional[URLSafeTimedSerializer]:
+        """
+Returns a signing serializer for the provided Flask application.
+
+If the application's secret key is not set, returns None. Otherwise, creates a
+URLSafeTimedSerializer instance with the secret key and additional configuration
+from the application's settings.
+
+Args:
+    app (Flask): The Flask application to generate the serializer for.
+Returns:
+    URLSafeTimedSerializer: The generated signing serializer, or None if the
+        application's secret key is not set.
+"""
         if not app.secret_key:
             return None
         signer_kwargs = dict(
@@ -289,6 +409,16 @@ class SecureCookieSessionInterface(SessionInterface):
     def open_session(
         self, app: "Flask", request: "Request"
     ) -> t.Optional[SecureCookieSession]:
+        """
+Opens a new session for the given Flask application and request.
+
+Args:
+    app (Flask): The Flask application instance.
+    request (Request): The HTTP request object.
+
+Returns:
+    t.Optional[SecureCookieSession]: The opened session, or None if creation fails.
+"""
         s = self.get_signing_serializer(app)
         if s is None:
             return None
@@ -313,10 +443,6 @@ It determines the necessary cookie attributes (name, domain, path, secure, sames
 the `get_cookie_name`, `get_cookie_domain`, `get_cookie_path`, `get_cookie_secure`, 
 `get_cookie_samesite`, and `get_cookie_httponly` methods.
 
-If the session was accessed at all, it adds a "Vary: Cookie" header to the response.
-If the session is empty or modified to be empty, it removes the cookie from the response.
-Otherwise, it sets the cookie with the determined attributes and adds a "Vary: Cookie" header.
-
 Parameters:
 app (Flask): The Flask application instance.
 session (SessionMixin): The session object being saved.
@@ -325,6 +451,7 @@ response (Response): The HTTP response object.
 Returns:
 None
 """
+        
         name = self.get_cookie_name(app)
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
