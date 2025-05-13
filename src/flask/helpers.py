@@ -25,35 +25,9 @@ if t.TYPE_CHECKING:  # pragma: no cover
     import typing_extensions as te
 
 
-def get_env() -> str:
-    import warnings
-
-    warnings.warn(
-        "'FLASK_ENV' and 'get_env' are deprecated and will be removed"
-        " in Flask 2.3. Use 'FLASK_DEBUG' instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return os.environ.get("FLASK_ENV") or "production"
-
-
 def get_debug_flag() -> bool:
     val = os.environ.get("FLASK_DEBUG")
-
-    if not val:
-        env = os.environ.get("FLASK_ENV")
-
-        if env is not None:
-            print(
-                "'FLASK_ENV' is deprecated and will not be used in"
-                " Flask 2.3. Use 'FLASK_DEBUG' instead.",
-                file=sys.stderr,
-            )
-            return env == "development"
-
-        return False
-
-    return val.lower() not in {"0", "false", "no"}
+    return bool(val and val.lower() not in {"0", "false", "no"})
 
 
 def get_load_dotenv(default: bool = True) -> bool:
@@ -337,4 +311,3 @@ def _split_blueprint_path(name: str) -> t.List[str]:
         out.extend(_split_blueprint_path(name.rpartition(".")[0]))
 
     return out
-

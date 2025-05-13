@@ -1,4 +1,3 @@
-import json
 import os
 import typing as t
 from collections import defaultdict
@@ -15,9 +14,6 @@ if t.TYPE_CHECKING:  # pragma: no cover
 
 DeferredSetupFunction = t.Callable[["BlueprintSetupState"], t.Callable]
 T_after_request = t.TypeVar("T_after_request", bound=ft.AfterRequestCallable)
-T_before_first_request = t.TypeVar(
-    "T_before_first_request", bound=ft.BeforeFirstRequestCallable
-)
 T_before_request = t.TypeVar("T_before_request", bound=ft.BeforeRequestCallable)
 T_error_handler = t.TypeVar("T_error_handler", bound=ft.ErrorHandlerCallable)
 T_teardown = t.TypeVar("T_teardown", bound=ft.TeardownCallable)
@@ -168,61 +164,6 @@ class Blueprint(Scaffold):
     """
 
     _got_registered_once = False
-
-    _json_encoder: t.Union[t.Type[json.JSONEncoder], None] = None
-    _json_decoder: t.Union[t.Type[json.JSONDecoder], None] = None
-
-    @property
-    def json_encoder(
-        self,
-    ) -> t.Union[t.Type[json.JSONEncoder], None]:
-        import warnings
-
-        warnings.warn(
-            "'bp.json_encoder' is deprecated and will be removed in Flask 2.3."
-            " Customize 'app.json_provider_class' or 'app.json' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self._json_encoder
-
-    @json_encoder.setter
-    def json_encoder(self, value: t.Union[t.Type[json.JSONEncoder], None]) -> None:
-        import warnings
-
-        warnings.warn(
-            "'bp.json_encoder' is deprecated and will be removed in Flask 2.3."
-            " Customize 'app.json_provider_class' or 'app.json' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        self._json_encoder = value
-
-    @property
-    def json_decoder(
-        self,
-    ) -> t.Union[t.Type[json.JSONDecoder], None]:
-        import warnings
-
-        warnings.warn(
-            "'bp.json_decoder' is deprecated and will be removed in Flask 2.3."
-            " Customize 'app.json_provider_class' or 'app.json' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self._json_decoder
-
-    @json_decoder.setter
-    def json_decoder(self, value: t.Union[t.Type[json.JSONDecoder], None]) -> None:
-        import warnings
-
-        warnings.warn(
-            "'bp.json_decoder' is deprecated and will be removed in Flask 2.3."
-            " Customize 'app.json_provider_class' or 'app.json' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        self._json_decoder = value
 
     def __init__(
         self,
@@ -502,22 +443,6 @@ class Blueprint(Scaffold):
         self.record_once(
             lambda s: s.app.before_request_funcs.setdefault(None, []).append(f)
         )
-        return f
-
-    @setupmethod
-    def before_app_first_request(
-        self, f: T_before_first_request
-    ) -> T_before_first_request:
-        import warnings
-
-        warnings.warn(
-            "'before_app_first_request' is deprecated and will be"
-            " removed in Flask 2.3. Use 'record_once' instead to run"
-            " setup code when registering the blueprint.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        self.record_once(lambda s: s.app.before_first_request_funcs.append(f))
         return f
 
     @setupmethod

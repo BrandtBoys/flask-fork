@@ -42,7 +42,7 @@ from .templating import render_template_string as render_template_string
 from .templating import stream_template as stream_template
 from .templating import stream_template_string as stream_template_string
 
-__version__ = "2.2.3"
+__version__ = "2.3.0.dev"
 
 
 def __getattr__(name):
@@ -51,7 +51,7 @@ def __getattr__(name):
         from .globals import __app_ctx_stack
 
         warnings.warn(
-            "'_app_ctx_stack' is deprecated and will be removed in Flask 2.3.",
+            "'_app_ctx_stack' is deprecated and will be removed in Flask 2.4.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -62,7 +62,7 @@ def __getattr__(name):
         from .globals import __request_ctx_stack
 
         warnings.warn(
-            "'_request_ctx_stack' is deprecated and will be removed in Flask 2.3.",
+            "'_request_ctx_stack' is deprecated and will be removed in Flask 2.4.",
             DeprecationWarning,
             stacklevel=2,
         )
