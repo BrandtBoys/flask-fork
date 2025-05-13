@@ -58,6 +58,15 @@ class Request(RequestBase):
 
     @property
     def max_content_length(self) -> int | None:
+        """
+Returns the maximum allowed content length.
+
+If a custom value has been set through `self._max_content_length`, it is returned.
+Otherwise, if an application context is available (`current_app`), the configuration value "MAX_CONTENT_LENGTH" is used. Otherwise, the default behavior of the parent class is called.
+
+Returns:
+    int | None: The maximum allowed content length or None if not set.
+"""
         if self._max_content_length is not None:
             return self._max_content_length
 
@@ -68,6 +77,17 @@ class Request(RequestBase):
 
     @max_content_length.setter
     def max_content_length(self, value: int | None) -> None:
+        """
+Sets the maximum content length.
+
+This method sets the maximum allowed length of content. The provided `value` parameter is used to set this limit.
+ 
+Parameters:
+    value (int | None): The maximum allowed content length. If None, there is no limit.
+ 
+Returns:
+    None
+"""
         self._max_content_length = value
 
     @property
@@ -82,10 +102,38 @@ class Request(RequestBase):
 
     @max_form_memory_size.setter
     def max_form_memory_size(self, value: int | None) -> None:
+        """
+Sets the maximum form memory size.
+
+This method sets the maximum amount of memory that can be allocated to a form.
+It does not return any value and is intended for internal use only.
+
+Args:
+    value (int | None): The maximum form memory size. If None, no limit is set.
+
+Raises:
+    TypeError: If the input value is not an integer or None.
+
+Note:
+This method should be called before any forms are created to ensure that
+the system has enough memory allocated for them.
+"""
         self._max_form_memory_size = value
 
     @property  # type: ignore[override]
     def max_form_parts(self) -> int | None:
+        """
+Returns the maximum number of form parts allowed.
+
+If `self._max_form_parts` is set, returns its value. Otherwise, checks if a
+current application context exists and returns the configured maximum form
+parts from it. If no current application context is available, falls back to
+the parent class's implementation.
+
+Returns:
+    int | None: The maximum number of form parts allowed, or None if not
+        applicable.
+"""
         if self._max_form_parts is not None:
             return self._max_form_parts
 
@@ -96,6 +144,15 @@ class Request(RequestBase):
 
     @max_form_parts.setter
     def max_form_parts(self, value: int | None) -> None:
+        """
+Returns the maximum number of form parts that can be created with a given value.
+
+Args:
+    value (int | None): The maximum value for form parts. If None, no limit is imposed.
+
+Returns:
+    None: This function does not return any value.
+"""
         self._max_form_parts = value
 
     @property
