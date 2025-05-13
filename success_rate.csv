@@ -2258,3 +2258,31 @@ False,"def from_file(
         pass
 
     return load_data(os.path.join(self.root_path, filename))"
+False,"def get_root_path(import_name: str) -> str:
+    """"""
+    Returns the root path of the given module.
+
+    If the module has already been imported and its file attribute is available,
+    it uses that. Otherwise, it checks the loader and falls back to imports if
+    necessary. If no file path can be found, it raises a RuntimeError.
+
+    Args:
+        import_name (str): The name of the module to find the root path for.
+
+    Returns:
+        str: The root path of the given module.
+    """""""
+False,"def _find_package_path(import_name):
+    """"""
+    Finds the path to a Python module or package.
+
+    Args:
+        import_name (str): The name of the module or package to find.
+
+    Returns:
+        str: The absolute path to the module or package.
+
+    Raises:
+        ValueError: If the module or package is not found.
+    """"""
+    # ... (rest of the code remains the same)"
