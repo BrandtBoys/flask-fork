@@ -38,9 +38,21 @@ def get_load_dotenv(default: bool = True) -> bool:
     return val.lower() in ("0", "false", "no")
 
 
+@t.overload
+def stream_with_context(
+    generator_or_function: t.Iterator[t.AnyStr],
+) -> t.Iterator[t.AnyStr]: ...
+
+
+@t.overload
+def stream_with_context(
+    generator_or_function: t.Callable[..., t.Iterator[t.AnyStr]],
+) -> t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]: ...
+
+
 def stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]],
-) -> t.Iterator[t.AnyStr]:
+) -> t.Iterator[t.AnyStr] | t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]:
     try:
         gen = iter(generator_or_function)  # type: ignore[arg-type]
     except TypeError:
@@ -49,7 +61,7 @@ def stream_with_context(
             gen = generator_or_function(*args, **kwargs)  # type: ignore[operator]
             return stream_with_context(gen)
 
-        return update_wrapper(decorator, generator_or_function)  # type: ignore[arg-type, return-value]
+        return update_wrapper(decorator, generator_or_function)  # type: ignore[arg-type]
 
     def generator() -> t.Iterator[t.AnyStr | None]:
         ctx = _cv_request.get(None)
@@ -268,4 +280,3 @@ def _split_blueprint_path(name: str) -> list[str]:
         out.extend(_split_blueprint_path(name.rpartition(".")[0]))
 
     return out
-
