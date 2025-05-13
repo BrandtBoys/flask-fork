@@ -59,6 +59,7 @@ if t.TYPE_CHECKING:  # pragma: no cover
 
     from .testing import FlaskClient
     from .testing import FlaskCliRunner
+    from .typing import HeadersValue
 
 T_shell_context_processor = t.TypeVar(
     "T_shell_context_processor", bound=ft.ShellContextProcessorCallable
@@ -179,6 +180,7 @@ class Flask(App):
             "TESTING": False,
             "PROPAGATE_EXCEPTIONS": None,
             "SECRET_KEY": None,
+            "SECRET_KEY_FALLBACKS": None,
             "PERMANENT_SESSION_LIFETIME": timedelta(days=31),
             "USE_X_SENDFILE": False,
             "SERVER_NAME": None,
@@ -188,9 +190,12 @@ class Flask(App):
             "SESSION_COOKIE_PATH": None,
             "SESSION_COOKIE_HTTPONLY": True,
             "SESSION_COOKIE_SECURE": False,
+            "SESSION_COOKIE_PARTITIONED": False,
             "SESSION_COOKIE_SAMESITE": None,
             "SESSION_REFRESH_EACH_REQUEST": True,
             "MAX_CONTENT_LENGTH": None,
+            "MAX_FORM_MEMORY_SIZE": 500_000,
+            "MAX_FORM_PARTS": 1_000,
             "SEND_FILE_MAX_AGE_DEFAULT": None,
             "TRAP_BAD_REQUEST_ERRORS": None,
             "TRAP_HTTP_EXCEPTIONS": False,
@@ -198,6 +203,7 @@ class Flask(App):
             "PREFERRED_URL_SCHEME": "http",
             "TEMPLATES_AUTO_RELOAD": None,
             "MAX_COOKIE_SIZE": 4093,
+            "PROVIDE_AUTOMATIC_OPTIONS": True,
         }
     )
 
@@ -292,7 +298,9 @@ class Flask(App):
             t.cast(str, self.static_folder), filename, max_age=max_age
         )
 
-    def open_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
+    def open_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = None
+    ) -> t.IO[t.AnyStr]:
         """
 Opens a resource file.
 
@@ -309,23 +317,33 @@ Raises:
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
-        return open(os.path.join(self.root_path, resource), mode)
+        path = os.path.join(self.root_path, resource)
 
-    def open_instance_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
+        if mode == "rb":
+            return open(path, mode)  # pyright: ignore
         """
 Opens an instance resource file.
 
+        return open(path, mode, encoding=encoding)
 Args:
     - `resource` (str): The path to the resource file.
     - `mode` (str, optional): The mode in which to open the file. Defaults to "rb".
 
+    def open_instance_resource(
+        self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
+    ) -> t.IO[t.AnyStr]:
 Returns:
     A file object opened at the specified location with the given mode.
 
 Raises:
     FileNotFoundError: If the instance_path does not exist or the resource is not found.
 """
-        return open(os.path.join(self.instance_path, resource), mode)
+        path = os.path.join(self.instance_path, resource)
+
+        if "b" in mode:
+            return open(path, mode)
+
+        return open(path, mode, encoding=encoding)
 
     def create_jinja_environment(self) -> Environment:
         options = dict(self.jinja_options)
@@ -728,7 +746,8 @@ Raises:
 
     def make_response(self, rv: ft.ResponseReturnValue) -> Response:
 
-        status = headers = None
+        status: int | None = None
+        headers: HeadersValue | None = None
 
         # unpack tuple returns
         if isinstance(rv, tuple):
@@ -740,7 +759,7 @@ Raises:
             # decide if a 2-tuple has status or headers
             elif len_rv == 2:
                 if isinstance(rv[1], (Headers, dict, tuple, list)):
-                    rv, headers = rv
+                    rv, headers = rv  # pyright: ignore
                 else:
                     rv, status = rv  # type: ignore[assignment,misc]
             # other sized tuples are not allowed
