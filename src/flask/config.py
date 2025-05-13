@@ -115,6 +115,19 @@ class Config(dict):  # type: ignore[type-arg]
     def from_prefixed_env(
         self, prefix: str = "FLASK", *, loads: t.Callable[[str], t.Any] = json.loads
     ) -> bool:
+        """
+Loads environment variables into a nested dictionary structure.
+
+This function iterates over the environment variables and their values. If a variable's key starts with the specified prefix, it is added to the dictionary. The function handles nested dictionaries by splitting the key at "__" and traversing down the dictionary tree.
+
+Args:
+    self: The object that will store the loaded environment variables.
+    prefix (str): The prefix used to identify environment variables. Defaults to "FLASK".
+    loads (callable): A function used to load the value of an environment variable. Defaults to json.loads.
+
+Returns:
+    bool: Always returns True, as this is a method of a class and its return type is not specified.
+"""
         prefix = f"{prefix}_"
 
         for key in sorted(os.environ):
