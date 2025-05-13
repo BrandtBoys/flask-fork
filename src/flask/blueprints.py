@@ -202,6 +202,20 @@ class Blueprint(Scaffold):
         self._blueprints: t.List[t.Tuple["Blueprint", dict]] = []
 
     def _check_setup_finished(self, f_name: str) -> None:
+        """
+Raises an AssertionError if the setup method has already been registered.
+
+If the setup method has been called at least once, this function will raise
+an AssertionError with a message indicating that further calls to the setup
+method will not be applied consistently. This is intended to prevent changes
+to imports, decorators, functions, etc. from being made after registration.
+
+Args:
+    f_name (str): The name of the setup method that was called.
+
+Raises:
+    AssertionError: If the setup method has already been registered.
+"""
         if self._got_registered_once:
             raise AssertionError(
                 f"The setup method '{f_name}' can no longer be called on the blueprint"
