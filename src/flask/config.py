@@ -75,6 +75,16 @@ class Config(dict):
     def __init__(
         self, root_path: str | os.PathLike, defaults: dict | None = None
     ) -> None:
+        """
+Initialize a new instance of the class.
+
+Parameters:
+    root_path (str | os.PathLike): The root path to be used for the instance.
+    defaults (dict | None, optional): Default values for the instance. Defaults to None.
+
+Returns:
+    None
+"""
         super().__init__(defaults or {})
         self.root_path = root_path
 
