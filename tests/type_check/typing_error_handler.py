@@ -57,6 +57,7 @@ Returns:
 @app.errorhandler(BadRequest)
 @app.errorhandler(404)
 def handle_multiple(e: BadRequest | NotFound) -> str:
+    return ""
     """
 Handles exceptions raised by API endpoints.
 
@@ -69,4 +70,3 @@ Args:
 Returns:
     str: A string representation of the error response.
 """
-    return ""

@@ -321,23 +321,12 @@ Raises:
 
         if mode == "rb":
             return open(path, mode)  # pyright: ignore
-        """
-Opens an instance resource file.
 
         return open(path, mode, encoding=encoding)
-Args:
-    - `resource` (str): The path to the resource file.
-    - `mode` (str, optional): The mode in which to open the file. Defaults to "rb".
 
     def open_instance_resource(
         self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
     ) -> t.IO[t.AnyStr]:
-Returns:
-    A file object opened at the specified location with the given mode.
-
-Raises:
-    FileNotFoundError: If the instance_path does not exist or the resource is not found.
-"""
         path = os.path.join(self.instance_path, resource)
 
         if "b" in mode:
