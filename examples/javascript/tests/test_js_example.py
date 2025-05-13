@@ -5,7 +5,7 @@ from flask import template_rendered
 @pytest.mark.parametrize(
     ("path", "template_name"),
     (
-        ("/", "xhr.html"),
+        ("/", "fetch.html"),
         ("/plain", "xhr.html"),
         ("/fetch", "fetch.html"),
         ("/jquery", "jquery.html"),
@@ -25,4 +25,3 @@ def test_index(app, client, path, template_name):
 def test_add(client, a, b, result):
     response = client.post("/add", data={"a": a, "b": b})
     assert response.get_json()["result"] == result
-
