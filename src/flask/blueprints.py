@@ -1,3 +1,4 @@
+import json
 import os
 import typing as t
 from collections import defaultdict
@@ -14,6 +15,9 @@ if t.TYPE_CHECKING:  # pragma: no cover
 
 DeferredSetupFunction = t.Callable[["BlueprintSetupState"], t.Callable]
 T_after_request = t.TypeVar("T_after_request", bound=ft.AfterRequestCallable)
+T_before_first_request = t.TypeVar(
+    "T_before_first_request", bound=ft.BeforeFirstRequestCallable
+)
 T_before_request = t.TypeVar("T_before_request", bound=ft.BeforeRequestCallable)
 T_error_handler = t.TypeVar("T_error_handler", bound=ft.ErrorHandlerCallable)
 T_teardown = t.TypeVar("T_teardown", bound=ft.TeardownCallable)
@@ -165,40 +169,61 @@ class Blueprint(Scaffold):
 
     _got_registered_once = False
 
-        """
-Returns the JSON encoder class, deprecation warning if applicable.
+    _json_encoder: t.Union[t.Type[json.JSONEncoder], None] = None
+    _json_decoder: t.Union[t.Type[json.JSONDecoder], None] = None
 
-This function is deprecated and will be removed in Flask 2.3. It's recommended to customize 'app.json_provider_class' or 'app.json' instead.
+    @property
+    def json_encoder(
+        self,
+    ) -> t.Union[t.Type[json.JSONEncoder], None]:
+        import warnings
 
-Args:
-    None
+        warnings.warn(
+            "'bp.json_encoder' is deprecated and will be removed in Flask 2.3."
+            " Customize 'app.json_provider_class' or 'app.json' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self._json_encoder
 
-Returns:
-    t.Union[t.Type[json.JSONEncoder], None]: The JSON encoder class or None.
-"""
-        """
-Deprecation Warning: json_encoder function is deprecated and will be removed in Flask 2.3.
- 
-To customize the JSON encoding behavior, use either 'app.json_provider_class' or 'app.json' instead.
+    @json_encoder.setter
+    def json_encoder(self, value: t.Union[t.Type[json.JSONEncoder], None]) -> None:
+        import warnings
 
-Args:
-    value (Union[Type[JSONEncoder], None]): The JSON encoder class to use. Defaults to None.
+        warnings.warn(
+            "'bp.json_encoder' is deprecated and will be removed in Flask 2.3."
+            " Customize 'app.json_provider_class' or 'app.json' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self._json_encoder = value
 
-Returns:
-    None
-"""
-        """
-Decodes JSON values.
+    @property
+    def json_decoder(
+        self,
+    ) -> t.Union[t.Type[json.JSONDecoder], None]:
+        import warnings
 
-This function is deprecated and will be removed in Flask 2.3.
-Instead, customize `app.json_provider_class` or `app.json`.
+        warnings.warn(
+            "'bp.json_decoder' is deprecated and will be removed in Flask 2.3."
+            " Customize 'app.json_provider_class' or 'app.json' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self._json_decoder
 
-Args:
-    value (t.Union[t.Type[json.JSONDecoder], None]): The JSON decoder to use.
+    @json_decoder.setter
+    def json_decoder(self, value: t.Union[t.Type[json.JSONDecoder], None]) -> None:
+        import warnings
 
-Returns:
-    None
-"""
+        warnings.warn(
+            "'bp.json_decoder' is deprecated and will be removed in Flask 2.3."
+            " Customize 'app.json_provider_class' or 'app.json' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self._json_decoder = value
+
     def __init__(
         self,
         name: str,
@@ -242,7 +267,6 @@ Attributes:
 Note:
 This function initializes a new instance of the class, setting up various attributes such as `name`, `url_prefix`, `subdomain`, and more. It also raises a ValueError if the 'name' parameter is empty or contains a dot '.' character.
 """
-        
         super().__init__(
             import_name=import_name,
             static_folder=static_folder,
@@ -250,9 +274,6 @@ This function initializes a new instance of the class, setting up various attrib
             template_folder=template_folder,
             root_path=root_path,
         )
-
-        if not name:
-            raise ValueError("'name' may not be empty.")
 
         if "." in name:
             raise ValueError("'name' may not contain a dot '.' character.")
@@ -284,14 +305,20 @@ Args:
 Raises:
     AssertionError: If the setup method has already been registered.
 """
-        
         if self._got_registered_once:
-            raise AssertionError(
-                f"The setup method '{f_name}' can no longer be called on the blueprint"
-                f" '{self.name}'. It has already been registered at least once, any"
-                " changes will not be applied consistently.\n"
-                "Make sure all imports, decorators, functions, etc. needed to set up"
-                " the blueprint are done before registering it."
+            import warnings
+
+            warnings.warn(
+                f"The setup method '{f_name}' can no longer be called on"
+                f" the blueprint '{self.name}'. It has already been"
+                " registered at least once, any changes will not be"
+                " applied consistently.\n"
+                "Make sure all imports, decorators, functions, etc."
+                " needed to set up the blueprint are done before"
+                " registering it.\n"
+                "This warning will become an exception in Flask 2.3.",
+                UserWarning,
+                stacklevel=3,
             )
 
     @setupmethod
@@ -399,17 +426,6 @@ Raises:
         for blueprint, bp_options in self._blueprints:
             bp_options = bp_options.copy()
             bp_url_prefix = bp_options.get("url_prefix")
-            bp_subdomain = bp_options.get("subdomain")
-
-            if bp_subdomain is None:
-                bp_subdomain = blueprint.subdomain
-
-            if state.subdomain is not None and bp_subdomain is not None:
-                bp_options["subdomain"] = bp_subdomain + "." + state.subdomain
-            elif bp_subdomain is not None:
-                bp_options["subdomain"] = bp_subdomain
-            elif state.subdomain is not None:
-                bp_options["subdomain"] = state.subdomain
 
             if bp_url_prefix is None:
                 bp_url_prefix = blueprint.url_prefix
@@ -522,21 +538,22 @@ Raises:
         return f
 
     @setupmethod
-        """
-Deprecation Notice:
+    def before_app_first_request(
+        self, f: T_before_first_request
+    ) -> T_before_first_request:
+        import warnings
 
-The `before_app_first_request` function is deprecated and will be removed in Flask 2.3.
-Use the `record_once` method instead to run setup code when registering a blueprint.
+        warnings.warn(
+            "'before_app_first_request' is deprecated and will be"
+            " removed in Flask 2.3. Use 'record_once' instead to run"
+            " setup code when registering the blueprint.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.record_once(lambda s: s.app.before_first_request_funcs.append(f))
+        return f
 
-Parameters:
-f (T_before_first_request): The function to register for before first request.
-
-Returns:
-T_before_first_request: The registered function.
-
-Raises:
-DeprecationWarning: If the function is deprecated and should be replaced with `record_once`.
-"""
+    @setupmethod
     def after_app_request(self, f: T_after_request) -> T_after_request:
         self.record_once(
             lambda s: s.app.after_request_funcs.setdefault(None, []).append(f)

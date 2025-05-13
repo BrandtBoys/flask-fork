@@ -1,5 +1,6 @@
 import functools
 import inspect
+import json
 import logging
 import os
 import sys
@@ -8,6 +9,7 @@ import weakref
 from collections.abc import Iterator as _abc_Iterator
 from datetime import timedelta
 from itertools import chain
+from threading import Lock
 from types import TracebackType
 from urllib.parse import quote as _url_quote
 
@@ -26,7 +28,6 @@ from werkzeug.routing import RequestRedirect
 from werkzeug.routing import RoutingException
 from werkzeug.routing import Rule
 from werkzeug.serving import is_running_from_reloader
-from werkzeug.utils import cached_property
 from werkzeug.utils import redirect as _wz_redirect
 from werkzeug.wrappers import Response as BaseResponse
 
@@ -47,6 +48,7 @@ from .helpers import _split_blueprint_path
 from .helpers import get_debug_flag
 from .helpers import get_flashed_messages
 from .helpers import get_load_dotenv
+from .helpers import locked_cached_property
 from .json.provider import DefaultJSONProvider
 from .json.provider import JSONProvider
 from .logging import create_logger
@@ -73,6 +75,9 @@ if t.TYPE_CHECKING:  # pragma: no cover
     from .testing import FlaskClient
     from .testing import FlaskCliRunner
 
+T_before_first_request = t.TypeVar(
+    "T_before_first_request", bound=ft.BeforeFirstRequestCallable
+)
 T_shell_context_processor = t.TypeVar(
     "T_shell_context_processor", bound=ft.ShellContextProcessorCallable
 )
@@ -269,30 +274,30 @@ class Flask(Scaffold):
     #: :data:`SECRET_KEY` configuration key. Defaults to ``None``.
     secret_key = ConfigAttribute("SECRET_KEY")
 
-        """
-Returns the name of the session cookie.
+    @property
+    def session_cookie_name(self) -> str:
+        import warnings
 
-This method is deprecated and will be removed in Flask 2.3. Instead, use
-`app.config['SESSION_COOKIE_NAME']`.
+        warnings.warn(
+            "'session_cookie_name' is deprecated and will be removed in Flask 2.3. Use"
+            " 'SESSION_COOKIE_NAME' in 'app.config' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.config["SESSION_COOKIE_NAME"]
 
-Args:
-    None
+    @session_cookie_name.setter
+    def session_cookie_name(self, value: str) -> None:
+        import warnings
 
-Returns:
-    str: The name of the session cookie.
-"""
-        """
-Deprecation Notice:
+        warnings.warn(
+            "'session_cookie_name' is deprecated and will be removed in Flask 2.3. Use"
+            " 'SESSION_COOKIE_NAME' in 'app.config' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.config["SESSION_COOKIE_NAME"] = value
 
-The `session_cookie_name` method is deprecated and will be removed in Flask 2.3.
-Use the 'SESSION_COOKIE_NAME' configuration option in 'app.config' instead.
-
-Parameters:
-value (str): The new session cookie name.
-
-Returns:
-None
-"""
     #: A :class:`~datetime.timedelta` which is used to set the expiration
     #: date of a permanent session.  The default is 31 days which makes a
     #: permanent session survive for roughly one month.
@@ -304,97 +309,117 @@ None
         "PERMANENT_SESSION_LIFETIME", get_converter=_make_timedelta
     )
 
-        """
-Deprecation Notice:
+    @property
+    def send_file_max_age_default(self) -> t.Optional[timedelta]:
+        import warnings
 
-The `send_file_max_age_default` method is deprecated and will be removed in Flask 2.3.
-Use 'SEND_FILE_MAX_AGE_DEFAULT' in 'app.config' instead.
+        warnings.warn(
+            "'send_file_max_age_default' is deprecated and will be removed in Flask"
+            " 2.3. Use 'SEND_FILE_MAX_AGE_DEFAULT' in 'app.config' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return _make_timedelta(self.config["SEND_FILE_MAX_AGE_DEFAULT"])
 
-Returns:
-    Optional[timedelta]: The maximum age for sending files, or None if not set.
+    @send_file_max_age_default.setter
+    def send_file_max_age_default(self, value: t.Union[int, timedelta, None]) -> None:
+        import warnings
 
-Raises:
-    DeprecationWarning: If the deprecated method is called.
+        warnings.warn(
+            "'send_file_max_age_default' is deprecated and will be removed in Flask"
+            " 2.3. Use 'SEND_FILE_MAX_AGE_DEFAULT' in 'app.config' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.config["SEND_FILE_MAX_AGE_DEFAULT"] = _make_timedelta(value)
 
-Note:
-This function is only available for backwards compatibility and should not be used in new code.
-"""
-        """
-Deprecation Notice:
+    @property
+    def use_x_sendfile(self) -> bool:
+        import warnings
 
-The `send_file_max_age_default` method is deprecated and will be removed in Flask 2.3.
-Use 'SEND_FILE_MAX_AGE_DEFAULT' in 'app.config' instead.
+        warnings.warn(
+            "'use_x_sendfile' is deprecated and will be removed in Flask 2.3. Use"
+            " 'USE_X_SENDFILE' in 'app.config' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.config["USE_X_SENDFILE"]
 
-Parameters:
-    value (Union[int, timedelta, None]): The maximum age of sent files in seconds.
-        If int, the value is used directly as a number of seconds.
-        If timedelta, the value is converted to seconds.
-        If None, no default is set.
+    @use_x_sendfile.setter
+    def use_x_sendfile(self, value: bool) -> None:
+        import warnings
 
-Returns:
-    None
-"""
-        """
-Deprecation Notice:
+        warnings.warn(
+            "'use_x_sendfile' is deprecated and will be removed in Flask 2.3. Use"
+            " 'USE_X_SENDFILE' in 'app.config' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.config["USE_X_SENDFILE"] = value
 
-The `use_x_sendfile` method is deprecated and will be removed in Flask 2.3.
-Instead, use the 'USE_X_SENDFILE' configuration option in the application's
-configuration dictionary.
+    _json_encoder: t.Union[t.Type[json.JSONEncoder], None] = None
+    _json_decoder: t.Union[t.Type[json.JSONDecoder], None] = None
 
-Returns:
-    bool: The value of the 'USE_X_SENDFILE' configuration option.
+    @property  # type: ignore[override]
+    def json_encoder(self) -> t.Type[json.JSONEncoder]:
+        import warnings
 
-Raises:
-    DeprecationWarning: If the 'use_x_sendfile' method is called.
-"""
-        """
-Returns the JSON encoder class for this application.
+        warnings.warn(
+            "'app.json_encoder' is deprecated and will be removed in Flask 2.3."
+            " Customize 'app.json_provider_class' or 'app.json' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
-This method is deprecated in favor of customizing 'app.json_provider_class' or 'app.json'.
-The `DeprecationWarning` will be raised when calling this function.
- 
-Args:
-    None
- 
-Returns:
-    t.Type[json.JSONEncoder]: The JSON encoder class.
-"""
-        """
-Deprecation Warning: `json_encoder` is deprecated and will be removed in Flask 2.3.
-Customize `json_provider_class` or `json` instead.
+        if self._json_encoder is None:
+            from . import json
 
-Args:
-    value (t.Type[json.JSONEncoder]): The new JSON encoder class to use.
+            return json.JSONEncoder
 
-Returns:
-    None
-"""
-        """
-Returns the JSON decoder class.
+        return self._json_encoder
 
-This function returns the JSON decoder class used by the application. It is deprecated in favor of customizing 'app.json_provider_class' or 'app.json'. 
+    @json_encoder.setter
+    def json_encoder(self, value: t.Type[json.JSONEncoder]) -> None:
+        import warnings
 
-Parameters:
-    None
+        warnings.warn(
+            "'app.json_encoder' is deprecated and will be removed in Flask 2.3."
+            " Customize 'app.json_provider_class' or 'app.json' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self._json_encoder = value
 
-Returns:
-    t.Type[json.JSONDecoder]: The JSON decoder class.
+    @property  # type: ignore[override]
+    def json_decoder(self) -> t.Type[json.JSONDecoder]:
+        import warnings
 
-Raises:
-    DeprecationWarning: If 'app.json_decoder' is called, it will raise a deprecation warning.
-"""
-        """
-Decodes JSON data using the provided decoder.
+        warnings.warn(
+            "'app.json_decoder' is deprecated and will be removed in Flask 2.3."
+            " Customize 'app.json_provider_class' or 'app.json' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
-This function is deprecated in Flask 2.3 and will be removed.
-Instead, customize `app.json_provider_class` or `app.json`.
+        if self._json_decoder is None:
+            from . import json
 
-Args:
-    value (t.Type[json.JSONDecoder]): The JSON decoder to use.
+            return json.JSONDecoder
 
-Returns:
-    None
-"""
+        return self._json_decoder
+
+    @json_decoder.setter
+    def json_decoder(self, value: t.Type[json.JSONDecoder]) -> None:
+        import warnings
+
+        warnings.warn(
+            "'app.json_decoder' is deprecated and will be removed in Flask 2.3."
+            " Customize 'app.json_provider_class' or 'app.json' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self._json_decoder = value
+
     json_provider_class: t.Type[JSONProvider] = DefaultJSONProvider
     """A subclass of :class:`~flask.json.provider.JSONProvider`. An
     instance is created and assigned to :attr:`app.json` when creating
@@ -421,6 +446,7 @@ Returns:
     #: Default configuration parameters.
     default_config = ImmutableDict(
         {
+            "ENV": None,
             "DEBUG": None,
             "TESTING": False,
             "PROPAGATE_EXCEPTIONS": None,
@@ -442,6 +468,10 @@ Returns:
             "TRAP_HTTP_EXCEPTIONS": False,
             "EXPLAIN_TEMPLATE_LOADING": False,
             "PREFERRED_URL_SCHEME": "http",
+            "JSON_AS_ASCII": None,
+            "JSON_SORT_KEYS": None,
+            "JSONIFY_PRETTYPRINT_REGULAR": None,
+            "JSONIFY_MIMETYPE": None,
             "TEMPLATES_AUTO_RELOAD": None,
             "MAX_COOKIE_SIZE": 4093,
         }
@@ -554,6 +584,17 @@ Returns:
             t.Callable[[Exception, str, t.Dict[str, t.Any]], str]
         ] = []
 
+        #: A list of functions that will be called at the beginning of the
+        #: first request to this instance. To register a function, use the
+        #: :meth:`before_first_request` decorator.
+        #:
+        #: .. deprecated:: 2.2
+        #:     Will be removed in Flask 2.3. Run setup code when
+        #:     creating the application instead.
+        #:
+        #: .. versionadded:: 0.8
+        self.before_first_request_funcs: t.List[ft.BeforeFirstRequestCallable] = []
+
         #: A list of functions that are called when the application context
         #: is destroyed.  Since the application context is also torn down
         #: if the request ends this is the place to store code that disconnects
@@ -610,6 +651,7 @@ Returns:
         # tracks internally if the application already handled at least one
         # request.
         self._got_first_request = False
+        self._before_request_lock = Lock()
 
         # Add a static route using the provided static_url_path, static_host,
         # and static_folder if there is a configured static_folder.
@@ -646,7 +688,7 @@ Returns:
                 " running it."
             )
 
-    @cached_property
+    @locked_cached_property
     def name(self) -> str:  # type: ignore
         if self.import_name == "__main__":
             fn = getattr(sys.modules["__main__"], "__file__", None)
@@ -655,7 +697,21 @@ Returns:
             return os.path.splitext(os.path.basename(fn))[0]
         return self.import_name
 
-    @cached_property
+    @property
+    def propagate_exceptions(self) -> bool:
+        import warnings
+
+        warnings.warn(
+            "'propagate_exceptions' is deprecated and will be removed in Flask 2.3.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        rv = self.config["PROPAGATE_EXCEPTIONS"]
+        if rv is not None:
+            return rv
+        return self.testing or self.debug
+
+    @locked_cached_property
     def logger(self) -> logging.Logger:
         """
 Returns an instance of the Logger class.
@@ -670,7 +726,7 @@ Returns:
 """
         return create_logger(self)
 
-    @cached_property
+    @locked_cached_property
     def jinja_env(self) -> Environment:
         """
 Returns an instance of Jinja2's Environment class.
@@ -697,31 +753,6 @@ Args:
 Returns:
     bool: Whether exceptions should be propagated to the application's context.
 """
-        import warnings
-
-        warnings.warn(
-            "'got_first_request' is deprecated and will be removed in Flask 2.4.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        """
-Returns an instance of the Logger class.
-
-This method is used to initialize and return a new logger object. The logger object is created using the `create_logger` function, which takes the current object (`self`) as an argument.
-
-Args:
-    self: The current object.
-
-Returns:
-    logging.Logger: An instance of the Logger class.
-"""
-        """
-Returns an instance of Jinja2's Environment class.
-
-This method is a wrapper around `create_jinja_environment` and provides a more Pythonic interface for creating a new Jinja environment. The returned environment can be used to compile templates, render templates with data, and perform other template-related tasks.
-
-Note: This method does not create a new environment instance; it simply delegates the creation to the underlying `create_jinja_environment` method.
-"""
         return self._got_first_request
 
     def make_config(self, instance_relative: bool = False) -> Config:
@@ -729,6 +760,7 @@ Note: This method does not create a new environment instance; it simply delegate
         if instance_relative:
             root_path = self.instance_path
         defaults = dict(self.default_config)
+        defaults["ENV"] = os.environ.get("FLASK_ENV") or "production"
         defaults["DEBUG"] = get_debug_flag()
         return self.config_class(root_path, defaults)
 
@@ -743,19 +775,31 @@ Note: This method does not create a new environment instance; it simply delegate
 
     def open_instance_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
         return open(os.path.join(self.instance_path, resource), mode)
-        """
-Returns the value of `TEMPLATES_AUTO_RELOAD` from the application configuration.
 
-If `TEMPLATES_AUTO_RELOAD` is set, its value is returned. Otherwise, the value of `debug` is used as a fallback.
+    @property
+    def templates_auto_reload(self) -> bool:
+        import warnings
 
-Deprecated since Flask 2.3 in favor of using `TEMPLATES_AUTO_RELOAD` in `app.config`.
+        warnings.warn(
+            "'templates_auto_reload' is deprecated and will be removed in Flask 2.3."
+            " Use 'TEMPLATES_AUTO_RELOAD' in 'app.config' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        rv = self.config["TEMPLATES_AUTO_RELOAD"]
+        return rv if rv is not None else self.debug
 
-Args:
-    None
+    @templates_auto_reload.setter
+    def templates_auto_reload(self, value: bool) -> None:
+        import warnings
 
-Returns:
-    bool: The value of `TEMPLATES_AUTO_RELOAD` or `debug` if not set.
-"""
+        warnings.warn(
+            "'templates_auto_reload' is deprecated and will be removed in Flask 2.3."
+            " Use 'TEMPLATES_AUTO_RELOAD' in 'app.config' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.config["TEMPLATES_AUTO_RELOAD"] = value
 
     def create_jinja_environment(self) -> Environment:
         options = dict(self.jinja_options)
@@ -817,31 +861,30 @@ Returns:
         for processor in self.shell_context_processors:
             rv.update(processor())
         return rv
-        """
-Returns the environment variable as a string.
 
-Deprecation Warning: This method is deprecated and will be removed in Flask 2.3.
-Use `app.debug` instead.
+    @property
+    def env(self) -> str:
+        import warnings
 
-Args:
-    None
+        warnings.warn(
+            "'app.env' is deprecated and will be removed in Flask 2.3."
+            " Use 'app.debug' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.config["ENV"]
 
-Returns:
-    str: The environment variable value.
+    @env.setter
+    def env(self, value: str) -> None:
+        import warnings
 
-Raises:
-    DeprecationWarning: If the 'app.env' method is called.
-"""
-        """
-Deprecation Warning: `env` method is deprecated and will be removed in Flask 2.3.
-Use `debug` attribute instead.
-
-Args:
-    value (str): The environment variable to set.
-
-Returns:
-    None
-"""
+        warnings.warn(
+            "'app.env' is deprecated and will be removed in Flask 2.3."
+            " Use 'app.debug' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.config["ENV"] = value
 
     @property
     def debug(self) -> bool:
@@ -879,8 +922,16 @@ Returns:
         if get_load_dotenv(load_dotenv):
             cli.load_dotenv()
 
-            # if set, env var overrides existing value
-            if "FLASK_DEBUG" in os.environ:
+            # if set, let env vars override previous values
+            if "FLASK_ENV" in os.environ:
+                print(
+                    "'FLASK_ENV' is deprecated and will not be used in"
+                    " Flask 2.3. Use 'FLASK_DEBUG' instead.",
+                    file=sys.stderr,
+                )
+                self.config["ENV"] = os.environ.get("FLASK_ENV") or "production"
+                self.debug = get_debug_flag()
+            elif "FLASK_DEBUG" in os.environ:
                 self.debug = get_debug_flag()
 
         # debug passed to method overrides all other sources
@@ -1054,20 +1105,20 @@ Returns:
         self, f: ft.TemplateGlobalCallable, name: t.Optional[str] = None
     ) -> None:
         self.jinja_env.globals[name or f.__name__] = f
-        """
-Deprecation Warning: before_first_request function is deprecated and will be removed in Flask 2.3.
- 
-   To avoid deprecation warnings, run setup code while creating the application instead.
 
-   Parameters:
-       f (T_before_first_request): The function to be executed before the first request.
+    @setupmethod
+    def before_first_request(self, f: T_before_first_request) -> T_before_first_request:
+        import warnings
 
-   Returns:
-       T_before_first_request: The input function for appending to self.before_first_request_funcs.
-
-   Note:
-       This function is deprecated and should not be used in new applications. Instead, run setup code while creating the application.
-"""
+        warnings.warn(
+            "'before_first_request' is deprecated and will be removed"
+            " in Flask 2.3. Run setup code while creating the"
+            " application instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.before_first_request_funcs.append(f)
+        return f
 
     @setupmethod
     def teardown_appcontext(self, f: T_teardown) -> T_teardown:
@@ -1242,7 +1293,7 @@ Returns
 Response
     The response from the dispatching process.
 """
-        self._got_first_request = True
+                    self._got_first_request = True
 
         try:
             request_started.send(self)
