@@ -8,3 +8,4 @@ Success,Comment
 
 "(True, '""""""\nConverts an object to a format suitable for JSON serialization.\n\nThis function checks the type of the input object and converts it accordingly:\n- If the object is a date, it returns its HTTP representation.\n- If the object is a decimal.Decimal or uuid.UUID, it returns its string representation.\n- If the object is a dataclass instance, it returns its dictionary representation.\n- If the object has an __html__ method, it returns its HTML representation.\n\nIf none of these conversions are possible, it raises a TypeError with a message indicating the type of the input object.\n\nArgs:\n    o: The object to be converted.\n\nReturns:\n    A string representation of the object in JSON format.\n\nRaises:\n    TypeError: If the object is not JSON serializable.\n""""""')"
 
+
