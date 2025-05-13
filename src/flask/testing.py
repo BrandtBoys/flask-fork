@@ -92,6 +92,18 @@ _werkzeug_version = ""
 
 
 def _get_werkzeug_version() -> str:
+    """
+Returns the version of Werkzeug, a Python web framework.
+
+This function uses the `importlib.metadata` module to retrieve the version from PyPI.
+If the version is not already cached in `_werkzeug_version`, it will be retrieved and stored for future use.
+
+Args:
+    None
+
+Returns:
+    str: The version of Werkzeug as a string
+"""
     global _werkzeug_version
 
     if not _werkzeug_version:

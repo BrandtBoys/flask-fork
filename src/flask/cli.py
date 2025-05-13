@@ -223,6 +223,21 @@ def locate_app(module_name, app_name, raise_if_not_found=True):
 
 
 def get_version(ctx, param, value):
+    """
+Returns the version information of Python, Flask, and Werkzeug.
+
+Parameters:
+- ctx (object): The context object containing information about the current session.
+- param (object): An optional parameter to be used in the function. Currently unused.
+- value (str): The input string that triggers this function call.
+
+Returns:
+None
+
+Side Effects:
+- Prints the version information of Python, Flask, and Werkzeug to the console.
+- Exits the current session using ctx.exit().
+"""
     if not value or ctx.resilient_parsing:
         return
 

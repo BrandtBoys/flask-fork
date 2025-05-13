@@ -55,6 +55,26 @@ def test_environ_base_default(app, client):
 
 
 def test_environ_base_modified(app, client):
+    """
+Test the base environment of a Flask application.
+
+This function tests that the remote address and user agent are correctly
+modified in the request context when using the `client` object to make a
+request to the root URL of the application. It verifies that these values
+are set in the `flask.g` dictionary, which is used by Flask to store
+context data.
+
+Parameters:
+app (Flask): The Flask application instance.
+client: An object providing a way to interact with the application's
+    request context.
+
+Returns:
+None
+
+Raises:
+AssertionError: If any of the assertions fail.
+"""
     @app.route("/")
     def index():
         flask.g.remote_addr = flask.request.remote_addr
