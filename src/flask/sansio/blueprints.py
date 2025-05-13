@@ -439,7 +439,35 @@ Returns:
             blueprint.register(app, bp_options)
 
     def _merge_blueprint_funcs(self, app: App, name: str) -> None:
+        """
+Merges blueprint functions into the application's configuration.
+
+This function merges the provided blueprint functions (`bp_dict`) with the parent dictionary
+(`parent_dict`) in a way that preserves the namespace. It also updates the application's error
+handler specification and view functions accordingly.
+
+Parameters:
+app (App): The application instance to be updated.
+name (str): The name of the blueprint, used for namespace resolution.
+
+Returns:
+None
+"""
         def extend(bp_dict, parent_dict):
+            """
+Extends a dictionary with another dictionary's values.
+
+This function takes two dictionaries as input: `bp_dict` and `parent_dict`. It iterates over the items in `bp_dict`, 
+constructs new keys by appending the current key to the parent dictionary's name if it exists, 
+and extends the corresponding value in `parent_dict`.
+
+Args:
+    bp_dict (dict): The dictionary containing values to be extended.
+    parent_dict (dict): The dictionary into which values will be extended.
+
+Returns:
+    None
+"""
             for key, values in bp_dict.items():
                 key = name if key is None else f"{name}.{key}"
                 parent_dict[key].extend(values)
