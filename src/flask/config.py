@@ -72,7 +72,9 @@ class Config(dict):
     :param defaults: an optional dictionary of default values
     """
 
-    def __init__(self, root_path: str, defaults: dict | None = None) -> None:
+    def __init__(
+        self, root_path: str | os.PathLike, defaults: dict | None = None
+    ) -> None:
         super().__init__(defaults or {})
         self.root_path = root_path
 
@@ -130,7 +132,7 @@ class Config(dict):
 
         return True
 
-    def from_pyfile(self, filename: str, silent: bool = False) -> bool:
+    def from_pyfile(self, filename: str | os.PathLike, silent: bool = False) -> bool:
         filename = os.path.join(self.root_path, filename)
         d = types.ModuleType("config")
         d.__file__ = filename
@@ -154,7 +156,7 @@ class Config(dict):
 
     def from_file(
         self,
-        filename: str,
+        filename: str | os.PathLike,
         load: t.Callable[[t.IO[t.Any]], t.Mapping],
         silent: bool = False,
         text: bool = True,
@@ -203,4 +205,3 @@ class Config(dict):
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__} {dict.__repr__(self)}>"
-
