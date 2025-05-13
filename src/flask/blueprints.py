@@ -165,40 +165,6 @@ class Blueprint(Scaffold):
 
     _got_registered_once = False
 
-        """
-Returns the JSON encoder class, deprecation warning if applicable.
-
-This function is deprecated and will be removed in Flask 2.3. It's recommended to customize 'app.json_provider_class' or 'app.json' instead.
-
-Args:
-    None
-
-Returns:
-    t.Union[t.Type[json.JSONEncoder], None]: The JSON encoder class or None.
-"""
-        """
-Deprecation Warning: json_encoder function is deprecated and will be removed in Flask 2.3.
- 
-To customize the JSON encoding behavior, use either 'app.json_provider_class' or 'app.json' instead.
-
-Args:
-    value (Union[Type[JSONEncoder], None]): The JSON encoder class to use. Defaults to None.
-
-Returns:
-    None
-"""
-        """
-Decodes JSON values.
-
-This function is deprecated and will be removed in Flask 2.3.
-Instead, customize `app.json_provider_class` or `app.json`.
-
-Args:
-    value (t.Union[t.Type[json.JSONDecoder], None]): The JSON decoder to use.
-
-Returns:
-    None
-"""
     def __init__(
         self,
         name: str,
@@ -242,7 +208,6 @@ Attributes:
 Note:
 This function initializes a new instance of the class, setting up various attributes such as `name`, `url_prefix`, `subdomain`, and more. It also raises a ValueError if the 'name' parameter is empty or contains a dot '.' character.
 """
-        
         super().__init__(
             import_name=import_name,
             static_folder=static_folder,
@@ -284,7 +249,6 @@ Args:
 Raises:
     AssertionError: If the setup method has already been registered.
 """
-        
         if self._got_registered_once:
             raise AssertionError(
                 f"The setup method '{f_name}' can no longer be called on the blueprint"
@@ -522,21 +486,6 @@ Raises:
         return f
 
     @setupmethod
-        """
-Deprecation Notice:
-
-The `before_app_first_request` function is deprecated and will be removed in Flask 2.3.
-Use the `record_once` method instead to run setup code when registering a blueprint.
-
-Parameters:
-f (T_before_first_request): The function to register for before first request.
-
-Returns:
-T_before_first_request: The registered function.
-
-Raises:
-DeprecationWarning: If the function is deprecated and should be replaced with `record_once`.
-"""
     def after_app_request(self, f: T_after_request) -> T_after_request:
         self.record_once(
             lambda s: s.app.after_request_funcs.setdefault(None, []).append(f)
