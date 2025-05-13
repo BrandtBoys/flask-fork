@@ -52,12 +52,51 @@ class Request(RequestBase):
     #: something similar.
     routing_exception: HTTPException | None = None
 
+    _max_content_length: int | None = None
+    _max_form_memory_size: int | None = None
+    _max_form_parts: int | None = None
+
     @property
-    def max_content_length(self) -> int | None:  # type: ignore[override]
-        if current_app:
-            return current_app.config["MAX_CONTENT_LENGTH"]  # type: ignore[no-any-return]
-        else:
-            return None
+    def max_content_length(self) -> int | None:
+        if self._max_content_length is not None:
+            return self._max_content_length
+
+        if not current_app:
+            return super().max_content_length
+
+        return current_app.config["MAX_CONTENT_LENGTH"]  # type: ignore[no-any-return]
+
+    @max_content_length.setter
+    def max_content_length(self, value: int | None) -> None:
+        self._max_content_length = value
+
+    @property
+    def max_form_memory_size(self) -> int | None:
+        if self._max_form_memory_size is not None:
+            return self._max_form_memory_size
+
+        if not current_app:
+            return super().max_form_memory_size
+
+        return current_app.config["MAX_FORM_MEMORY_SIZE"]  # type: ignore[no-any-return]
+
+    @max_form_memory_size.setter
+    def max_form_memory_size(self, value: int | None) -> None:
+        self._max_form_memory_size = value
+
+    @property  # type: ignore[override]
+    def max_form_parts(self) -> int | None:
+        if self._max_form_parts is not None:
+            return self._max_form_parts
+
+        if not current_app:
+            return super().max_form_parts
+
+        return current_app.config["MAX_FORM_PARTS"]  # type: ignore[no-any-return]
+
+    @max_form_parts.setter
+    def max_form_parts(self, value: int | None) -> None:
+        self._max_form_parts = value
 
     @property
     def endpoint(self) -> str | None:
