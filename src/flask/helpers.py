@@ -225,6 +225,23 @@ def send_from_directory(
 
 def get_root_path(import_name: str) -> str:
     # Module already imported and has a file attribute. Use that first.
+    """
+Returns the root path of the given imported module.
+
+If the module has already been imported and its file attribute is available,
+its directory path is returned. Otherwise, it attempts to find the loader
+associated with the import specification and uses it to determine the root
+path. If this fails, it falls back to using the current working directory.
+
+Args:
+    import_name (str): The name of the module for which to retrieve the root path.
+
+Returns:
+    str: The root path of the given imported module.
+Raises:
+    ValueError: If the loader is not found or if the module specification is None.
+    RuntimeError: If no root path can be found for a namespace package.
+"""
     mod = sys.modules.get(import_name)
 
     if mod is not None and hasattr(mod, "__file__") and mod.__file__ is not None:
