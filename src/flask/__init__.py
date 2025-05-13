@@ -1,3 +1,6 @@
+from markupsafe import escape
+from markupsafe import Markup
+
 from . import json as json
 from .app import Flask as Flask
 from .app import Request as Request
@@ -39,7 +42,7 @@ from .templating import render_template_string as render_template_string
 from .templating import stream_template as stream_template
 from .templating import stream_template_string as stream_template_string
 
-__version__ = "2.3.0.dev"
+__version__ = "2.2.3"
 
 
 def __getattr__(name):
@@ -61,7 +64,7 @@ Raises:
         from .globals import __app_ctx_stack
 
         warnings.warn(
-            "'_app_ctx_stack' is deprecated and will be removed in Flask 2.4.",
+            "'_app_ctx_stack' is deprecated and will be removed in Flask 2.3.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -72,34 +75,10 @@ Raises:
         from .globals import __request_ctx_stack
 
         warnings.warn(
-            "'_request_ctx_stack' is deprecated and will be removed in Flask 2.4.",
+            "'_request_ctx_stack' is deprecated and will be removed in Flask 2.3.",
             DeprecationWarning,
             stacklevel=2,
         )
         return __request_ctx_stack
-
-    if name == "escape":
-        import warnings
-        from markupsafe import escape
-
-        warnings.warn(
-            "'flask.escape' is deprecated and will be removed in Flask 2.4. Import"
-            " 'markupsafe.escape' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return escape
-
-    if name == "escape":
-        import warnings
-        from markupsafe import Markup
-
-        warnings.warn(
-            "'flask.Markup' is deprecated and will be removed in Flask 2.4. Import"
-            " 'markupsafe.Markup' instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return Markup
 
     raise AttributeError(name)
