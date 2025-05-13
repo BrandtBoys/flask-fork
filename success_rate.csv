@@ -27,3 +27,4 @@ Success,Comment
 "(True, '""""""\nReturns the value of the requested attribute, or raises an AttributeError if it does not exist.\n\nThe function is used to handle special attributes that are deprecated and will be removed in future versions of Flask.\nIt provides a way to access these attributes while still raising a warning about their deprecation.\n\nAttributes:\n    - `_app_ctx_stack`: The application context stack. (Deprecated)\n    - `_request_ctx_stack`: The request context stack. (Deprecated)\n    - `escape`: A function for escaping HTML characters. (Deprecated, use markupsafe.escape instead)\n    - `Markup`: A class for representing unescaped HTML. (Deprecated, use markupsafe.Markup instead)\n    - `signals_available`: Always returns True, as signals are always available.\n\nRaises:\n    AttributeError: If the requested attribute does not exist.\n""""""')"
 
 
+
