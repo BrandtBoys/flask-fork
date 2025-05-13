@@ -52,6 +52,15 @@ class DispatchingJinjaLoader(BaseLoader):
     """
 
     def __init__(self, app: App) -> None:
+        """
+Initializes the object with an application instance.
+
+Args:
+    app (App): The application instance to be associated with this object.
+
+Returns:
+    None
+"""
         self.app = app
 
     def get_source(  # type: ignore

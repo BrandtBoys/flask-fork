@@ -225,6 +225,29 @@ class Flask(App):
         instance_relative_config: bool = False,
         root_path: str | None = None,
     ):
+        """
+Adds a static route to the application using the provided `static_url_path`, 
+`static_host`, and `static_folder`. This is done without checking if 
+`static_folder` exists, as it might be created while the server is running. 
+
+This method uses a weakref to avoid creating a reference cycle between the app 
+and the view function.
+
+Args:
+    - import_name (str): The name of the module being imported.
+    - static_url_path (str | None): The URL path for serving static files.
+    - static_folder (str | os.PathLike | None): The folder where static files are stored. Defaults to "static".
+    - static_host (str | None): The host for serving static files. Required if `host_matching` is False.
+    - host_matching (bool): Whether the host should be matched in the URL path. Defaults to False.
+    - subdomain_matching (bool): Whether the subdomain should be matched in the URL path. Defaults to False.
+    - template_folder (str | os.PathLike | None): The folder where templates are stored. Defaults to "templates".
+    - instance_path (str | None): The path for serving instance-specific files. Defaults to None.
+    - instance_relative_config (bool): Whether configuration should be relative to the instance. Defaults to False.
+    - root_path (str | None): The root path of the application. Defaults to None.
+
+Raises:
+    AssertionError: If `static_host` and `host_matching` do not match, or if `static_folder` exists but is not configured.
+"""
         super().__init__(
             import_name=import_name,
             static_url_path=static_url_path,
@@ -258,6 +281,18 @@ class Flask(App):
             )
 
     def get_send_file_max_age(self, filename: str | None) -> int | None:
+        """
+Returns the maximum age in seconds for sending files.
+
+If `filename` is provided, it will be used to retrieve the default send file max age from the application configuration.
+Otherwise, the default value will be returned.
+
+Args:
+    filename (str | None): The name of the file to use for retrieving the default send file max age. Defaults to None.
+
+Returns:
+    int | None: The maximum age in seconds for sending files, or None if no default is set.
+"""
         value = current_app.config["SEND_FILE_MAX_AGE_DEFAULT"]
 
         if value is None:
@@ -269,6 +304,22 @@ class Flask(App):
         return value
 
     def send_static_file(self, filename: str) -> Response:
+        """
+Sends a static file from the configured static folder.
+
+This method is used to serve static files. It checks if the `static_folder` attribute has been set and raises a RuntimeError if not.
+It then calls `get_send_file_max_age` to determine the maximum age for the file, which is necessary for blueprints to work correctly.
+Finally, it uses `send_from_directory` to send the file from the static folder.
+
+Args:
+    filename (str): The name of the file to be sent.
+
+Returns:
+    Response: A response object containing the sent file.
+
+Raises:
+    RuntimeError: If 'static_folder' is not set.
+"""
         if not self.has_static_folder:
             raise RuntimeError("'static_folder' must be set to serve static_files.")
 
@@ -280,6 +331,19 @@ class Flask(App):
         )
 
     def open_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
+        """
+Opens a resource file.
+
+Args:
+    resource (str): The path to the resource file.
+    mode (str, optional): The mode in which to open the file. Defaults to "rb". Supported modes are "r", "rt", and "rb".
+
+Returns:
+    t.IO[t.AnyStr]: A file object opened in the specified mode.
+
+Raises:
+    ValueError: If an unsupported mode is provided.
+"""
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
@@ -318,6 +382,16 @@ class Flask(App):
         return rv
 
     def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
+        """
+Creates a URL adapter for the current request.
+
+If `subdomain_matching` is disabled, it uses the default subdomain.
+Otherwise, it does not use a subdomain. The server name and subdomain are
+printed to the console for debugging purposes.
+
+Returns:
+    A bound URL map or None if the server name is not set.
+"""
         if request is not None:
             # If subdomain matching is disabled (the default), use the
             # default subdomain in all cases. This should be the default
@@ -470,6 +544,19 @@ class Flask(App):
     ) -> HTTPException | ft.ResponseReturnValue:
         # Proxy exceptions don't have error codes.  We want to always return
         # those unchanged as errors
+        """
+Handles HTTP exceptions by checking their type and returning them accordingly.
+
+If the exception does not have an error code (i.e., it's a ProxyException), 
+it will be returned unchanged as an error. If it's a RoutingException, 
+it will also be returned without modification. Otherwise, it will be 
+passed to the error handler function to determine its response.
+
+Args:
+    e (HTTPException): The HTTP exception to handle.
+Returns:
+    HTTPException | ft.ResponseReturnValue: The handled exception or its response.
+"""
         if e.code is None:
             return e
 
@@ -487,6 +574,19 @@ class Flask(App):
     def handle_user_exception(
         self, e: Exception
     ) -> HTTPException | ft.ResponseReturnValue:
+        """
+Handles exceptions raised by the application.
+
+This function checks for specific exception types and decides how to handle them.
+If a `BadRequestKeyError` occurs and debug mode or the trap bad request errors config flag are set, it sets the `show_exception` attribute of the error object to True.
+If an `HTTPException` occurs but is not trapped by the application, it calls the `handle_http_exception` method to handle the exception.
+Otherwise, it finds an error handler for the exception using the `_find_error_handler` method and calls it with the exception as an argument.
+
+Args:
+    e (Exception): The exception to be handled.
+Returns:
+    HTTPException | ft.ResponseReturnValue: The result of handling the exception or None if no handler is found.
+"""
         if isinstance(e, BadRequestKeyError) and (
             self.debug or self.config["TRAP_BAD_REQUEST_ERRORS"]
         ):
@@ -503,6 +603,18 @@ class Flask(App):
         return self.ensure_sync(handler)(e)
 
     def handle_exception(self, e: Exception) -> Response:
+        """
+Handles exceptions raised during the execution of a request.
+
+If propagation is enabled, re-raises the exception. Otherwise, logs the exception and
+continues with the next error handler in the chain.
+
+Args:
+    e (Exception): The exception to be handled.
+
+Returns:
+    Response: A response object containing the server error.
+"""
         exc_info = sys.exc_info()
         got_request_exception.send(self, _async_wrapper=self.ensure_sync, exception=e)
         propagate = self.config["PROPAGATE_EXCEPTIONS"]

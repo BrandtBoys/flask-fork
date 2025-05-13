@@ -303,6 +303,7 @@ Args:
 Returns:
     None
 """
+            
             if state.first_registration:
                 func(state)
 
@@ -547,6 +548,7 @@ Args:
 Returns:
     None
 """
+            
             state.app.jinja_env.filters[name or f.__name__] = f
 
         self.record_once(register_template)
@@ -610,10 +612,11 @@ Registers a Jinja template test in the application's setup state.
 
 Args:
     state (BlueprintSetupState): The current state of the application's setup.
-
+    
 Returns:
-    None
+    None: This function does not return any value. It modifies the provided BlueprintSetupState object directly.
 """
+            
             state.app.jinja_env.tests[name or f.__name__] = f
 
         self.record_once(register_template)
@@ -637,14 +640,15 @@ Returns:
 """
         def decorator(f: T_template_global) -> T_template_global:
             """
-Decorates a function to add it as an app template global.
+Adds the provided function as a template global for the application.
 
 Args:
-    f (T_template_global): The function to be decorated.
+    f (T_template_global): The function to be added as a template global.
 
 Returns:
     T_template_global: The decorated function.
 """
+            
             self.add_app_template_global(f, name=name)
             return f
 
@@ -794,6 +798,7 @@ Args:
 Returns:
     function: The decorated function.
 """
+            
             self.record_once(lambda s: s.app.errorhandler(code)(f))
             return f
 

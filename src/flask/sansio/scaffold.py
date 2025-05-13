@@ -628,6 +628,7 @@ Args:
 Returns:
     F: The decorated view function.
 """
+            
             self.view_functions[endpoint] = f
             return f
 

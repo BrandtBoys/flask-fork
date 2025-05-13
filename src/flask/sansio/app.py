@@ -487,6 +487,11 @@ Note: This method does not create a new environment instance; it simply delegate
         return self.create_jinja_environment()
 
     def create_jinja_environment(self) -> Environment:
+        """
+Raises a NotImplementedError to be implemented by subclasses.
+
+Subclasses must provide an implementation of this method that returns a Jinja2 environment.
+"""
         raise NotImplementedError()
 
     def make_config(self, instance_relative: bool = False) -> Config:
@@ -804,6 +809,7 @@ Args:
 Returns:
     Callable[[T_template_test], T_template_test]: The decorated function.
 """
+        
         def decorator(f: T_template_test) -> T_template_test:
             self.add_template_test(f, name=name)
             return f
@@ -847,14 +853,17 @@ Returns:
 """
         def decorator(f: T_template_global) -> T_template_global:
             """
-Decorates a function to add it as a template global.
+Adds a function as a template global.
+
+Decorates a function to make it accessible as a template global variable.
 
 Args:
-    f (T_template_global): The function to be decorated.
+    f (T_template_global): The function to be decorated. This should be a callable object.
 
 Returns:
-    T_template_global: The decorated function.
+    T_template_global: The decorated function, which is now accessible as a template global variable.
 """
+            
             self.add_template_global(f, name=name)
             return f
 
@@ -979,6 +988,14 @@ Returns:
         return False
 
     def should_ignore_error(self, error: BaseException | None) -> bool:
+        """
+Determines whether an exception should be ignored.
+
+Args:
+    error (BaseException | None): The exception to check. Can be None for no exception.
+Returns:
+    bool: True if the exception should be ignored, False otherwise.
+"""
         return False
 
     def redirect(self, location: str, code: int = 302) -> BaseResponse:

@@ -35,6 +35,15 @@ class JSONProvider:
     """
 
     def __init__(self, app: App) -> None:
+        """
+Initializes the object with the given application instance.
+
+Args:
+    app (App): The application instance to be used by this object.
+
+Returns:
+    None
+"""
         self._app = weakref.proxy(app)
 
     def dumps(self, obj: t.Any, **kwargs: t.Any) -> str:

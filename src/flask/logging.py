@@ -42,6 +42,15 @@ default_handler.setFormatter(
 
 
 def create_logger(app: App) -> logging.Logger:
+    """
+Creates a logger instance for the given application.
+
+Args:
+    app (App): The application object containing the name of the logger.
+
+Returns:
+    logging.Logger: A configured logger instance.
+"""
     logger = logging.getLogger(app.name)
 
     if app.debug and not logger.level:
