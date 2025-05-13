@@ -42,16 +42,3 @@ Args:
 @app.teardown_appcontext
 async def teardown_async(exc: BaseException | None) -> None:
     ...
-    """
-Teardowns an asynchronous operation.
-
-This function is used to handle exceptions that occur during an asynchronous operation.
-It provides a way to clean up resources and restore the original state of the system
-after an exception has occurred.
-
-Args:
-    exc (BaseException | None): The exception that occurred during the operation. Can be None if no exception occurred.
-
-Returns:
-    None: This function does not return any value, it only cleans up resources.
-"""
