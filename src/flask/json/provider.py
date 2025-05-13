@@ -70,6 +70,25 @@ class JSONProvider:
 
 
 def _default(o: t.Any) -> t.Any:
+    """
+Converts an object to a format suitable for JSON serialization.
+
+This function checks the type of the input object and converts it accordingly:
+- If the object is a date, it returns its HTTP representation.
+- If the object is a decimal.Decimal or uuid.UUID, it returns its string representation.
+- If the object is a dataclass instance, it returns its dictionary representation.
+- If the object has an __html__ method, it returns its HTML representation.
+
+If none of these conversions are possible, it raises a TypeError with a message indicating the type of the input object.
+
+Args:
+    o: The object to be converted
+
+Returns:
+    A string representation of the object in JSON format
+Raises:
+    TypeError: If the object is not JSON serializable
+"""
     if isinstance(o, date):
         return http_date(o)
 

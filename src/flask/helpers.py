@@ -44,13 +44,35 @@ def stream_with_context(
 ) -> t.Iterator[t.AnyStr]: ...
 
 
-@t.overload
+@t"""
+Returns an iterator that yields values from a given generator or function, 
+with context information (i.e., the current frame and line number). 
+
+Args:
+    generator_or_function: An iterator that produces strings.
+
+Yields:
+    The next string produced by the input iterator.
+"""
+    .overload
 def stream_with_context(
     generator_or_function: t.Callable[..., t.Iterator[t.AnyStr]],
 ) -> t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]: ...
 
 
-def stream_with_context(
+de"""
+Returns a function that takes an iterator as input and returns an iterator over the same values, 
+with the ability to iterate over the original sequence again using the `next()` function. 
+
+This is achieved by creating a context manager that yields control back to the caller after each iteration.
+
+Args:
+    generator_or_function: A callable that returns an iterator. This can be either a generator expression or a function.
+
+Returns:
+    A new function that takes an iterator as input and returns an iterator over the same values.
+"""
+    f stream_with_context(
     generator_or_function: t.Iterator[t.AnyStr] | t.Callable[..., t.Iterator[t.AnyStr]],
 ) -> t.Iterator[t.AnyStr] | t.Callable[[t.Iterator[t.AnyStr]], t.Iterator[t.AnyStr]]:
     try:
