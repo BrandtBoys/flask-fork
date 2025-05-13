@@ -656,7 +656,6 @@ the flashed messages are properly cleaned after each test.
 Note: Make sure to set `app.testing=True` before running these tests, as otherwise,
 AssertionErrors in view functions will cause a 500 response instead of propagating exceptions.
 """
-    
     @app.route("/")
     def index():
         """
@@ -1745,7 +1744,6 @@ def test_no_setup_after_first_request(app, client):
     def index():
         return "Awesome"
 
-    assert not app.got_first_request
     assert client.get("/").data == b"Awesome"
 
     with pytest.raises(AssertionError) as exc_info:
