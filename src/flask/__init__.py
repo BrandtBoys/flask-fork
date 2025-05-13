@@ -42,7 +42,7 @@ from .templating import render_template_string as render_template_string
 from .templating import stream_template as stream_template
 from .templating import stream_template_string as stream_template_string
 
-__version__ = "2.2.5.dev"
+__version__ = "2.2.5"
 
 
 def __getattr__(name):
@@ -62,7 +62,6 @@ Attributes:
 Raises:
     AttributeError: If the requested attribute does not exist.
 """
-    
     if name == "_app_ctx_stack":
         import warnings
         from .globals import __app_ctx_stack

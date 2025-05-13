@@ -862,7 +862,6 @@ Example usage:
 
     index()
 """
-        
         flask.flash("Hello World")
         flask.flash("Hello World", "error")
         flask.flash(flask.Markup("<em>Testing</em>"), "warning")
@@ -946,7 +945,6 @@ Args:
 Returns:
     str: An empty string, indicating successful test execution.
 """
-        
         messages = flask.get_flashed_messages(category_filter=["message", "warning"])
         assert len(messages) == 2
         assert messages[0] == "Hello World"
@@ -1955,7 +1953,6 @@ Args:
 Returns:
     None
 """
-    
     app.debug = True
 
     @app.route("/")
