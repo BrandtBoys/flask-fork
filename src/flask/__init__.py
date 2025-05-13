@@ -49,7 +49,7 @@ def __getattr__(name):
     """
 Returns the value of the requested attribute, or raises an AttributeError if it does not exist.
 
-The function is used to handle special attributes that are deprecated and will be removed in future versions of Flask.
+This function is used to handle special attributes that are deprecated and will be removed in future versions of Flask.
 It provides a way to access these attributes while still raising a warning about their deprecation.
 
 Attributes:
@@ -62,6 +62,7 @@ Attributes:
 Raises:
     AttributeError: If the requested attribute does not exist.
 """
+    
     if name == "_app_ctx_stack":
         import warnings
         from .globals import __app_ctx_stack
