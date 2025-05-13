@@ -117,21 +117,14 @@ class FlaskClient(Client):
     def session_transaction(
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Generator[SessionMixin, None, None]:
-        # new cookie interface for Werkzeug >= 2.3
-        cookie_storage = self._cookies if hasattr(self, "_cookies") else self.cookie_jar
-
-        if cookie_storage is None:
+        if self._cookies is None:
             raise TypeError(
                 "Cookies are disabled. Create a client with 'use_cookies=True'."
             )
 
         app = self.application
         ctx = app.test_request_context(*args, **kwargs)
-
-        if hasattr(self, "_add_cookies_to_wsgi"):
-            self._add_cookies_to_wsgi(ctx.request.environ)
-        else:
-            self.cookie_jar.inject_wsgi(ctx.request.environ)  # type: ignore[union-attr]
+        self._add_cookies_to_wsgi(ctx.request.environ)
 
         with ctx:
             sess = app.session_interface.open_session(app, ctx.request)
@@ -148,14 +141,11 @@ class FlaskClient(Client):
         with ctx:
             app.session_interface.save_session(app, sess, resp)
 
-        if hasattr(self, "_update_cookies_from_response"):
-            self._update_cookies_from_response(
-                ctx.request.host.partition(":")[0], resp.headers.getlist("Set-Cookie")
-            )
-        else:
-            self.cookie_jar.extract_wsgi(  # type: ignore[union-attr]
-                ctx.request.environ, resp.headers
-            )
+        self._update_cookies_from_response(
+            ctx.request.host.partition(":")[0],
+            ctx.request.path,
+            resp.headers.getlist("Set-Cookie"),
+        )
 
     def _copy_environ(self, other):
         out = {**self.environ_base, **other}
@@ -255,4 +245,3 @@ class FlaskCliRunner(CliRunner):
             kwargs["obj"] = ScriptInfo(create_app=lambda: self.app)
 
         return super().invoke(cli, args, **kwargs)
-
