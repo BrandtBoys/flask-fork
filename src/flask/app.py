@@ -59,7 +59,6 @@ if t.TYPE_CHECKING:  # pragma: no cover
 
     from .testing import FlaskClient
     from .testing import FlaskCliRunner
-    from .typing import HeadersValue
 
 T_shell_context_processor = t.TypeVar(
     "T_shell_context_processor", bound=ft.ShellContextProcessorCallable
@@ -189,12 +188,9 @@ class Flask(App):
             "SESSION_COOKIE_PATH": None,
             "SESSION_COOKIE_HTTPONLY": True,
             "SESSION_COOKIE_SECURE": False,
-            "SESSION_COOKIE_PARTITIONED": False,
             "SESSION_COOKIE_SAMESITE": None,
             "SESSION_REFRESH_EACH_REQUEST": True,
             "MAX_CONTENT_LENGTH": None,
-            "MAX_FORM_MEMORY_SIZE": 500_000,
-            "MAX_FORM_PARTS": 1_000,
             "SEND_FILE_MAX_AGE_DEFAULT": None,
             "TRAP_BAD_REQUEST_ERRORS": None,
             "TRAP_HTTP_EXCEPTIONS": False,
@@ -202,7 +198,6 @@ class Flask(App):
             "PREFERRED_URL_SCHEME": "http",
             "TEMPLATES_AUTO_RELOAD": None,
             "MAX_COOKIE_SIZE": 4093,
-            "PROVIDE_AUTOMATIC_OPTIONS": True,
         }
     )
 
@@ -297,28 +292,14 @@ class Flask(App):
             t.cast(str, self.static_folder), filename, max_age=max_age
         )
 
-    def open_resource(
-        self, resource: str, mode: str = "rb", encoding: str | None = None
-    ) -> t.IO[t.AnyStr]:
+    def open_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
-        path = os.path.join(self.root_path, resource)
+        return open(os.path.join(self.root_path, resource), mode)
 
-        if mode == "rb":
-            return open(path, mode)  # pyright: ignore
-
-        return open(path, mode, encoding=encoding)
-
-    def open_instance_resource(
-        self, resource: str, mode: str = "rb", encoding: str | None = "utf-8"
-    ) -> t.IO[t.AnyStr]:
-        path = os.path.join(self.instance_path, resource)
-
-        if "b" in mode:
-            return open(path, mode)
-
-        return open(path, mode, encoding=encoding)
+    def open_instance_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
+        return open(os.path.join(self.instance_path, resource), mode)
 
     def create_jinja_environment(self) -> Environment:
         options = dict(self.jinja_options)
@@ -721,8 +702,7 @@ class Flask(App):
 
     def make_response(self, rv: ft.ResponseReturnValue) -> Response:
 
-        status: int | None = None
-        headers: HeadersValue | None = None
+        status = headers = None
 
         # unpack tuple returns
         if isinstance(rv, tuple):
@@ -734,7 +714,7 @@ class Flask(App):
             # decide if a 2-tuple has status or headers
             elif len_rv == 2:
                 if isinstance(rv[1], (Headers, dict, tuple, list)):
-                    rv, headers = rv  # pyright: ignore
+                    rv, headers = rv
                 else:
                     rv, status = rv  # type: ignore[assignment,misc]
             # other sized tuples are not allowed
@@ -912,4 +892,3 @@ class Flask(App):
         self, environ: WSGIEnvironment, start_response: StartResponse
     ) -> cabc.Iterable[bytes]:
         return self.wsgi_app(environ, start_response)
-
