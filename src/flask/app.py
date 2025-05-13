@@ -550,6 +550,15 @@ class Flask(Scaffold):
 
     @property
     def got_first_request(self) -> bool:
+        """
+Deprecation Notice: `got_first_request` is deprecated and will be removed in Flask 2.4.
+
+Returns:
+    bool: Whether the first request has been received.
+
+Raises:
+    DeprecationWarning: If the function is called, indicating that it should not be used.
+"""
         import warnings
 
         warnings.warn(
