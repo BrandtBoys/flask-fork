@@ -21,3 +21,4 @@ def process(self: Task, total: int) -> object:
         time.sleep(1)
 
     return {"current": total, "total": total}
+

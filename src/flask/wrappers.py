@@ -53,7 +53,6 @@ class Request(RequestBase):
 
     @property
     def max_content_length(self) -> int | None:  # type: ignore
-        """Read-only view of the ``MAX_CONTENT_LENGTH`` config key."""
         if current_app:
             return current_app.config["MAX_CONTENT_LENGTH"]
         else:
@@ -61,14 +60,6 @@ class Request(RequestBase):
 
     @property
     def endpoint(self) -> str | None:
-        """The endpoint that matched the request URL.
-
-        This will be ``None`` if matching failed or has not been
-        performed yet.
-
-        This in combination with :attr:`view_args` can be used to
-        reconstruct the same URL or a modified URL.
-        """
         if self.url_rule is not None:
             return self.url_rule.endpoint
 
@@ -76,16 +67,6 @@ class Request(RequestBase):
 
     @property
     def blueprint(self) -> str | None:
-        """The registered name of the current blueprint.
-
-        This will be ``None`` if the endpoint is not part of a
-        blueprint, or if URL matching failed or has not been performed
-        yet.
-
-        This does not necessarily match the name the blueprint was
-        created with. It may have been nested, or registered with a
-        different name.
-        """
         endpoint = self.endpoint
 
         if endpoint is not None and "." in endpoint:
@@ -95,14 +76,6 @@ class Request(RequestBase):
 
     @property
     def blueprints(self) -> list[str]:
-        """The registered names of the current blueprint upwards through
-        parent blueprints.
-
-        This will be an empty list if there is no current blueprint, or
-        if URL matching failed.
-
-        .. versionadded:: 2.0.1
-        """
         name = self.blueprint
 
         if name is None:
@@ -161,13 +134,9 @@ class Response(ResponseBase):
 
     @property
     def max_cookie_size(self) -> int:  # type: ignore
-        """Read-only view of the :data:`MAX_COOKIE_SIZE` config key.
-
-        See :attr:`~werkzeug.wrappers.Response.max_cookie_size` in
-        Werkzeug's docs.
-        """
         if current_app:
             return current_app.config["MAX_COOKIE_SIZE"]
 
         # return Werkzeug's default when not in an app context
         return super().max_cookie_size
+
