@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import typing as t
+
 from . import json as json
 from .app import Flask as Flask
 from .blueprints import Blueprint as Blueprint
@@ -37,3 +41,20 @@ from .templating import stream_template as stream_template
 from .templating import stream_template_string as stream_template_string
 from .wrappers import Request as Request
 from .wrappers import Response as Response
+
+
+def __getattr__(name: str) -> t.Any:
+    if name == "__version__":
+        import importlib.metadata
+        import warnings
+
+        warnings.warn(
+            "The '__version__' attribute is deprecated and will be removed in"
+            " Flask 3.2. Use feature detection or"
+            " 'importlib.metadata.version(\"flask\")' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return importlib.metadata.version("flask")
+
+    raise AttributeError(name)
