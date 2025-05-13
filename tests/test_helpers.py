@@ -162,8 +162,35 @@ class TestUrlFor:
         assert flask.url_for("myview", _method="POST") == "/myview/create"
 
     def test_url_for_with_self(self, app, req_ctx):
+        """
+Tests the `url_for` function with a route that includes a parameter.
+
+This test case verifies that the `url_for` function correctly generates URLs
+for routes that include parameters. In this specific case, it tests the
+`/self` route and ensures that the generated URL is correct when using
+the `self` parameter.
+
+Args:
+    app (Flask): The Flask application instance.
+    req_ctx: The request context object.
+
+Returns:
+    None
+
+Raises:
+    AssertionError: If the generated URL does not match the expected result.
+"""
         @app.route("/<self>")
         def index(self):
+            """
+Returns the magic number '42' as per the problem's requirements.
+
+Args:
+    None
+
+Returns:
+    str: The string representation of the magic number 42.
+"""
             return "42"
 
         assert flask.url_for("index", self="2") == "/2"
