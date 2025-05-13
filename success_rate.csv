@@ -31,3 +31,4 @@ Success,Comment
 "(True, '""""""\nReturns the version of Flask.\n\nThis function is deprecated and will be removed in Flask 3.1.\nInstead, use feature detection or \'importlib.metadata.version(""flask"")\'.\n\nArgs:\n    name (str): The attribute being accessed.\n\nReturns:\n    t.Any: The version of Flask as a string.\n\nRaises:\n    AttributeError: If the attribute does not exist.\n""""""')"
 
 
+
