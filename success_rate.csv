@@ -1,2 +1,3 @@
 Success,Comment
 "(True, '""""""\nLoads a Flask application instance.\n\nThis method attempts to load an existing Flask application from the `self._loaded_app` attribute,\nor creates a new one if none exists. It also sets the debug flag of the loaded application\nif `self.set_debug_flag` is True.\n\nIf no application can be found, it raises a `NoAppException`.\n\nReturns:\n    The loaded Flask application instance.\n""""""')"
+
