@@ -242,6 +242,7 @@ Attributes:
 Note:
 This function initializes a new instance of the class, setting up various attributes such as `name`, `url_prefix`, `subdomain`, and more. It also raises a ValueError if the 'name' parameter is empty or contains a dot '.' character.
 """
+        
         super().__init__(
             import_name=import_name,
             static_folder=static_folder,
@@ -283,6 +284,7 @@ Args:
 Raises:
     AssertionError: If the setup method has already been registered.
 """
+        
         if self._got_registered_once:
             raise AssertionError(
                 f"The setup method '{f_name}' can no longer be called on the blueprint"
