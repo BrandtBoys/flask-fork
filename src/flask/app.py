@@ -365,21 +365,24 @@ Raises:
 
     def create_url_adapter(self, request: Request | None) -> MapAdapter | None:
         if request is not None:
-            # If subdomain matching is disabled (the default), use the
-            # default subdomain in all cases. This should be the default
-            # in Werkzeug but it currently does not have that feature.
-            if not self.subdomain_matching:
-                subdomain = self.url_map.default_subdomain or None
-            else:
-                subdomain = None
+            subdomain = None
+            server_name = self.config["SERVER_NAME"]
+
+            if self.url_map.host_matching:
+                # Don't pass SERVER_NAME, otherwise it's used and the actual
+                # host is ignored, which breaks host matching.
+                server_name = None
+            elif not self.subdomain_matching:
+                # Werkzeug doesn't implement subdomain matching yet. Until then,
+                # disable it by forcing the current subdomain to the default, or
+                # the empty string.
+                subdomain = self.url_map.default_subdomain or ""
 
             return self.url_map.bind_to_environ(
-                request.environ,
-                server_name=self.config["SERVER_NAME"],
-                subdomain=subdomain,
+                request.environ, server_name=server_name, subdomain=subdomain
             )
-        # We need at the very least the server name to be set for this
-        # to work.
+
+        # Need at least SERVER_NAME to match/build outside a request.
         if self.config["SERVER_NAME"] is not None:
             return self.url_map.bind(
                 self.config["SERVER_NAME"],
