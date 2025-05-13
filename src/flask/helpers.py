@@ -287,6 +287,21 @@ class locked_cached_property(werkzeug.utils.cached_property):
         name: t.Optional[str] = None,
         doc: t.Optional[str] = None,
     ) -> None:
+        """
+Initialize a cached property with optional getter, name, and documentation.
+
+This method initializes a cached property with the provided getter function, 
+name (defaulting to None), and documentation (defaulting to None). It also sets up 
+a lock for thread-safe access to the property.
+
+Args:
+    fget: The getter function for the property.
+    name: The name of the property (optional).
+    doc: The documentation string for the property (optional).
+
+Returns:
+    None
+"""
         import warnings
 
         warnings.warn(
