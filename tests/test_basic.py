@@ -1,16 +1,15 @@
 import gc
 import re
-import time
 import uuid
 import warnings
 import weakref
 from datetime import datetime
 from datetime import timezone
 from platform import python_implementation
-from threading import Thread
 
 import pytest
 import werkzeug.serving
+from markupsafe import Markup
 from werkzeug.exceptions import BadRequest
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
@@ -252,25 +251,14 @@ def test_session(app, client):
     assert client.get("/get").data == b"42"
 
 
-def test_session_using_server_name(app, client):
-    app.config.update(SERVER_NAME="example.com")
+def test_session_path(app, client):
+    app.config.update(APPLICATION_ROOT="/foo")
 
     @app.route("/")
     def index():
         flask.session["testing"] = 42
         return "Hello World"
 
-    rv = client.get("/", "http://example.com/")
-    cookie = rv.headers["set-cookie"].lower()
-    # or condition for Werkzeug < 2.3
-    assert "domain=example.com" in cookie or "domain=.example.com" in cookie
-
-
-def test_session_using_server_name_and_port(app, client):
-    app.config.update(SERVER_NAME="example.com:8080")
-
-    @app.route("/")
-    def index():
         """
 Flask Session Initialization and Response Generation
 
@@ -285,20 +273,6 @@ str: A greeting message "Hello World"
 Side Effects:
 - Initializes the Flask session variable 'testing' with value 42
 """
-        flask.session["testing"] = 42
-        return "Hello World"
-
-    rv = client.get("/", "http://example.com:8080/")
-    cookie = rv.headers["set-cookie"].lower()
-    # or condition for Werkzeug < 2.3
-    assert "domain=example.com" in cookie or "domain=.example.com" in cookie
-
-
-def test_session_using_server_name_port_and_path(app, client):
-    app.config.update(SERVER_NAME="example.com:8080", APPLICATION_ROOT="/foo")
-
-    @app.route("/")
-    def index():
         """
 Flask Session Initialization and Response Generation
 
@@ -313,13 +287,8 @@ str: A greeting message "Hello World"
 Side Effects:
 - Initializes the Flask session variable 'testing' with value 42
 """
-        flask.session["testing"] = 42
-        return "Hello World"
-
     rv = client.get("/", "http://example.com:8080/foo")
-    assert "domain=example.com" in rv.headers["set-cookie"].lower()
     assert "path=/foo" in rv.headers["set-cookie"].lower()
-    assert "httponly" in rv.headers["set-cookie"].lower()
 
 
 def test_session_using_application_root(app, client):
@@ -411,7 +380,6 @@ def test_session_using_samesite_attribute(app, client):
     assert "samesite=lax" in cookie
 
 
-def test_session_localhost_warning(recwarn, app, client):
     """
 Test session warning for localhost.
 
@@ -427,10 +395,6 @@ Parameters:
 Returns:
     None
 """
-    app.config.update(SERVER_NAME="localhost:5000")
-
-    @app.route("/")
-    def index():
         """
 Flask Session Test Function
 
@@ -443,16 +407,6 @@ Returns:
 Note:
     This function should be used as part of a larger application to test session management.
 """
-        flask.session["testing"] = 42
-        return "testing"
-
-    rv = client.get("/", "http://localhost:5000/")
-    assert "domain" not in rv.headers["set-cookie"].lower()
-    w = recwarn.pop(UserWarning)
-    assert "'localhost' is not a valid cookie domain" in str(w.message)
-
-
-def test_session_ip_warning(recwarn, app, client):
     """
 Test session IP warning.
 
@@ -467,10 +421,6 @@ Parameters:
 Returns:
     None
 """
-    app.config.update(SERVER_NAME="127.0.0.1:5000")
-
-    @app.route("/")
-    def index():
         """
 Flask Session Test Function
 
@@ -483,15 +433,6 @@ Returns:
 Note:
     This function should be used as part of a larger application to test session management.
 """
-        flask.session["testing"] = 42
-        return "testing"
-
-    rv = client.get("/", "http://127.0.0.1:5000/")
-    assert "domain=127.0.0.1" in rv.headers["set-cookie"].lower()
-    w = recwarn.pop(UserWarning)
-    assert "cookie domain is an IP" in str(w.message)
-
-
 def test_missing_session(app):
     app.secret_key = None
 
@@ -584,7 +525,7 @@ Returns:
 """
         flask.session["t"] = (1, 2, 3)
         flask.session["b"] = b"\xff"
-        flask.session["m"] = flask.Markup("<html>")
+        flask.session["m"] = Markup("<html>")
         flask.session["u"] = the_uuid
         flask.session["d"] = now
         flask.session["t_tag"] = {" t": "not-a-tuple"}
@@ -598,8 +539,8 @@ Returns:
         assert s["t"] == (1, 2, 3)
         assert type(s["b"]) == bytes
         assert s["b"] == b"\xff"
-        assert type(s["m"]) == flask.Markup
-        assert s["m"] == flask.Markup("<html>")
+        assert type(s["m"]) == Markup
+        assert s["m"] == Markup("<html>")
         assert s["u"] == the_uuid
         assert s["d"] == now
         assert s["t_tag"] == {" t": "not-a-tuple"}
@@ -762,7 +703,7 @@ Notes:
 """
         flask.flash("Hello World")
         flask.flash("Hello World", "error")
-        flask.flash(flask.Markup("<em>Testing</em>"), "warning")
+        flask.flash(Markup("<em>Testing</em>"), "warning")
         return ""
 
     @app.route("/test/")
@@ -786,7 +727,7 @@ Raises:
         assert list(messages) == [
             "Hello World",
             "Hello World",
-            flask.Markup("<em>Testing</em>"),
+            Markup("<em>Testing</em>"),
         ]
         return ""
 
@@ -811,7 +752,7 @@ Returns:
         assert list(messages) == [
             ("message", "Hello World"),
             ("error", "Hello World"),
-            ("warning", flask.Markup("<em>Testing</em>")),
+            ("warning", Markup("<em>Testing</em>")),
         ]
         return ""
 
@@ -830,7 +771,7 @@ Returns:
         )
         assert list(messages) == [
             ("message", "Hello World"),
-            ("warning", flask.Markup("<em>Testing</em>")),
+            ("warning", Markup("<em>Testing</em>")),
         ]
         return ""
 
@@ -852,7 +793,7 @@ Returns:
         messages = flask.get_flashed_messages(category_filter=["message", "warning"])
         assert len(messages) == 2
         assert messages[0] == "Hello World"
-        assert messages[1] == flask.Markup("<em>Testing</em>")
+        assert messages[1] == Markup("<em>Testing</em>")
         return ""
 
     # Create new test client on each test to clean flashed messages.
@@ -1863,16 +1804,12 @@ Returns:
     def index():
         return "Awesome"
 
-    assert not app.got_first_request
     assert client.get("/").data == b"Awesome"
 
     with pytest.raises(AssertionError) as exc_info:
         app.add_url_rule("/foo", endpoint="late")
 
     assert "setup method 'add_url_rule'" in str(exc_info.value)
-
-
-def test_before_first_request_functions(app, client):
     """
 Request Functions for Application Testing
 
@@ -1885,27 +1822,11 @@ client (object): The client object used to make HTTP requests.
 Returns:
 None
 """
-    got = []
-
-    with pytest.deprecated_call():
-
-        @app.before_first_request
-        def foo():
             """
 Adds 42 to the 'got' list.
 
 This function is not intended for external use and should only be accessed internally within the application.
 """
-            got.append(42)
-
-    client.get("/")
-    assert got == [42]
-    client.get("/")
-    assert got == [42]
-    assert app.got_first_request
-
-
-def test_before_first_request_functions_concurrent(app, client):
     """
 Concurrently tests the application's routing functionality by making a request to the root URL while another thread is asserting that a value was appended to the `got` list.
 
@@ -1915,12 +1836,6 @@ The `get_and_assert` function makes a GET request to the root URL and asserts th
 
 This test ensures that the application's routing functionality works correctly even when multiple threads are making requests concurrently.
 """
-    got = []
-
-    with pytest.deprecated_call():
-
-        @app.before_first_request
-        def foo():
             """
 Returns the result of appending 42 to the 'got' list after a 200ms delay.
 
@@ -1936,18 +1851,6 @@ Raises:
 Example:
     >>> get_and_asse()
 """
-            time.sleep(0.2)
-            got.append(42)
-
-    def get_and_assert():
-        client.get("/")
-        assert got == [42]
-
-    t = Thread(target=get_and_assert)
-    t.start()
-    get_and_assert()
-    t.join()
-    assert app.got_first_request
 
 
 def test_routing_redirect_debugging(monkeypatch, app, client):

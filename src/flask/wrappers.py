@@ -124,7 +124,7 @@ class Response(ResponseBase):
         Added :attr:`max_cookie_size`.
     """
 
-    default_mimetype = "text/html"
+    default_mimetype: t.Optional[str] = "text/html"
 
     json_module = json
 
@@ -137,4 +137,3 @@ class Response(ResponseBase):
 
         # return Werkzeug's default when not in an app context
         return super().max_cookie_size
-
