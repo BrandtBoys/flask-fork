@@ -507,19 +507,18 @@ def test_session_stored_last(app, client):
 
 def test_session_special_types(app, client):
     """
-Test session special types.
+Tests the behavior of Flask's session object when storing special types such as bytes, Markup objects, and UUIDs.
 
-This function tests the behavior of Flask's session object when storing
-special types such as bytes, Markup objects, and UUIDs. It verifies that
-these types are stored correctly and can be retrieved from the session.
+This function tests that these types are stored correctly and can be retrieved from the session.
 
 Parameters:
-app (Flask application): The Flask application instance.
-client (Client): The Client instance used for testing.
+    app (Flask application): The Flask application instance.
+    client (Client): The Client instance used for testing.
 
 Returns:
-None
+    None
 """
+    
     now = datetime.now(timezone.utc).replace(microsecond=0)
     the_uuid = uuid.uuid4()
 
@@ -805,6 +804,7 @@ Example usage:
 
     index()
 """
+        
         flask.flash("Hello World")
         flask.flash("Hello World", "error")
         flask.flash(Markup("<em>Testing</em>"), "warning")
@@ -845,6 +845,7 @@ which returns a list of tuples containing message category and corresponding mes
 
 It asserts that the length of the returned list is 3 and checks if it contains the expected messages.
 """
+        
         messages = flask.get_flashed_messages(with_categories=True)
         assert len(messages) == 3
         assert list(messages) == [
@@ -875,6 +876,13 @@ It asserts that the length of the returned list is 3 and checks if it contains t
 
     @app.route("/test_filters_without_returning_categories/")
     def test_filters2():
+        """
+Tests the functionality of getting flashed messages with a category filter.
+
+This function tests that the `flask.get_flashed_messages` method returns two messages
+when called with a category filter. The first message is expected to be "Hello World"
+and the second message is expected to be an HTML-marked string "<em>Testing</em>".
+"""
         messages = flask.get_flashed_messages(category_filter=["message", "warning"])
         assert len(messages) == 2
         assert messages[0] == "Hello World"

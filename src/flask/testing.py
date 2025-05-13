@@ -132,6 +132,21 @@ class FlaskClient(Client):
     def session_transaction(
         self, *args: t.Any, **kwargs: t.Any
     ) -> t.Generator[SessionMixin, None, None]:
+        """
+Yield a session object for the current test request context.
+
+This function is used to create and manage sessions for testing purposes.
+It checks if cookies are enabled, sets up the WSGI context, opens a new session,
+and saves it after use. If the session backend fails to open a session, a
+RuntimeError is raised.
+
+Args:
+    *args: Variable length argument list containing any arguments passed to the test request context.
+    **kwargs: Keyworded arguments for the test request context.
+
+Returns:
+    A generator yielding SessionMixin objects.
+"""
         if self._cookies is None:
             raise TypeError(
                 "Cookies are disabled. Create a client with 'use_cookies=True'."
@@ -199,7 +214,11 @@ If no request is provided, one will be created from the given arguments and keyw
 
 Returns:
     TestResponse: The response object for the test request.
+
+Raises:
+    ValueError: If the request cannot be created from the given arguments and keyword arguments.
 """
+        
         if args and isinstance(
             args[0], (werkzeug.test.EnvironBuilder, dict, BaseRequest)
         ):
@@ -240,18 +259,19 @@ Returns:
 
     def __enter__(self) -> FlaskClient:
         """
-    Enters the context of a Flask client.
+Enters the context of a Flask client.
 
-    This method is used to create a new context for the Flask client. It sets the `preserve_context` attribute to `True`, 
-    indicating that subsequent invocations will preserve the current context. If an attempt is made to nest client invocations, 
-    a RuntimeError is raised.
+This method is used to create a new context for the Flask client. It sets the `preserve_context` attribute to `True`, 
+indicating that subsequent invocations will preserve the current context. If an attempt is made to nest client invocations, 
+a RuntimeError is raised.
 
-    Returns:
-        The instance of the FlaskClient class, allowing for method chaining.
+Returns:
+    The instance of the FlaskClient class, allowing for method chaining.
     
-    Raises:
-        RuntimeError: If an attempt is made to nest client invocations.
+Raises:
+    RuntimeError: If an attempt is made to nest client invocations.
 """
+        
         if self.preserve_context:
             raise RuntimeError("Cannot nest client invocations")
         self.preserve_context = True
@@ -276,6 +296,7 @@ Args:
 Returns:
     None
 """
+        
         self.preserve_context = False
         self._context_stack.close()
 
@@ -297,6 +318,7 @@ Args:
 Returns:
     None
 """
+        
         self.app = app
         super().__init__(**kwargs)
 

@@ -93,6 +93,19 @@ class NullSession(SecureCookieSession):
     """
 
     def _fail(self, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:
+        """
+Raises a RuntimeError indicating that the session is unavailable due to an unconfigured secret key.
+
+Args:
+    *args: Variable length argument list.
+    **kwargs: Arbitrary keyword arguments.
+
+Returns:
+    None, as this function does not return any value. Instead, it raises a RuntimeError with a descriptive error message.
+
+Raises:
+    RuntimeError: If the session is unavailable because no secret key was set.
+"""
         raise RuntimeError(
             "The session is unavailable because no secret "
             "key was set.  Set the secret_key on the "
@@ -162,7 +175,14 @@ Args:
 
 Returns:
     NullSession: A null session instance.
+
+Raises:
+    TypeError: If the provided `app` is not an instance of Flask.
+
+Note:
+This method creates a new instance of the `NullSession` class, which does not store any data. It is intended for use in testing or other scenarios where no session data needs to be stored.
 """
+        
         return self.null_session_class()
 
     def is_null_session(self, obj: object) -> bool:
@@ -181,6 +201,15 @@ Returns:
         return app.config["SESSION_COOKIE_NAME"]
 
     def get_cookie_domain(self, app: Flask) -> str | None:
+        """
+Returns the domain of the session cookie from a given Flask application.
+
+Args:
+    app (Flask): The Flask application instance.
+
+Returns:
+    str | None: The domain of the session cookie, or None if not set.
+"""
         rv = app.config["SESSION_COOKIE_DOMAIN"]
         return rv if rv else None
 
@@ -226,6 +255,7 @@ Args:
 Returns:
     bool: Whether the session cookie is secure.
 """
+        
         return app.config["SESSION_COOKIE_SECURE"]
 
     def get_cookie_samesite(self, app: Flask) -> str:
@@ -279,6 +309,7 @@ Returns:
 Raises:
     NotImplementedError: If the method is not implemented by subclasses.
 """
+        
         raise NotImplementedError()
 
     def save_session(
@@ -389,13 +420,14 @@ the `get_cookie_name`, `get_cookie_domain`, `get_cookie_path`, `get_cookie_secur
 `get_cookie_samesite`, and `get_cookie_httponly` methods.
 
 Parameters:
-app (Flask): The Flask application instance.
-session (SessionMixin): The session object being saved.
-response (Response): The HTTP response object.
+    app (Flask): The Flask application instance.
+    session (SessionMixin): The session object being saved.
+    response (Response): The HTTP response object.
 
 Returns:
-None
+    None
 """
+        
         name = self.get_cookie_name(app)
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
