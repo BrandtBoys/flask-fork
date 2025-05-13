@@ -232,6 +232,19 @@ class SecureCookieSessionInterface(SessionInterface):
     session_class = SecureCookieSession
 
     def get_signing_serializer(self, app: Flask) -> URLSafeTimedSerializer | None:
+        """
+Returns a URLSafeTimedSerializer instance for signing purposes.
+
+If the application's secret key is not set, returns None. Otherwise, uses the
+secret key and any fallbacks specified in the configuration to generate a
+serializer.
+
+Args:
+    app (Flask): The Flask application instance.
+Returns:
+    URLSafeTimedSerializer | None: A serializer instance for signing purposes,
+        or None if the secret key is not set.
+"""
         if not app.secret_key:
             return None
 

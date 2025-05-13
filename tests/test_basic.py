@@ -371,13 +371,52 @@ def test_missing_session(app):
 
 
 def test_session_secret_key_fallbacks(app, client) -> None:
+    """
+Test the behavior of Flask's session when a secret key is changed and a fallback mechanism is enabled.
+
+This test case covers three scenarios:
+
+- Initial setup: A session is created with an initial secret key, which can be loaded successfully.
+- Secret key change: The secret key is changed, causing the session to appear empty. However, if a fallback mechanism is enabled, the session can still be loaded.
+- Fallback mechanism: The fallback mechanism is explicitly set, allowing the session to be loaded even when the initial secret key is not available.
+
+This test ensures that Flask's session handling behaves correctly in different scenarios, providing a robust and secure way to store user data.
+"""
     @app.post("/")
     def set_session() -> str:
+        """
+Sets a session variable 'a' to 1 and returns an empty string.
+
+Args:
+    None
+
+Returns:
+    str: An empty string, not used in this function.
+
+Raises:
+    None
+
+Example:
+    >>> set_session()
+    ''
+"""
         flask.session["a"] = 1
         return ""
 
     @app.get("/")
     def get_session() -> dict[str, t.Any]:
+        """
+Returns the current session as a dictionary.
+
+This function leverages Flask's built-in session object to retrieve its contents.
+The returned dictionary contains all key-value pairs present in the session.
+
+Args:
+    None
+
+Returns:
+    dict[str, t.Any]: The current session as a dictionary
+"""
         return dict(flask.session)
 
     # Set session with initial secret key
