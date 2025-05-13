@@ -162,6 +162,15 @@ class SessionInterface:
         return app.config["SESSION_COOKIE_NAME"]
 
     def get_cookie_domain(self, app: "Flask") -> t.Optional[str]:
+        """
+Returns the domain of the session cookie for a given Flask application.
+
+Args:
+    app (Flask): The Flask application instance.
+
+Returns:
+    Optional[str]: The domain of the session cookie, or None if not set.
+"""
         rv = app.config["SESSION_COOKIE_DOMAIN"]
         return rv if rv else None
 

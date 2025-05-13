@@ -331,6 +331,20 @@ Returns:
 
 
 def is_ip(value: str) -> bool:
+    """
+Checks if the provided string is a valid IP address.
+
+This function uses the `socket` module to perform the validation.
+It supports both IPv4 and IPv6 addresses.
+
+Args:
+    value (str): The IP address to be validated.
+
+Returns:
+    bool: True if the IP address is valid, False otherwise.
+
+Deprecation Warning: This function is deprecated and will be removed in Flask 2.4.
+"""
     warnings.warn(
         "The 'is_ip' function is deprecated and will be removed in Flask 2.4.",
         DeprecationWarning,

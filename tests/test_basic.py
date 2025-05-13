@@ -252,6 +252,25 @@ def test_session(app, client):
 
 
 def test_session_path(app, client):
+    """
+Tests the session path configuration for a Flask application.
+
+This function tests that the `APPLICATION_ROOT` is correctly set as the
+session path. It does this by updating the app's config, creating an index
+route with a test session value, and then making a GET request to the root
+URL of the app. The response headers are checked to ensure that the correct
+Cookie is being set.
+
+Args:
+    app (Flask): The Flask application instance.
+    client (requests.Session): A requests session object for making HTTP requests.
+
+Returns:
+    None
+
+Raises:
+    AssertionError: If the expected Cookie header value is not found in the response.
+"""
     app.config.update(APPLICATION_ROOT="/foo")
 
     @app.route("/")
