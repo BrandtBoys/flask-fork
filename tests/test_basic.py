@@ -412,6 +412,20 @@ def test_session_stored_last(app, client):
 
 
 def test_session_special_types(app, client):
+    """
+Test session special types.
+
+This function tests the behavior of Flask's session object when storing
+special types such as bytes, Markup objects, and UUIDs. It verifies that
+these types are stored correctly and can be retrieved from the session.
+
+Parameters:
+app (Flask application): The Flask application instance.
+client (Client): The client instance used for testing.
+
+Returns:
+None
+"""
     now = datetime.now(timezone.utc).replace(microsecond=0)
     the_uuid = uuid.uuid4()
 
@@ -755,6 +769,20 @@ def test_teardown_request_handler_debug_mode(app, client):
 
 
 def test_teardown_request_handler_error(app, client):
+    """
+Test teardown request handler error functionality.
+
+This test verifies that all teardown requests are passed the same original exception.
+It also checks that a request with a division by zero error is handled correctly,
+and that an internal server error response is returned to the client.
+
+Parameters:
+app (Flask application): The Flask application instance being tested.
+client (requests session): The HTTP client used to make requests to the application.
+
+Returns:
+None
+"""
     called = []
     app.testing = False
 
@@ -772,6 +800,21 @@ def test_teardown_request_handler_error(app, client):
 
     @app.teardown_request
     def teardown_request2(exc):
+        """
+Raises a new `TypeError` exception to test that all teardown requests are passed the same original exception.
+
+This function is designed to be used in conjunction with other teardown functions. It raises a new error and blows away sys.exc_info(), 
+so we can test that all teardown_requests get passed the same original exception.
+
+Args:
+    exc (Exception): The exception to be raised.
+
+Returns:
+    None
+
+Raises:
+    TypeError: A new `TypeError` exception is raised.
+"""
         assert type(exc) is ZeroDivisionError
         called.append(True)
         # This raises a new error and blows away sys.exc_info(), so we can
