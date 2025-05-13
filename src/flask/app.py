@@ -293,12 +293,38 @@ class Flask(App):
         )
 
     def open_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
+        """
+Opens a resource file.
+
+Args:
+    resource (str): The path to the resource file.
+    mode (str, optional): The mode in which to open the file. Defaults to "rb". Supported modes are "r", "rt", and "rb".
+
+Returns:
+    t.IO[t.AnyStr]: A file object opened in the specified mode.
+
+Raises:
+    ValueError: If an unsupported mode is provided.
+"""
         if mode not in {"r", "rt", "rb"}:
             raise ValueError("Resources can only be opened for reading.")
 
         return open(os.path.join(self.root_path, resource), mode)
 
     def open_instance_resource(self, resource: str, mode: str = "rb") -> t.IO[t.AnyStr]:
+        """
+Opens an instance resource file.
+
+Args:
+    - `resource` (str): The path to the resource file.
+    - `mode` (str, optional): The mode in which to open the file. Defaults to "rb".
+
+Returns:
+    A file object opened at the specified location with the given mode.
+
+Raises:
+    FileNotFoundError: If the instance_path does not exist or the resource is not found.
+"""
         return open(os.path.join(self.instance_path, resource), mode)
 
     def create_jinja_environment(self) -> Environment:
