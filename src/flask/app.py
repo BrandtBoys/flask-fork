@@ -535,17 +535,6 @@ class Flask(Scaffold):
     def jinja_env(self) -> Environment:
         return self.create_jinja_environment()
 
-    @property
-    def got_first_request(self) -> bool:
-        import warnings
-
-        warnings.warn(
-            "'got_first_request' is deprecated and will be removed in Flask 2.4.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self._got_first_request
-
     def make_config(self, instance_relative: bool = False) -> Config:
         root_path = self.root_path
         if instance_relative:
@@ -1375,4 +1364,3 @@ class Flask(Scaffold):
 
     def __call__(self, environ: dict, start_response: t.Callable) -> t.Any:
         return self.wsgi_app(environ, start_response)
-

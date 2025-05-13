@@ -2,14 +2,11 @@ from __future__ import annotations
 
 import importlib.util
 import os
-import socket
 import sys
 import typing as t
-import warnings
 from datetime import datetime
 from functools import lru_cache
 from functools import update_wrapper
-from threading import RLock
 
 import werkzeug.utils
 from werkzeug.exceptions import abort as _wz_abort
@@ -265,70 +262,6 @@ def get_root_path(import_name: str) -> str:
     return os.path.dirname(os.path.abspath(filepath))
 
 
-class locked_cached_property(werkzeug.utils.cached_property):
-    """A :func:`property` that is only evaluated once. Like
-    :class:`werkzeug.utils.cached_property` except access uses a lock
-    for thread safety.
-
-    .. deprecated:: 2.3
-        Will be removed in Flask 2.4. Use a lock inside the decorated function if
-        locking is needed.
-
-    .. versionchanged:: 2.0
-        Inherits from Werkzeug's ``cached_property`` (and ``property``).
-    """
-
-    def __init__(
-        self,
-        fget: t.Callable[[t.Any], t.Any],
-        name: str | None = None,
-        doc: str | None = None,
-    ) -> None:
-        import warnings
-
-        warnings.warn(
-            "'locked_cached_property' is deprecated and will be removed in Flask 2.4."
-            " Use a lock inside the decorated function if locking is needed.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__(fget, name=name, doc=doc)
-        self.lock = RLock()
-
-    def __get__(self, obj: object, type: type = None) -> t.Any:  # type: ignore
-        if obj is None:
-            return self
-
-        with self.lock:
-            return super().__get__(obj, type=type)
-
-    def __set__(self, obj: object, value: t.Any) -> None:
-        with self.lock:
-            super().__set__(obj, value)
-
-    def __delete__(self, obj: object) -> None:
-        with self.lock:
-            super().__delete__(obj)
-
-
-def is_ip(value: str) -> bool:
-    warnings.warn(
-        "The 'is_ip' function is deprecated and will be removed in Flask 2.4.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-
-    for family in (socket.AF_INET, socket.AF_INET6):
-        try:
-            socket.inet_pton(family, value)
-        except OSError:
-            pass
-        else:
-            return True
-
-    return False
-
-
 @lru_cache(maxsize=None)
 def _split_blueprint_path(name: str) -> list[str]:
     out: list[str] = [name]
@@ -337,4 +270,3 @@ def _split_blueprint_path(name: str) -> list[str]:
         out.extend(_split_blueprint_path(name.rpartition(".")[0]))
 
     return out
-
