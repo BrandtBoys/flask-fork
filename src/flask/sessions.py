@@ -93,6 +93,19 @@ class NullSession(SecureCookieSession):
     """
 
     def _fail(self, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:
+        """
+Raises a RuntimeError indicating that the session is unavailable due to an unconfigured secret key.
+
+Args:
+    *args: Variable length argument list.
+    **kwargs: Arbitrary keyword arguments.
+
+Returns:
+    None, as this function does not return any value. Instead, it raises a RuntimeError with a descriptive error message.
+
+Raises:
+    RuntimeError: If the session is unavailable because no secret key was set.
+"""
         raise RuntimeError(
             "The session is unavailable because no secret "
             "key was set.  Set the secret_key on the "

@@ -124,6 +124,24 @@ def redirect(
 
 
 def abort(code: int | BaseResponse, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:
+    """
+Aborts the application with a given error code.
+
+This function is used to terminate the application and return an error response.
+It takes in an optional `code` parameter which specifies the error code,
+as well as any additional arguments that may be required for the abort process.
+
+Args:
+    - code (int | BaseResponse): The error code to use for the abort.
+    - *args: Additional positional arguments.
+    - **kwargs: Additional keyword arguments.
+
+Returns:
+    None
+
+Raises:
+    NoReturn: If the application is not currently running, this function will raise a NoReturn exception.
+"""
     if current_app:
         current_app.aborter(code, *args, **kwargs)
 

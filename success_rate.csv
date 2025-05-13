@@ -59,3 +59,47 @@ self (object): The instance of the class being tested.
 Returns:
 None
 """""""
+False,"""""""
+Raises a routing exception if the request is not debuggable, 
+or if it's a redirect with an invalid status code or method.
+
+Args:
+    request (Request): The incoming HTTP request.
+
+Returns:
+    None
+""""""
+def raise_routing_exception(self, request: Request) -> t.NoReturn:
+    ...
+"
+True,"""""""
+Aborts the application with a given error code.
+
+This function is used to terminate the application and return an error response.
+It takes in an optional `code` parameter which specifies the error code,
+as well as any additional arguments that may be required for the abort process.
+
+Args:
+    - code (int | BaseResponse): The error code to use for the abort.
+    - *args: Additional positional arguments.
+    - **kwargs: Additional keyword arguments.
+
+Returns:
+    None
+
+Raises:
+    NoReturn: If the application is not currently running, this function will raise a NoReturn exception.
+"""""""
+True,"""""""
+Raises a RuntimeError indicating that the session is unavailable due to an unconfigured secret key.
+
+Args:
+    *args: Variable length argument list.
+    **kwargs: Arbitrary keyword arguments.
+
+Returns:
+    None, as this function does not return any value. Instead, it raises a RuntimeError with a descriptive error message.
+
+Raises:
+    RuntimeError: If the session is unavailable because no secret key was set.
+"""""""
