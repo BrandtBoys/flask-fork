@@ -182,6 +182,9 @@ class SessionInterface:
     def get_cookie_samesite(self, app: Flask) -> str | None:
         return app.config["SESSION_COOKIE_SAMESITE"]  # type: ignore[no-any-return]
 
+    def get_cookie_partitioned(self, app: Flask) -> bool:
+        return app.config["SESSION_COOKIE_PARTITIONED"]  # type: ignore[no-any-return]
+
     def get_expiration_time(self, app: Flask, session: SessionMixin) -> datetime | None:
         if session.permanent:
             return datetime.now(timezone.utc) + app.permanent_session_lifetime
@@ -262,6 +265,7 @@ class SecureCookieSessionInterface(SessionInterface):
         domain = self.get_cookie_domain(app)
         path = self.get_cookie_path(app)
         secure = self.get_cookie_secure(app)
+        partitioned = self.get_cookie_partitioned(app)
         samesite = self.get_cookie_samesite(app)
         httponly = self.get_cookie_httponly(app)
 
@@ -278,6 +282,7 @@ class SecureCookieSessionInterface(SessionInterface):
                     domain=domain,
                     path=path,
                     secure=secure,
+                    partitioned=partitioned,
                     samesite=samesite,
                     httponly=httponly,
                 )
@@ -298,7 +303,7 @@ class SecureCookieSessionInterface(SessionInterface):
             domain=domain,
             path=path,
             secure=secure,
+            partitioned=partitioned,
             samesite=samesite,
         )
         response.vary.add("Cookie")
-
