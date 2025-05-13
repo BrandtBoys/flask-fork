@@ -157,6 +157,22 @@ class Config(dict):
         silent: bool = False,
         text: bool = True,
     ) -> bool:
+        """
+Loads a configuration file from disk.
+
+This method attempts to open the specified file and load its contents using the provided `load` function.
+If successful, it returns whether the loaded object is a mapping (i.e., a dictionary or similar data structure).
+If an error occurs while loading the file, it will be raised unless `silent` is True, in which case it will return False instead.
+
+Parameters:
+filename (str): The path to the configuration file to load.
+load (Callable[[IO[Any], Mapping]): A function that takes an IO object and returns a mapping.
+silent (bool, optional): Whether to suppress error messages. Defaults to False.
+text (bool, optional): Whether to open the file in text mode instead of binary mode. Defaults to True.
+
+Returns:
+bool: Whether the loaded object is a mapping or not.
+"""
         filename = os.path.join(self.root_path, filename)
 
         try:

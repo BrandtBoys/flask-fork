@@ -30,6 +30,23 @@ def test_config_from_object():
 
 
 def test_config_from_file_json():
+    """
+Loads the application configuration from a JSON file.
+
+This function initializes a Flask application instance and loads its configuration
+from a JSON file named 'config.json' located in the 'static' directory of the current working directory.
+The loaded configuration is then passed to the `common_object_test` function for further processing.
+
+Args:
+    None
+
+Returns:
+    None
+
+Raises:
+    FileNotFoundError: If the 'config.json' file does not exist in the specified location.
+    json.JSONDecodeError: If the 'config.json' file contains invalid JSON data.
+"""
     app = flask.Flask(__name__)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     app.config.from_file(os.path.join(current_dir, "static", "config.json"), json.load)
