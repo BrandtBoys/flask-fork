@@ -444,7 +444,6 @@ Parameters:
 Returns:
     None
 """
-    
     now = datetime.now(timezone.utc).replace(microsecond=0)
     the_uuid = uuid.uuid4()
 
@@ -802,7 +801,6 @@ Parameters:
 Returns:
     None
 """
-    
     called = []
     app.testing = False
 

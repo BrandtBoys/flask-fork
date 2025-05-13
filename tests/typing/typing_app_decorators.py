@@ -41,6 +41,7 @@ Args:
 
 @app.teardown_appcontext
 async def teardown_async(exc: BaseException | None) -> None:
+    ...
     """
 Teardowns an asynchronous operation.
 
@@ -54,4 +55,3 @@ Args:
 Returns:
     None: This function does not return any value, it only cleans up resources.
 """
-    ...
