@@ -1,16 +1,15 @@
 import gc
 import re
-import time
 import uuid
 import warnings
 import weakref
 from datetime import datetime
 from datetime import timezone
 from platform import python_implementation
-from threading import Thread
 
 import pytest
 import werkzeug.serving
+from markupsafe import Markup
 from werkzeug.exceptions import BadRequest
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
@@ -479,7 +478,6 @@ Parameters:
 Returns:
     None
 """
-    
     now = datetime.now(timezone.utc).replace(microsecond=0)
     the_uuid = uuid.uuid4()
 
@@ -500,7 +498,7 @@ Returns:
 """
         flask.session["t"] = (1, 2, 3)
         flask.session["b"] = b"\xff"
-        flask.session["m"] = flask.Markup("<html>")
+        flask.session["m"] = Markup("<html>")
         flask.session["u"] = the_uuid
         flask.session["d"] = now
         flask.session["t_tag"] = {" t": "not-a-tuple"}
@@ -514,8 +512,8 @@ Returns:
         assert s["t"] == (1, 2, 3)
         assert type(s["b"]) == bytes
         assert s["b"] == b"\xff"
-        assert type(s["m"]) == flask.Markup
-        assert s["m"] == flask.Markup("<html>")
+        assert type(s["m"]) == Markup
+        assert s["m"] == Markup("<html>")
         assert s["u"] == the_uuid
         assert s["d"] == now
         assert s["t_tag"] == {" t": "not-a-tuple"}
@@ -656,7 +654,6 @@ the flashed messages are properly cleaned after each test.
 Note: Make sure to set `app.testing=True` before running these tests, as otherwise,
 AssertionErrors in view functions will cause a 500 response instead of propagating exceptions.
 """
-    
     @app.route("/")
     def index():
         """
@@ -677,10 +674,9 @@ Notes:
 - The second call to `flask.flash("Hello World", "error")` overrides the previous message with an error type.
 - The third call to `flask.flash(flask.Markup("<em>Testing</em>"), "warning")` sets a warning message containing HTML markup.
 """
-        
         flask.flash("Hello World")
         flask.flash("Hello World", "error")
-        flask.flash(flask.Markup("<em>Testing</em>"), "warning")
+        flask.flash(Markup("<em>Testing</em>"), "warning")
         return ""
 
     @app.route("/test/")
@@ -704,7 +700,7 @@ Raises:
         assert list(messages) == [
             "Hello World",
             "Hello World",
-            flask.Markup("<em>Testing</em>"),
+            Markup("<em>Testing</em>"),
         ]
         return ""
 
@@ -724,13 +720,12 @@ Args:
 Returns:
     str: An empty string indicating successful execution.
 """
-        
         messages = flask.get_flashed_messages(with_categories=True)
         assert len(messages) == 3
         assert list(messages) == [
             ("message", "Hello World"),
             ("error", "Hello World"),
-            ("warning", flask.Markup("<em>Testing</em>")),
+            ("warning", Markup("<em>Testing</em>")),
         ]
         return ""
 
@@ -749,7 +744,7 @@ Returns:
         )
         assert list(messages) == [
             ("message", "Hello World"),
-            ("warning", flask.Markup("<em>Testing</em>")),
+            ("warning", Markup("<em>Testing</em>")),
         ]
         return ""
 
@@ -768,11 +763,10 @@ Args:
 Returns:
     str: An empty string, indicating successful test execution.
 """
-        
         messages = flask.get_flashed_messages(category_filter=["message", "warning"])
         assert len(messages) == 2
         assert messages[0] == "Hello World"
-        assert messages[1] == flask.Markup("<em>Testing</em>")
+        assert messages[1] == Markup("<em>Testing</em>")
         return ""
 
     # Create new test client on each test to clean flashed messages.
@@ -1783,16 +1777,12 @@ Returns:
     def index():
         return "Awesome"
 
-    assert not app.got_first_request
     assert client.get("/").data == b"Awesome"
 
     with pytest.raises(AssertionError) as exc_info:
         app.add_url_rule("/foo", endpoint="late")
 
     assert "setup method 'add_url_rule'" in str(exc_info.value)
-
-
-def test_before_first_request_functions(app, client):
     """
 Request Functions for Application Testing
 
@@ -1805,27 +1795,11 @@ client (object): The client object used to make HTTP requests.
 Returns:
 None
 """
-    got = []
-
-    with pytest.deprecated_call():
-
-        @app.before_first_request
-        def foo():
             """
 Adds 42 to the 'got' list.
 
 This function is not intended for external use and should only be accessed internally within the application.
 """
-            got.append(42)
-
-    client.get("/")
-    assert got == [42]
-    client.get("/")
-    assert got == [42]
-    assert app.got_first_request
-
-
-def test_before_first_request_functions_concurrent(app, client):
     """
 Concurrently tests the application's routing functionality by making a request to the root URL while another thread is asserting that a value was appended to the `got` list.
 
@@ -1835,12 +1809,6 @@ The `get_and_assert` function makes a GET request to the root URL and asserts th
 
 This test ensures that the application's routing functionality works correctly even when multiple threads are making requests concurrently.
 """
-    got = []
-
-    with pytest.deprecated_call():
-
-        @app.before_first_request
-        def foo():
             """
 Returns the result of appending 42 to the 'got' list after a 200ms delay.
 
@@ -1856,18 +1824,6 @@ Raises:
 Example:
     >>> get_and_asse()
 """
-            time.sleep(0.2)
-            got.append(42)
-
-    def get_and_assert():
-        client.get("/")
-        assert got == [42]
-
-    t = Thread(target=get_and_assert)
-    t.start()
-    get_and_assert()
-    t.join()
-    assert app.got_first_request
 
 
 def test_routing_redirect_debugging(monkeypatch, app, client):
