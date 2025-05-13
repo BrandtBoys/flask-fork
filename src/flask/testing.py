@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import typing as t
 from contextlib import contextmanager
 from contextlib import ExitStack
@@ -45,11 +43,11 @@ class EnvironBuilder(werkzeug.test.EnvironBuilder):
 
     def __init__(
         self,
-        app: Flask,
+        app: "Flask",
         path: str = "/",
-        base_url: str | None = None,
-        subdomain: str | None = None,
-        url_scheme: str | None = None,
+        base_url: t.Optional[str] = None,
+        subdomain: t.Optional[str] = None,
+        url_scheme: t.Optional[str] = None,
         *args: t.Any,
         **kwargs: t.Any,
     ) -> None:
@@ -116,12 +114,12 @@ class FlaskClient(Client):
     Basic usage is outlined in the :doc:`/testing` chapter.
     """
 
-    application: Flask
+    application: "Flask"
 
     def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
         super().__init__(*args, **kwargs)
         self.preserve_context = False
-        self._new_contexts: list[t.ContextManager[t.Any]] = []
+        self._new_contexts: t.List[t.ContextManager[t.Any]] = []
         self._context_stack = ExitStack()
         self.environ_base = {
             "REMOTE_ADDR": "127.0.0.1",
@@ -134,6 +132,8 @@ class FlaskClient(Client):
     ) -> t.Generator[SessionMixin, None, None]:
         """
 Yield a session object for the current test request context.
+        # new cookie interface for Werkzeug >= 2.3
+        cookie_storage = self._cookies if hasattr(self, "_cookies") else self.cookie_jar
 
 This function is used to create and manage sessions for testing purposes.
 It checks if cookies are enabled, sets up the WSGI context, opens a new session,
@@ -147,14 +147,18 @@ Args:
 Returns:
     A generator yielding SessionMixin objects.
 """
-        if self._cookies is None:
+        if cookie_storage is None:
             raise TypeError(
                 "Cookies are disabled. Create a client with 'use_cookies=True'."
             )
 
         app = self.application
         ctx = app.test_request_context(*args, **kwargs)
-        self._add_cookies_to_wsgi(ctx.request.environ)
+
+        if hasattr(self, "_add_cookies_to_wsgi"):
+            self._add_cookies_to_wsgi(ctx.request.environ)
+        else:
+            self.cookie_jar.inject_wsgi(ctx.request.environ)  # type: ignore[union-attr]
 
         with ctx:
             sess = app.session_interface.open_session(app, ctx.request)
@@ -171,11 +175,25 @@ Returns:
         with ctx:
             app.session_interface.save_session(app, sess, resp)
 
-        self._update_cookies_from_response(
-            ctx.request.host.partition(":")[0],
-            ctx.request.path,
-            resp.headers.getlist("Set-Cookie"),
-        )
+        if hasattr(self, "_update_cookies_from_response"):
+            try:
+                # Werkzeug>=2.3.3
+                self._update_cookies_from_response(
+                    ctx.request.host.partition(":")[0],
+                    ctx.request.path,
+                    resp.headers.getlist("Set-Cookie"),
+                )
+            except TypeError:
+                # Werkzeug>=2.3.0,<2.3.3
+                self._update_cookies_from_response(  # type: ignore[call-arg]
+                    ctx.request.host.partition(":")[0],
+                    resp.headers.getlist("Set-Cookie"),  # type: ignore[arg-type]
+                )
+        else:
+            # Werkzeug<2.3.0
+            self.cookie_jar.extract_wsgi(  # type: ignore[union-attr]
+                ctx.request.environ, resp.headers
+            )
 
     def _copy_environ(self, other):
         out = {**self.environ_base, **other}
@@ -200,7 +218,7 @@ Returns:
         buffered: bool = False,
         follow_redirects: bool = False,
         **kwargs: t.Any,
-    ) -> TestResponse:
+    ) -> "TestResponse":
         """
 Opens a new test request.
 
@@ -218,7 +236,6 @@ Returns:
 Raises:
     ValueError: If the request cannot be created from the given arguments and keyword arguments.
 """
-        
         if args and isinstance(
             args[0], (werkzeug.test.EnvironBuilder, dict, BaseRequest)
         ):
@@ -257,7 +274,7 @@ Raises:
 
         return response
 
-    def __enter__(self) -> FlaskClient:
+    def __enter__(self) -> "FlaskClient":
         """
 Enters the context of a Flask client.
 
@@ -271,7 +288,6 @@ Returns:
 Raises:
     RuntimeError: If an attempt is made to nest client invocations.
 """
-        
         if self.preserve_context:
             raise RuntimeError("Cannot nest client invocations")
         self.preserve_context = True
@@ -279,9 +295,9 @@ Raises:
 
     def __exit__(
         self,
-        exc_type: type | None,
-        exc_value: BaseException | None,
-        tb: TracebackType | None,
+        exc_type: t.Optional[type],
+        exc_value: t.Optional[BaseException],
+        tb: t.Optional[TracebackType],
     ) -> None:
         """
 Closes the context stack and sets preserve_context to False.
@@ -296,7 +312,6 @@ Args:
 Returns:
     None
 """
-        
         self.preserve_context = False
         self._context_stack.close()
 
@@ -307,7 +322,7 @@ class FlaskCliRunner(CliRunner):
     :meth:`~flask.Flask.test_cli_runner`. See :ref:`testing-cli`.
     """
 
-    def __init__(self, app: Flask, **kwargs: t.Any) -> None:
+    def __init__(self, app: "Flask", **kwargs: t.Any) -> None:
         """
 Initialize a new instance of the class.
 
@@ -318,7 +333,6 @@ Args:
 Returns:
     None
 """
-        
         self.app = app
         super().__init__(**kwargs)
 

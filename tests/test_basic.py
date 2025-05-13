@@ -1,15 +1,16 @@
 import gc
 import re
+import time
 import uuid
 import warnings
 import weakref
 from datetime import datetime
 from datetime import timezone
 from platform import python_implementation
+from threading import Thread
 
 import pytest
 import werkzeug.serving
-from markupsafe import Markup
 from werkzeug.exceptions import BadRequest
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
@@ -251,57 +252,46 @@ def test_session(app, client):
     assert client.get("/get").data == b"42"
 
 
-def test_session_path(app, client):
-    app.config.update(APPLICATION_ROOT="/foo")
-    """
-Test session using server name.
-
-This function tests the functionality of Flask's session handling when using a server name.
-It updates the session with a value and then checks if the session is correctly set for the domain specified by the `SERVER_NAME` configuration variable.
-
-Parameters:
-app (Flask application): The Flask application instance to use for testing.
-client (requests Session): A requests session object used to make HTTP requests.
-
-Returns:
-None
-"""
+def test_session_using_server_name(app, client):
+    app.config.update(SERVER_NAME="example.com")
 
     @app.route("/")
     def index():
         flask.session["testing"] = 42
         return "Hello World"
 
-        """
-Flask Session Initialization and Response Generation
+    rv = client.get("/", "http://example.com/")
+    cookie = rv.headers["set-cookie"].lower()
+    # or condition for Werkzeug < 2.3
+    assert "domain=example.com" in cookie or "domain=.example.com" in cookie
 
-This function initializes a Flask session variable 'testing' with value 42 and returns a string response.
 
-Parameters:
-None
+def test_session_using_server_name_and_port(app, client):
+    app.config.update(SERVER_NAME="example.com:8080")
 
-Returns:
-str: A greeting message "Hello World"
+    @app.route("/")
+    def index():
+        flask.session["testing"] = 42
+        return "Hello World"
 
-Side Effects:
-- Initializes the Flask session variable 'testing' with value 42
-"""
-        """
-Flask Session Initialization and Response Generation
+    rv = client.get("/", "http://example.com:8080/")
+    cookie = rv.headers["set-cookie"].lower()
+    # or condition for Werkzeug < 2.3
+    assert "domain=example.com" in cookie or "domain=.example.com" in cookie
 
-This function initializes a Flask session variable 'testing' with value 42 and returns a string response.
 
-Parameters:
-None
+def test_session_using_server_name_port_and_path(app, client):
+    app.config.update(SERVER_NAME="example.com:8080", APPLICATION_ROOT="/foo")
 
-Returns:
-str: A greeting message "Hello World"
+    @app.route("/")
+    def index():
+        flask.session["testing"] = 42
+        return "Hello World"
 
-Side Effects:
-- Initializes the Flask session variable 'testing' with value 42
-"""
     rv = client.get("/", "http://example.com:8080/foo")
+    assert "domain=example.com" in rv.headers["set-cookie"].lower()
     assert "path=/foo" in rv.headers["set-cookie"].lower()
+    assert "httponly" in rv.headers["set-cookie"].lower()
 
 
 def test_session_using_application_root(app, client):
@@ -393,59 +383,34 @@ def test_session_using_samesite_attribute(app, client):
     assert "samesite=lax" in cookie
 
 
-    """
-Test session warning for localhost.
+def test_session_localhost_warning(recwarn, app, client):
+    app.config.update(SERVER_NAME="localhost:5000")
 
-This function tests the behavior of Flask's session warnings when using a local server.
-It updates the session with a test value, sends a request to the index route,
-and verifies that the correct warning is raised and its message matches the expected value.
+    @app.route("/")
+    def index():
+        flask.session["testing"] = 42
+        return "testing"
 
-Parameters:
-    recwarn (WarningRegistry): The registry of warnings to be popped from.
-    app (Flask application instance): The Flask application instance.
-    client (TestClient): The test client for making requests to the application.
+    rv = client.get("/", "http://localhost:5000/")
+    assert "domain" not in rv.headers["set-cookie"].lower()
+    w = recwarn.pop(UserWarning)
+    assert "'localhost' is not a valid cookie domain" in str(w.message)
 
-Returns:
-    None
-"""
-        """
-Flask Session Test Function
 
-This function tests the functionality of Flask's session management.
-It sets a test value in the session and returns a success message.
+def test_session_ip_warning(recwarn, app, client):
+    app.config.update(SERVER_NAME="127.0.0.1:5000")
 
-Returns:
-    str: A success message indicating that the test was run successfully.
+    @app.route("/")
+    def index():
+        flask.session["testing"] = 42
+        return "testing"
 
-Note:
-    This function should be used as part of a larger application to test session management.
-"""
-    """
-Test session IP warning.
+    rv = client.get("/", "http://127.0.0.1:5000/")
+    assert "domain=127.0.0.1" in rv.headers["set-cookie"].lower()
+    w = recwarn.pop(UserWarning)
+    assert "cookie domain is an IP" in str(w.message)
 
-This function tests the behavior of Flask when setting a cookie with an IP address as its domain.
-It verifies that a UserWarning is raised and that the warning message contains the expected text.
 
-Parameters:
-    recwarn (warnings.Warnings): The warnings registry to use for this test.
-    app (Flask application instance): The Flask application instance to use for this test.
-    client (requests.Session): The requests session to use for making HTTP requests.
-
-Returns:
-    None
-"""
-        """
-Flask Session Test Function
-
-This function tests the functionality of Flask's session management.
-It sets a test value in the session and returns a success message.
-
-Returns:
-    str: A success message indicating that the test was run successfully.
-
-Note:
-    This function should be used as part of a larger application to test session management.
-"""
 def test_missing_session(app):
     app.secret_key = None
 
@@ -518,7 +483,6 @@ Parameters:
 Returns:
     None
 """
-    
     now = datetime.now(timezone.utc).replace(microsecond=0)
     the_uuid = uuid.uuid4()
 
@@ -538,7 +502,7 @@ Returns:
 """
         flask.session["t"] = (1, 2, 3)
         flask.session["b"] = b"\xff"
-        flask.session["m"] = Markup("<html>")
+        flask.session["m"] = flask.Markup("<html>")
         flask.session["u"] = the_uuid
         flask.session["d"] = now
         flask.session["t_tag"] = {" t": "not-a-tuple"}
@@ -552,8 +516,8 @@ Returns:
         assert s["t"] == (1, 2, 3)
         assert type(s["b"]) == bytes
         assert s["b"] == b"\xff"
-        assert type(s["m"]) == Markup
-        assert s["m"] == Markup("<html>")
+        assert type(s["m"]) == flask.Markup
+        assert s["m"] == flask.Markup("<html>")
         assert s["u"] == the_uuid
         assert s["d"] == now
         assert s["t_tag"] == {" t": "not-a-tuple"}
@@ -804,10 +768,9 @@ Example usage:
 
     index()
 """
-        
         flask.flash("Hello World")
         flask.flash("Hello World", "error")
-        flask.flash(Markup("<em>Testing</em>"), "warning")
+        flask.flash(flask.Markup("<em>Testing</em>"), "warning")
         return ""
 
     @app.route("/test/")
@@ -831,7 +794,7 @@ Raises:
         assert list(messages) == [
             "Hello World",
             "Hello World",
-            Markup("<em>Testing</em>"),
+            flask.Markup("<em>Testing</em>"),
         ]
         return ""
 
@@ -845,13 +808,12 @@ which returns a list of tuples containing message category and corresponding mes
 
 It asserts that the length of the returned list is 3 and checks if it contains the expected messages.
 """
-        
         messages = flask.get_flashed_messages(with_categories=True)
         assert len(messages) == 3
         assert list(messages) == [
             ("message", "Hello World"),
             ("error", "Hello World"),
-            ("warning", Markup("<em>Testing</em>")),
+            ("warning", flask.Markup("<em>Testing</em>")),
         ]
         return ""
 
@@ -870,7 +832,7 @@ It asserts that the length of the returned list is 3 and checks if it contains t
         )
         assert list(messages) == [
             ("message", "Hello World"),
-            ("warning", Markup("<em>Testing</em>")),
+            ("warning", flask.Markup("<em>Testing</em>")),
         ]
         return ""
 
@@ -886,7 +848,7 @@ and the second message is expected to be an HTML-marked string "<em>Testing</em>
         messages = flask.get_flashed_messages(category_filter=["message", "warning"])
         assert len(messages) == 2
         assert messages[0] == "Hello World"
-        assert messages[1] == Markup("<em>Testing</em>")
+        assert messages[1] == flask.Markup("<em>Testing</em>")
         return ""
 
     # Create new test client on each test to clean flashed messages.
@@ -1897,53 +1859,50 @@ Returns:
     def index():
         return "Awesome"
 
+    assert not app.got_first_request
     assert client.get("/").data == b"Awesome"
 
     with pytest.raises(AssertionError) as exc_info:
         app.add_url_rule("/foo", endpoint="late")
 
     assert "setup method 'add_url_rule'" in str(exc_info.value)
-    """
-Request Functions for Application Testing
 
-This function tests the application's behavior when making requests before and after the first request.
 
-Parameters:
-app (object): The application object to be tested.
-client (object): The client object used to make HTTP requests.
+def test_before_first_request_functions(app, client):
+    got = []
 
-Returns:
-None
-"""
-            """
-Adds 42 to the 'got' list.
+    with pytest.deprecated_call():
 
-This function is not intended for external use and should only be accessed internally within the application.
-"""
-    """
-Concurrently tests the application's routing functionality by making a request to the root URL while another thread is asserting that a value was appended to the `got` list.
+        @app.before_first_request
+        def foo():
+            got.append(42)
 
-This function uses pytest's deprecated_call context manager to ensure that the `foo` function, which appends a value to the `got` list, is called before the first request is made. It then creates a new thread that runs the `get_and_assert` function in parallel with the main thread.
+    client.get("/")
+    assert got == [42]
+    client.get("/")
+    assert got == [42]
+    assert app.got_first_request
 
-The `get_and_assert` function makes a GET request to the root URL and asserts that the value appended to the `got` list matches the expected value. The main thread waits for the thread to finish before asserting that the application's `got_first_request` attribute is set to True.
 
-This test ensures that the application's routing functionality works correctly even when multiple threads are making requests concurrently.
-"""
-            """
-Returns the result of appending 42 to the 'got' list after a 200ms delay.
+def test_before_first_request_functions_concurrent(app, client):
+    got = []
 
-Args:
-    None
+    with pytest.deprecated_call():
 
-Returns:
-    None
+        @app.before_first_request
+        def foo():
+            time.sleep(0.2)
+            got.append(42)
 
-Raises:
-    None
+    def get_and_assert():
+        client.get("/")
+        assert got == [42]
 
-Example:
-    >>> get_and_asse()
-"""
+    t = Thread(target=get_and_assert)
+    t.start()
+    get_and_assert()
+    t.join()
+    assert app.got_first_request
 
 
 def test_routing_redirect_debugging(monkeypatch, app, client):
