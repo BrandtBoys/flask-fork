@@ -378,20 +378,6 @@ Returns:
         # Merge blueprint data into parent.
         if first_bp_registration or first_name_registration:
             self._merge_blueprint_funcs(app, name)
-                """
-Extends a dictionary with another dictionary's values.
-
-This function takes two dictionaries as input: `bp_dict` and `parent_dict`. It iterates over the items in `bp_dict`, 
-constructs new keys by appending the current key to the parent dictionary's name if it exists, and extends the 
-values of the corresponding item in `parent_dict`.
-
-Args:
-    bp_dict (dict): The dictionary containing values to be extended.
-    parent_dict (dict): The dictionary whose values will be extended.
-
-Returns:
-    None
-"""
 
         for deferred in self.deferred_functions:
             deferred(state)
