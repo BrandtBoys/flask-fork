@@ -2,7 +2,7 @@ from flask import jsonify
 from flask import render_template
 from flask import request
 
-from js_example import app
+from . import app
 
 
 @app.route("/", defaults={"js": "fetch"})
@@ -16,4 +16,3 @@ def add():
     a = request.form.get("a", 0, type=float)
     b = request.form.get("b", 0, type=float)
     return jsonify(result=a + b)
-

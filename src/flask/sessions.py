@@ -14,7 +14,8 @@ from .json.tag import TaggedJSONSerializer
 
 if t.TYPE_CHECKING:  # pragma: no cover
     from .app import Flask
-    from .wrappers import Request, Response
+    from .wrappers import Request
+    from .wrappers import Response
 
 
 class SessionMixin(MutableMapping):
@@ -293,4 +294,3 @@ class SecureCookieSessionInterface(SessionInterface):
             samesite=samesite,
         )
         response.vary.add("Cookie")
-

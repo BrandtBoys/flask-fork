@@ -19,7 +19,6 @@ from werkzeug.routing import RequestRedirect
 
 import flask
 
-
 require_cpython_gc = pytest.mark.skipif(
     python_implementation() != "CPython",
     reason="Requires CPython GC behavior",
@@ -190,7 +189,8 @@ def test_url_mapping(app, client):
 
 
 def test_werkzeug_routing(app, client):
-    from werkzeug.routing import Submount, Rule
+    from werkzeug.routing import Rule
+    from werkzeug.routing import Submount
 
     app.url_map.add(
         Submount("/foo", [Rule("/bar", endpoint="bar"), Rule("/", endpoint="index")])
@@ -210,7 +210,8 @@ def test_werkzeug_routing(app, client):
 
 
 def test_endpoint_decorator(app, client):
-    from werkzeug.routing import Submount, Rule
+    from werkzeug.routing import Rule
+    from werkzeug.routing import Submount
 
     app.url_map.add(
         Submount("/foo", [Rule("/bar", endpoint="bar"), Rule("/", endpoint="index")])
@@ -445,9 +446,9 @@ None
         client.get("/")
         s = flask.session
         assert s["t"] == (1, 2, 3)
-        assert type(s["b"]) is bytes
+        assert type(s["b"]) is bytes  # noqa: E721
         assert s["b"] == b"\xff"
-        assert type(s["m"]) is Markup
+        assert type(s["m"]) is Markup  # noqa: E721
         assert s["m"] == Markup("<html>")
         assert s["u"] == the_uuid
         assert s["d"] == now
@@ -827,7 +828,7 @@ Raises:
 
     @app.route("/")
     def fails():
-        1 // 0
+        raise ZeroDivisionError
 
     rv = client.get("/")
     assert rv.status_code == 500
@@ -894,7 +895,7 @@ def test_error_handling(app, client):
 
     @app.route("/error")
     def error():
-        1 // 0
+        raise ZeroDivisionError
 
     @app.route("/forbidden")
     def error2():
@@ -920,7 +921,7 @@ def test_error_handling_processing(app, client):
 
     @app.route("/")
     def broken_func():
-        1 // 0
+        raise ZeroDivisionError
 
     @app.after_request
     def after_request(resp):
@@ -1090,12 +1091,13 @@ def test_error_handler_after_processor_error(app, client):
     @app.before_request
     def before_request():
         if _trigger == "before":
-            1 // 0
+            raise ZeroDivisionError
 
     @app.after_request
     def after_request(response):
         if _trigger == "after":
-            1 // 0
+            raise ZeroDivisionError
+
         return response
 
     @app.route("/")
@@ -1550,7 +1552,7 @@ def test_exception_propagation(app, client, key):
 
     @app.route("/")
     def index():
-        1 // 0
+        raise ZeroDivisionError
 
     if key is not None:
         app.config[key] = True

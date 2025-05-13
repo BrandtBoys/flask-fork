@@ -29,12 +29,12 @@ def hello_json() -> Response:
 
 
 @app.route("/json/dict")
-def hello_json_dict() -> t.Dict[str, t.Any]:
+def hello_json_dict() -> dict[str, t.Any]:
     return {"response": "Hello, World!"}
 
 
 @app.route("/json/dict")
-def hello_json_list() -> t.List[t.Any]:
+def hello_json_list() -> list[t.Any]:
     return [{"message": "Hello"}, {"message": "World"}]
 
 
@@ -110,4 +110,3 @@ app.add_url_rule(
     "/about",
     view_func=RenderTemplateView.as_view("about_page", template_name="about.html"),
 )
-

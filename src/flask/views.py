@@ -6,7 +6,6 @@ from . import typing as ft
 from .globals import current_app
 from .globals import request
 
-
 http_method_funcs = frozenset(
     ["get", "post", "head", "options", "delete", "put", "trace", "patch"]
 )
@@ -169,4 +168,3 @@ class MethodView(View):
 
         assert meth is not None, f"Unimplemented method {request.method!r}"
         return current_app.ensure_sync(meth)(**kwargs)
-

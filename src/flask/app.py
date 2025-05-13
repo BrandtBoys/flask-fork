@@ -865,7 +865,8 @@ Returns:
                 # class to the correct type
                 try:
                     rv = self.response_class.force_type(
-                        rv, request.environ  # type: ignore[arg-type]
+                        rv,  # type: ignore[arg-type]
+                        request.environ,
                     )
                 except TypeError as e:
                     raise TypeError(
@@ -933,7 +934,8 @@ Returns:
         return response
 
     def do_teardown_request(
-        self, exc: BaseException | None = _sentinel  # type: ignore
+        self,
+        exc: BaseException | None = _sentinel,  # type: ignore[assignment]
     ) -> None:
         if exc is _sentinel:
             exc = sys.exc_info()[1]
@@ -946,7 +948,8 @@ Returns:
         request_tearing_down.send(self, _async_wrapper=self.ensure_sync, exc=exc)
 
     def do_teardown_appcontext(
-        self, exc: BaseException | None = _sentinel  # type: ignore
+        self,
+        exc: BaseException | None = _sentinel,  # type: ignore[assignment]
     ) -> None:
         if exc is _sentinel:
             exc = sys.exc_info()[1]

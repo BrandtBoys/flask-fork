@@ -11,7 +11,7 @@ from flask import url_for
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
-from flaskr.db import get_db
+from .db import get_db
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -104,4 +104,3 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("index"))
-
