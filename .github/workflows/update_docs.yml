@@ -11,7 +11,7 @@ jobs:
         with:
             fetch-depth: 0
       - name: DocTide Action
-        uses: BrandtBoys/DocTide@v1.1.0
+        uses: BrandtBoys/DocTide@vmain
         with:
           testing: false
         env:
