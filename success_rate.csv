@@ -1,0 +1,2 @@
+Success,Comment
+"(True, '""""""\nReturns a URLSafeTimedSerializer instance for signing purposes.\n\nIf the application\'s secret key is not set, returns None. Otherwise, constructs\na serializer with fallback keys from `SECRET_KEY_FALLBACKS` configuration.\nThe current secret key is always at the top of the list to ensure compatibility\nwith itsdangerous.\n\nArgs:\n    app (Flask): The Flask application instance.\n\nReturns:\n    URLSafeTimedSerializer | None: A serializer instance for signing purposes, or None if no secret key is set.\n""""""')"
