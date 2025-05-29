@@ -40,3 +40,4 @@ def test_context_available(app, client):
         return name
 
     assert client.get("/admin").data == b"admin"
+

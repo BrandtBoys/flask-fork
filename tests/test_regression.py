@@ -28,3 +28,4 @@ def test_aborting(app):
         assert location_parts[2] == "test"
         rv = c.get("/test")
         assert rv.data == b"42"
+

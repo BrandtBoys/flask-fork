@@ -7,3 +7,4 @@ from blueprintapp.apps.frontend import frontend  # noqa: E402
 
 app.register_blueprint(admin)
 app.register_blueprint(frontend)
+

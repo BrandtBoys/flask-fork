@@ -84,3 +84,4 @@ def test_tag_order():
 
     s.register(Tag2, index=None)
     assert isinstance(s.order[-1], Tag2)
+

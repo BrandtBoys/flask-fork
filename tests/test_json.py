@@ -103,7 +103,6 @@ def test_jsonify_dicts(app, client):
 
 
 def test_jsonify_arrays(app, client):
-    """Test jsonify of lists and args unpacking."""
     a_list = [
         0,
         42,
@@ -165,7 +164,6 @@ class FixedOffset(datetime.tzinfo):
 
 @pytest.mark.parametrize("tz", (("UTC", 0), ("PST", -8), ("KST", 9)))
 def test_jsonify_aware_datetimes(tz):
-    """Test if aware datetime.datetime objects are converted into GMT."""
     tzinfo = FixedOffset(hours=tz[1], name=tz[0])
     dt = datetime.datetime(2017, 1, 1, 12, 34, 56, tzinfo=tzinfo)
     gmt = FixedOffset(hours=0, name="GMT")
@@ -174,7 +172,6 @@ def test_jsonify_aware_datetimes(tz):
 
 
 def test_jsonify_uuid_types(app, client):
-    """Test jsonify with uuid.UUID types"""
 
     test_uuid = uuid.UUID(bytes=b"\xde\xad\xbe\xef" * 4)
     url = "/uuid_test"
@@ -344,3 +341,4 @@ def test_html_method():
 
     result = json.dumps(ObjectWithHTML())
     assert result == '"<p>test</p>"'
+

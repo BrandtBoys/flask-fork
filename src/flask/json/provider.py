@@ -39,37 +39,15 @@ class JSONProvider:
         self._app: App = weakref.proxy(app)
 
     def dumps(self, obj: t.Any, **kwargs: t.Any) -> str:
-        """Serialize data as JSON.
-
-        :param obj: The data to serialize.
-        :param kwargs: May be passed to the underlying JSON library.
-        """
         raise NotImplementedError
 
     def dump(self, obj: t.Any, fp: t.IO[str], **kwargs: t.Any) -> None:
-        """Serialize data as JSON and write to a file.
-
-        :param obj: The data to serialize.
-        :param fp: A file opened for writing text. Should use the UTF-8
-            encoding to be valid JSON.
-        :param kwargs: May be passed to the underlying JSON library.
-        """
         fp.write(self.dumps(obj, **kwargs))
 
     def loads(self, s: str | bytes, **kwargs: t.Any) -> t.Any:
-        """Deserialize data as JSON.
-
-        :param s: Text or UTF-8 bytes.
-        :param kwargs: May be passed to the underlying JSON library.
-        """
         raise NotImplementedError
 
     def load(self, fp: t.IO[t.AnyStr], **kwargs: t.Any) -> t.Any:
-        """Deserialize data as JSON read from a file.
-
-        :param fp: A file opened for reading text or UTF-8 bytes.
-        :param kwargs: May be passed to the underlying JSON library.
-        """
         return self.loads(fp.read(), **kwargs)
 
     def _prepare_response_obj(
@@ -87,20 +65,6 @@ class JSONProvider:
         return args or kwargs
 
     def response(self, *args: t.Any, **kwargs: t.Any) -> Response:
-        """Serialize the given arguments as JSON, and return a
-        :class:`~flask.Response` object with the ``application/json``
-        mimetype.
-
-        The :func:`~flask.json.jsonify` function calls this method for
-        the current application.
-
-        Either positional or keyword arguments can be given, not both.
-        If no arguments are given, ``None`` is serialized.
-
-        :param args: A single value to serialize, or multiple values to
-            treat as a list to serialize.
-        :param kwargs: Treat as a dict to serialize.
-        """
         obj = self._prepare_response_obj(args, kwargs)
         return self._app.response_class(self.dumps(obj), mimetype="application/json")
 
@@ -164,44 +128,15 @@ class DefaultJSONProvider(JSONProvider):
     """The mimetype set in :meth:`response`."""
 
     def dumps(self, obj: t.Any, **kwargs: t.Any) -> str:
-        """Serialize data as JSON to a string.
-
-        Keyword arguments are passed to :func:`json.dumps`. Sets some
-        parameter defaults from the :attr:`default`,
-        :attr:`ensure_ascii`, and :attr:`sort_keys` attributes.
-
-        :param obj: The data to serialize.
-        :param kwargs: Passed to :func:`json.dumps`.
-        """
         kwargs.setdefault("default", self.default)
         kwargs.setdefault("ensure_ascii", self.ensure_ascii)
         kwargs.setdefault("sort_keys", self.sort_keys)
         return json.dumps(obj, **kwargs)
 
     def loads(self, s: str | bytes, **kwargs: t.Any) -> t.Any:
-        """Deserialize data as JSON from a string or bytes.
-
-        :param s: Text or UTF-8 bytes.
-        :param kwargs: Passed to :func:`json.loads`.
-        """
         return json.loads(s, **kwargs)
 
     def response(self, *args: t.Any, **kwargs: t.Any) -> Response:
-        """Serialize the given arguments as JSON, and return a
-        :class:`~flask.Response` object with it. The response mimetype
-        will be "application/json" and can be changed with
-        :attr:`mimetype`.
-
-        If :attr:`compact` is ``False`` or debug mode is enabled, the
-        output will be formatted to be easier to read.
-
-        Either positional or keyword arguments can be given, not both.
-        If no arguments are given, ``None`` is serialized.
-
-        :param args: A single value to serialize, or multiple values to
-            treat as a list to serialize.
-        :param kwargs: Treat as a dict to serialize.
-        """
         obj = self._prepare_response_obj(args, kwargs)
         dump_args: dict[str, t.Any] = {}
 
@@ -213,3 +148,4 @@ class DefaultJSONProvider(JSONProvider):
         return self._app.response_class(
             f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
         )
+

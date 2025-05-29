@@ -58,25 +58,6 @@ class Request(RequestBase):
 
     @property
     def max_content_length(self) -> int | None:
-        """The maximum number of bytes that will be read during this request. If
-        this limit is exceeded, a 413 :exc:`~werkzeug.exceptions.RequestEntityTooLarge`
-        error is raised. If it is set to ``None``, no limit is enforced at the
-        Flask application level. However, if it is ``None`` and the request has
-        no ``Content-Length`` header and the WSGI server does not indicate that
-        it terminates the stream, then no data is read to avoid an infinite
-        stream.
-
-        Each request defaults to the :data:`MAX_CONTENT_LENGTH` config, which
-        defaults to ``None``. It can be set on a specific ``request`` to apply
-        the limit to that specific view. This should be set appropriately based
-        on an application's or view's specific needs.
-
-        .. versionchanged:: 3.1
-            This can be set per-request.
-
-        .. versionchanged:: 0.6
-            This is configurable through Flask config.
-        """
         if self._max_content_length is not None:
             return self._max_content_length
 
@@ -91,19 +72,6 @@ class Request(RequestBase):
 
     @property
     def max_form_memory_size(self) -> int | None:
-        """The maximum size in bytes any non-file form field may be in a
-        ``multipart/form-data`` body. If this limit is exceeded, a 413
-        :exc:`~werkzeug.exceptions.RequestEntityTooLarge` error is raised. If it
-        is set to ``None``, no limit is enforced at the Flask application level.
-
-        Each request defaults to the :data:`MAX_FORM_MEMORY_SIZE` config, which
-        defaults to ``500_000``. It can be set on a specific ``request`` to
-        apply the limit to that specific view. This should be set appropriately
-        based on an application's or view's specific needs.
-
-        .. versionchanged:: 3.1
-            This is configurable through Flask config.
-        """
         if self._max_form_memory_size is not None:
             return self._max_form_memory_size
 
@@ -118,19 +86,6 @@ class Request(RequestBase):
 
     @property  # type: ignore[override]
     def max_form_parts(self) -> int | None:
-        """The maximum number of fields that may be present in a
-        ``multipart/form-data`` body. If this limit is exceeded, a 413
-        :exc:`~werkzeug.exceptions.RequestEntityTooLarge` error is raised. If it
-        is set to ``None``, no limit is enforced at the Flask application level.
-
-        Each request defaults to the :data:`MAX_FORM_PARTS` config, which
-        defaults to ``1_000``. It can be set on a specific ``request`` to apply
-        the limit to that specific view. This should be set appropriately based
-        on an application's or view's specific needs.
-
-        .. versionchanged:: 3.1
-            This is configurable through Flask config.
-        """
         if self._max_form_parts is not None:
             return self._max_form_parts
 
@@ -145,14 +100,6 @@ class Request(RequestBase):
 
     @property
     def endpoint(self) -> str | None:
-        """The endpoint that matched the request URL.
-
-        This will be ``None`` if matching failed or has not been
-        performed yet.
-
-        This in combination with :attr:`view_args` can be used to
-        reconstruct the same URL or a modified URL.
-        """
         if self.url_rule is not None:
             return self.url_rule.endpoint  # type: ignore[no-any-return]
 
@@ -160,16 +107,6 @@ class Request(RequestBase):
 
     @property
     def blueprint(self) -> str | None:
-        """The registered name of the current blueprint.
-
-        This will be ``None`` if the endpoint is not part of a
-        blueprint, or if URL matching failed or has not been performed
-        yet.
-
-        This does not necessarily match the name the blueprint was
-        created with. It may have been nested, or registered with a
-        different name.
-        """
         endpoint = self.endpoint
 
         if endpoint is not None and "." in endpoint:
@@ -179,14 +116,6 @@ class Request(RequestBase):
 
     @property
     def blueprints(self) -> list[str]:
-        """The registered names of the current blueprint upwards through
-        parent blueprints.
-
-        This will be an empty list if there is no current blueprint, or
-        if URL matching failed.
-
-        .. versionadded:: 2.0.1
-        """
         name = self.blueprint
 
         if name is None:
@@ -245,13 +174,9 @@ class Response(ResponseBase):
 
     @property
     def max_cookie_size(self) -> int:  # type: ignore
-        """Read-only view of the :data:`MAX_COOKIE_SIZE` config key.
-
-        See :attr:`~werkzeug.wrappers.Response.max_cookie_size` in
-        Werkzeug's docs.
-        """
         if current_app:
             return current_app.config["MAX_COOKIE_SIZE"]  # type: ignore[no-any-return]
 
         # return Werkzeug's default when not in an app context
         return super().max_cookie_size
+

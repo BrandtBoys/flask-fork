@@ -258,3 +258,4 @@ def test_init_once(app, client):
     app.add_url_rule("/", view_func=CountInit.as_view("index"))
     assert client.get("/").data == b"1"
     assert client.get("/").data == b"1"
+

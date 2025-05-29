@@ -323,3 +323,4 @@ def test_normal_environ_completes():
 
     response = app.test_client().get("/", headers={"host": "xn--on-0ia.com"})
     assert response.status_code == 200
+

@@ -96,3 +96,4 @@ def test_log_view_exception(app, client):
     err = stream.getvalue()
     assert "Exception on / [GET]" in err
     assert "Exception: test" in err
+

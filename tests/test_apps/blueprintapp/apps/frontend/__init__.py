@@ -12,3 +12,4 @@ def index():
 @frontend.route("/missing")
 def missing_template():
     return render_template("missing_template.html")
+

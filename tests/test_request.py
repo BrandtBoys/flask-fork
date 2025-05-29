@@ -68,3 +68,4 @@ def test_trusted_hosts_config(app: Flask) -> None:
     assert r.status_code == 200
     r = client.get(base_url="http://bad.test")
     assert r.status_code == 400
+

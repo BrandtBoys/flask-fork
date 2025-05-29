@@ -49,3 +49,4 @@ request: Request = LocalProxy(  # type: ignore[assignment]
 session: SessionMixin = LocalProxy(  # type: ignore[assignment]
     _cv_request, "session", unbound_message=_no_req_msg
 )
+

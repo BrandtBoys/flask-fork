@@ -179,3 +179,4 @@ def test_appcontext_tearing_down_signal(app, client):
         assert isinstance(recorded[0], ZeroDivisionError)
     finally:
         flask.appcontext_tearing_down.disconnect(record_teardown, app)
+

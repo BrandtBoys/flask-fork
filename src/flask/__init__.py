@@ -58,3 +58,4 @@ def __getattr__(name: str) -> t.Any:
         return importlib.metadata.version("flask")
 
     raise AttributeError(name)
+
